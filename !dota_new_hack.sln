@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32104.313
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "!dota_new_hack", "!dota_new_hack\!dota_new_hack.vcxproj", "{3A8FE626-ECF8-4FA6-8BB2-D224A948963A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "!dota_injector", "!dota_injector\!dota_injector.vcxproj", "{6DE317F8-703C-4AE1-9164-713598AAF5CC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3A8FE626-ECF8-4FA6-8BB2-D224A948963A}.Debug|x64.ActiveCfg = Debug|x64
+		{3A8FE626-ECF8-4FA6-8BB2-D224A948963A}.Debug|x64.Build.0 = Debug|x64
+		{3A8FE626-ECF8-4FA6-8BB2-D224A948963A}.Release|x64.ActiveCfg = Release|x64
+		{3A8FE626-ECF8-4FA6-8BB2-D224A948963A}.Release|x64.Build.0 = Release|x64
+		{6DE317F8-703C-4AE1-9164-713598AAF5CC}.Debug|x64.ActiveCfg = Debug|x64
+		{6DE317F8-703C-4AE1-9164-713598AAF5CC}.Debug|x64.Build.0 = Debug|x64
+		{6DE317F8-703C-4AE1-9164-713598AAF5CC}.Release|x64.ActiveCfg = Release|x64
+		{6DE317F8-703C-4AE1-9164-713598AAF5CC}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ADF47115-EFE4-44FE-B57D-1BDB692278A1}
+	EndGlobalSection
+EndGlobal

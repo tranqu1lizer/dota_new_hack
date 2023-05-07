@@ -1,0 +1,718 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="core">
+      <UniqueIdentifier>{82e380d3-a805-4944-b2e5-7b8e63955f72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\lib">
+      <UniqueIdentifier>{1450c561-e30f-4afd-bf6e-e6fbdceb2a93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\sdk_game">
+      <UniqueIdentifier>{f27fa270-ca99-46a7-824b-70e62d18d4a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\lib\protobuf">
+      <UniqueIdentifier>{d2e70861-4307-4503-8c5a-7feda321e75d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\lib\minhook">
+      <UniqueIdentifier>{5948e637-ceb8-4223-b138-7749b377cd7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\lib\protobuf\files">
+      <UniqueIdentifier>{fa51e2b1-48a0-438a-845f-317fd18a06a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gui">
+      <UniqueIdentifier>{ceddbce2-ab27-4711-823f-6a5882a6c720}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\lib\imgui">
+      <UniqueIdentifier>{45bf04bf-3ae6-45d9-8f58-2f70e75cca55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\hook">
+      <UniqueIdentifier>{5427da82-5728-488d-b400-bf521d74c139}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\functions">
+      <UniqueIdentifier>{01c9482f-4be5-4284-bebe-48aad76e5189}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\util">
+      <UniqueIdentifier>{6ae9609c-de2b-418f-891f-7c6e046d3e7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\lua">
+      <UniqueIdentifier>{7c627c78-1efc-4894-a289-ce50e35313b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\sdk_game\valve">
+      <UniqueIdentifier>{7d89d06c-1e76-41aa-bb16-f341df6cfc15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\sdk_game\panorama">
+      <UniqueIdentifier>{b455f5c3-596c-4d28-9173-5347377f038c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="core\sdk_game\IAppSystem.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\C_BaseEntity.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="main.hpp" />
+    <ClInclude Include="core\sdk_game\IEngineClient.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\color.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\ISchemaSystem.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\CGameEventManager.h">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\CGameRules.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\gui.hpp">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\INetChan.h">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\CHandle.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\EntityIndex.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\NormalClass.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\hook\hook.hpp">
+      <Filter>core\hook</Filter>
+    </ClInclude>
+    <ClInclude Include="core\functions\functions.hpp">
+      <Filter>core\functions</Filter>
+    </ClInclude>
+    <ClInclude Include="core\util\util.hpp">
+      <Filter>core\util</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\C_DOTAPlayerController.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\CEntityIdentity.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\IGameUIService.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\CDOTA_ParticleManager.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\ISteamClient.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\CEconItem.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\CEntityInstance.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\CDOTA_RichPresence.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\Data.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\ICVar.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\IResourceSystem.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\CDOTA_Camera.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lua\events.hpp">
+      <Filter>core\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lua\scripts.hpp">
+      <Filter>core\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="core\global.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\DataTeamPlayer_t.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\C_CollisionProperty.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\CDOTA_ModifierManager.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\minhook\MinHook.h">
+      <Filter>core\lib\minhook</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\CDOTA_BaseAbility.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\C_BaseCombatCharacter.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\CDOTA_BaseNPC.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\singleton.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\vector.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\CDOTA_InventoryManager.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\CGCClient.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\valve\CUtlVector.hpp">
+      <Filter>core\sdk_game\valve</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\valve\CUtlMemory.hpp">
+      <Filter>core\sdk_game\valve</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\valve\CUtlString.hpp">
+      <Filter>core\sdk_game\valve</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\imgui\imconfig.h">
+      <Filter>core\lib\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\imgui\imgui.h">
+      <Filter>core\lib\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\imgui\imgui_impl_dx11.h">
+      <Filter>core\lib\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\imgui\imgui_impl_win32.h">
+      <Filter>core\lib\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\imgui\imgui_internal.h">
+      <Filter>core\lib\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\imgui\imgui_stdlib.h">
+      <Filter>core\lib\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\imgui\imstb_rectpack.h">
+      <Filter>core\lib\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\imgui\imstb_textedit.h">
+      <Filter>core\lib\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\imgui\imstb_truetype.h">
+      <Filter>core\lib\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\imgui\stb_image.h">
+      <Filter>core\lib\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\base_gcmessages.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\c_peer2peer_netmessages.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\clientmessages.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\connectionless_netmessages.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\demo.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_broadcastmessages.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_client_enums.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_clientmessages.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_commonmessages.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_client.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_client_battle_report.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_client_candy_shop.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_client_chat.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_client_coaching.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_client_fantasy.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_client_guild.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_client_guild_events.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_client_match_management.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_client_team.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_client_tournament.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_client_watch.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_common.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_common_bot_script.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_common_league.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_common_lobby.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_common_match_management.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_msgid.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_server.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_gcmessages_webapi.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_hud_types.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_match_metadata.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_messages_mlbot.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_modifiers.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_scenariomessages.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_shared_enums.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_usercmd.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\dota_usermessages.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\econ_gcmessages.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\econ_shared_enums.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\engine_gcmessages.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\enums_clientserver.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\gameevents.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\gametoolevents.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\gcsdk_gcmessages.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\gcsystemmsgs.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\netmessages.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\network_connection.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\networkbasetypes.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\networksystem_protomessages.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\steamdatagram_messages_auth.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\steamdatagram_messages_sdr.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\steammessages.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\steammessages_cloud.steamworkssdk.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\steammessages_gamenetworkingui.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\steammessages_helprequest.steamworkssdk.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\steammessages_int.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\steammessages_oauth.steamworkssdk.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\steammessages_player.steamworkssdk.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\steammessages_publishedfile.steamworkssdk.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\steammessages_steamlearn.steamworkssdk.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\steammessages_unified_base.steamworkssdk.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\steamnetworkingsockets_messages.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\steamnetworkingsockets_messages_certs.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\steamnetworkingsockets_messages_udp.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\te.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\uifontfile_format.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\usercmd.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\usermessages.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\lib\protobuf\files\valveextensions.pb.h">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\valve\CUtlMap.hpp">
+      <Filter>core\sdk_game\valve</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\valve\CUtlDelegate.hpp">
+      <Filter>core\sdk_game\valve</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\valve\CUtlRBTree.hpp">
+      <Filter>core\sdk_game\valve</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\valve\CUtlSymbol.hpp">
+      <Filter>core\sdk_game\valve</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\panorama\UIEngine.hpp">
+      <Filter>core\sdk_game\panorama</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\panorama\CPanel2D.hpp">
+      <Filter>core\sdk_game\panorama</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\panorama\CUIPanel.hpp">
+      <Filter>core\sdk_game\panorama</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\valve\CBaseFileSystem.hpp">
+      <Filter>core\sdk_game\valve</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\valve\CUtlTSHash.hpp">
+      <Filter>core\sdk_game\valve</Filter>
+    </ClInclude>
+    <ClInclude Include="core\util\city.hpp" />
+    <ClInclude Include="core\util\cityhash32.hxx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="gui\gui.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="core\hook\hook.cpp">
+      <Filter>core\hook</Filter>
+    </ClCompile>
+    <ClCompile Include="core\functions\functions.cpp">
+      <Filter>core\functions</Filter>
+    </ClCompile>
+    <ClCompile Include="core\util\util.cpp">
+      <Filter>core\util</Filter>
+    </ClCompile>
+    <ClCompile Include="core\sdk_game\CEconItem.cpp">
+      <Filter>core\sdk_game</Filter>
+    </ClCompile>
+    <ClCompile Include="core\sdk_game\CDOTA_ParticleManager.cpp">
+      <Filter>core\sdk_game</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lua\events.cpp">
+      <Filter>core\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lua\scripts.cpp">
+      <Filter>core\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\imgui\imgui.cpp">
+      <Filter>core\lib\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\imgui\imgui_demo.cpp">
+      <Filter>core\lib\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\imgui\imgui_draw.cpp">
+      <Filter>core\lib\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\imgui\imgui_impl_dx11.cpp">
+      <Filter>core\lib\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\imgui\imgui_impl_win32.cpp">
+      <Filter>core\lib\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\imgui\imgui_stdlib.cpp">
+      <Filter>core\lib\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\imgui\imgui_tables.cpp">
+      <Filter>core\lib\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\imgui\imgui_widgets.cpp">
+      <Filter>core\lib\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\base_gcmessages.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\c_peer2peer_netmessages.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\clientmessages.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\connectionless_netmessages.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\demo.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_broadcastmessages.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_client_enums.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_clientmessages.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_commonmessages.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_client.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_client_battle_report.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_client_candy_shop.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_client_chat.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_client_coaching.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_client_fantasy.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_client_guild.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_client_guild_events.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_client_match_management.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_client_team.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_client_tournament.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_client_watch.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_common.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_common_bot_script.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_common_league.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_common_lobby.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_common_match_management.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_msgid.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_server.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_gcmessages_webapi.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_hud_types.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_match_metadata.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_messages_mlbot.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_modifiers.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_scenariomessages.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_shared_enums.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_usercmd.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\dota_usermessages.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\econ_gcmessages.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\econ_shared_enums.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\engine_gcmessages.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\enums_clientserver.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\gameevents.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\gametoolevents.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\gcsdk_gcmessages.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\gcsystemmsgs.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\netmessages.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\network_connection.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\networkbasetypes.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\networksystem_protomessages.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\steamdatagram_messages_auth.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\steamdatagram_messages_sdr.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\steammessages.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\steammessages_cloud.steamworkssdk.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\steammessages_gamenetworkingui.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\steammessages_helprequest.steamworkssdk.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\steammessages_int.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\steammessages_oauth.steamworkssdk.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\steammessages_player.steamworkssdk.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\steammessages_publishedfile.steamworkssdk.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\steammessages_steamlearn.steamworkssdk.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\steammessages_unified_base.steamworkssdk.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\steamnetworkingsockets_messages.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\steamnetworkingsockets_messages_certs.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\steamnetworkingsockets_messages_udp.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\te.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\uifontfile_format.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\usercmd.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\usermessages.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\lib\protobuf\files\valveextensions.pb.cc">
+      <Filter>core\lib\protobuf\files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\sdk_game\panorama\CPanelStyle.hpp" />
+    <ClCompile Include="core\util\city.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="core\sdk_game\CGameEntitySystem.hpp">
+      <Filter>core\sdk_game</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="core\lib\minhook\libMinHook.x64.lib">
+      <Filter>core\lib\minhook</Filter>
+    </Library>
+  </ItemGroup>
+</Project>
