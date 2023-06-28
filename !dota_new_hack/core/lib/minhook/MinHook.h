@@ -121,6 +121,8 @@ extern "C" {
     //   ppOriginal  [out] A pointer to the trampoline function, which will be
     //                     used to call the original target function.
     //                     This parameter can be NULL.
+    MH_STATUS WINAPI MH_CreateHookApi(
+        LPCWSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal);
 
     // Creates a hook for the specified API function, in disabled state.
     // Parameters:
@@ -136,6 +138,9 @@ extern "C" {
     //   ppTarget    [out] A pointer to the target function, which will be used
     //                     with other functions.
     //                     This parameter can be NULL.
+    MH_STATUS WINAPI MH_CreateHookApiEx(
+        LPCWSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal, LPVOID *ppTarget);
+
     // Removes an already created hook.
     // Parameters:
     //   pTarget [in] A pointer to the target function.
@@ -154,6 +159,23 @@ extern "C" {
     //                If this parameter is MH_ALL_HOOKS, all created hooks are
     //                disabled in one go.
     MH_STATUS WINAPI MH_DisableHook(LPVOID pTarget);
+
+    // Queues to enable an already created hook.
+    // Parameters:
+    //   pTarget [in] A pointer to the target function.
+    //                If this parameter is MH_ALL_HOOKS, all created hooks are
+    //                queued to be enabled.
+    MH_STATUS WINAPI MH_QueueEnableHook(LPVOID pTarget);
+
+    // Queues to disable an already created hook.
+    // Parameters:
+    //   pTarget [in] A pointer to the target function.
+    //                If this parameter is MH_ALL_HOOKS, all created hooks are
+    //                queued to be disabled.
+    MH_STATUS WINAPI MH_QueueDisableHook(LPVOID pTarget);
+
+    // Applies all queued changes in one go.
+    MH_STATUS WINAPI MH_ApplyQueued(VOID);
 
 #ifdef __cplusplus
 }

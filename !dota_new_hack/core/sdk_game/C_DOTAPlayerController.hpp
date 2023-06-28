@@ -5,9 +5,9 @@
 class C_DOTAPlayerController : VClass {
 public:
 
-	CHandle GetAssignedHero( ) {
-		if ( !util::does_exists( this ) ) return CHandle{};
-		static const auto offset = schema::dynamic_field( "client.dll/C_DOTAPlayerController/m_hAssignedHero" );
+	CHandle assigned_hero( ) {
+		if ( !util::exists( this ) ) return CHandle{};
+		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTAPlayerController/m_hAssignedHero" );
 		return Member<CHandle>( offset );
 	}
 };

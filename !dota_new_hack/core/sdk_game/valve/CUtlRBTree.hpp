@@ -23,6 +23,16 @@ struct UtlRBTreeNode_t : public UtlRBTreeLinks_t< I >
 
 class Node_t;
 
+template <typename T>
+class CDefLess
+{
+public:
+	CDefLess( ) {}
+	CDefLess( int i ) {}
+	inline bool operator()( const T& lhs, const T& rhs ) const { return ( lhs < rhs ); }
+	inline bool operator!( ) const { return false; }
+};
+
 template < class T, class I = unsigned short, typename L = bool (*)(const T&, const T&), class M = CUtlMemory< UtlRBTreeNode_t< T, I >, I > >
 class CUtlRBTree
 {
@@ -80,7 +90,7 @@ public:
 	}
 
 	// Checks if the tree as a whole is valid
-	bool  IsValid() const
+	bool  is_valid() const
 	{
 		if (!Count())
 			return true;

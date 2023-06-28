@@ -10,13 +10,13 @@ void CEconItem::EnsureCustomDataExists( )
 
 		if ( m_dirtyBits.m_bHasEquipSingleton )
 		{
-			m_pCustomData->m_vecEquipped.AddToTail( m_EquipInstanceSingleton );
+			m_pCustomData->m_vecEquipped.add_to_tail( m_EquipInstanceSingleton );
 			m_EquipInstanceSingleton = EquippedInstance_t( );
 			m_dirtyBits.m_bHasEquipSingleton = false;
 		}
 		if ( m_dirtyBits.m_bHasAttribSingleton )
 		{
-			m_pCustomData->m_vecAttributes.AddToTail( m_CustomAttribSingleton );
+			m_pCustomData->m_vecAttributes.add_to_tail( m_CustomAttribSingleton );
 			m_dirtyBits.m_bHasAttribSingleton = false;
 		}
 	}
@@ -49,12 +49,11 @@ void CEconItem::UnequipFromClass( equipped_class_t unClass ) noexcept
 
 void CEconItem::Equip( equipped_class_t unClass, equipped_slot_t unSlot )
 {
-
     UnequipFromClass( unClass );
 
     if ( m_pCustomData )
     {
-        m_pCustomData->m_vecEquipped.AddToTail( { unClass, unSlot } );
+        m_pCustomData->m_vecEquipped.add_to_tail( { unClass, unSlot } );
     }
     else if ( !m_dirtyBits.m_bHasEquipSingleton )
     {
@@ -64,6 +63,6 @@ void CEconItem::Equip( equipped_class_t unClass, equipped_slot_t unSlot )
     else
     {
         EnsureCustomDataExists( );
-        m_pCustomData->m_vecEquipped.AddToTail( { unClass, unSlot } );
+        m_pCustomData->m_vecEquipped.add_to_tail( { unClass, unSlot } );
     }
 }

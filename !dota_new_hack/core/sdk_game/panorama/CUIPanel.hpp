@@ -13,8 +13,8 @@ class CUIPanel : public VClass
 	}
 
 public:
-	template<class T>
-	GETTER( T, panel2d_as, 0x8 );
+	template<class T = CPanel2D>
+	GETTER( T*, panel2d_as, 0x8 );
 	GETTER( CUIPanel*, parent, 0x18 );
 	GETTER( CUtlVector<CUIPanel*>, children, 0x28 );
 	GETTER( CUtlVector<CPanoramaSymbol>, classes, 0x160 );
@@ -23,10 +23,22 @@ public:
 		return reinterpret_cast<CPanelStyle*>( reinterpret_cast<std::uintptr_t>( this ) + 0x70 );
 	}
 
-	void delete_async( ) { 
-		if ( !global::patterns::CPanel2D__DeleteAsync ) return;
-		typedef std::uintptr_t( __fastcall* fn_t )( void* panel2d, bool remove_immediately );
-		reinterpret_cast<fn_t>( global::patterns::CPanel2D__DeleteAsync )( panel2d_as<void*>( ), true );
+	bool loaded( ) {
+		return CallVFunc<22, bool>( );
+	}
+
+	bool set_parent( CUIPanel* p ) {
+		return CallVFunc<28>( p );
+	}
+
+	void set_draggable( bool state = false ) {
+		CallVFunc<198>( state );
+	}
+
+	bool delete_async( const float delay = 0.f ) {
+		if ( !global::patterns::CPanel2D__DeleteAsync ) return false;
+		typedef bool( __fastcall* fn_t )( void*, float );
+		return reinterpret_cast<fn_t>( global::patterns::CPanel2D__DeleteAsync )( panel2d_as<void>( ), delay );
 	}
 
 	void set_property( std::uint16_t symbol, const std::string_view& value ) {
@@ -41,12 +53,12 @@ public:
 	}
 
 	void set_property( const std::string_view& symbol, const std::string_view& value ) {
-		this->set_property( CPanoramaUIEngine::GetInstance( ).m_pUIEngineSource2->MakeSymbol( symbol.data( ) ), value );
+		this->set_property( CPanoramaUIEngine::GetInstance( )->engine_source2( )->make_symbol( symbol.data( ) ), value );
 	}
 
 	void set_style( const std::string_view& style ) {
-		static constexpr auto sym_st = "style";
-		this->set_property( sym_st, style );
+		static constexpr auto style_symbol = "style";
+		this->set_property( style_symbol, style );
 	}
 
 	const char* attribute_string( CPanoramaSymbol style_symbol, const char* ret_if_null = nullptr ) {
@@ -67,12 +79,9 @@ public:
 		return name ? name : "undefined";
 	}
 
-	CUIPanel* child_rebuild( int a2 ) {
-		const auto v2 = Member<std::uintptr_t>( 0x30 );
-		if ( v2 && a2 >= 0 && a2 < *reinterpret_cast<std::uintptr_t*>( v2 ) )
-			return *reinterpret_cast<CUIPanel**>( v2 + 8 * a2 );
-		else
-			return 0;
+	inline std::uintptr_t find_child_in_layout_file( const char* child )
+	{
+		return CallVFunc<48, bool>( child );
 	}
 
 	std::uintptr_t add_child( CUIPanel* c ) {
@@ -83,18 +92,18 @@ public:
 		return CallVFunc<260>( c );
 	}
 
-	inline std::uintptr_t load_layout( const char* str, bool opt )
+	inline std::uintptr_t load_layout_file( const char* str, bool bOverrideExisting = false )
 	{
-		return CallVFunc<14, bool>( str, opt );
+		return CallVFunc<14, bool>( str, bOverrideExisting );
 	}
 
-	inline std::uintptr_t load_layout_error_handle( const char* str, bool opt )
+	inline std::uintptr_t load_layout_file_error_handle( const char* str, bool bOverrideExisting = false )
 	{
-		return CallVFunc<15, bool>( str, opt );
+		return CallVFunc<15, bool>( str, bOverrideExisting );
 	}
 
 	bool reload_layout( ) {
-		return CallVFunc<268, bool>(  );
+		return CallVFunc<268, bool>( );
 	}
 
 	inline void remove_and_delete_children( )
@@ -111,7 +120,7 @@ public:
 	}
 
 	void add_class( const char* class_ ) {
-		const auto symbol = CPanoramaUIEngine::GetInstance( ).m_pUIEngineSource2->MakeSymbol( class_ );
+		const auto symbol = CPanoramaUIEngine::GetInstance( )->engine_source2( )->make_symbol( class_ );
 		CallVFunc<135>( symbol );
 	}
 
@@ -124,6 +133,19 @@ public:
 		std::vector<CUIPanel*> result;
 		_FindChildrenWithIdTraverse( id, result );
 		return result;
+	}
+
+	[[nodiscard]] CUIPanel* find_child_traverse( const std::string_view& id ) {
+		try {
+			std::vector<CUIPanel*> result;
+			_FindChildrenWithIdTraverse( id, result );
+
+			return result.size( ) > 0 ? result.front( ) : nullptr;
+		}
+		catch ( std::exception& ex ) {
+			std::cout << ex.what( ) << std::endl;
+			return nullptr;
+		}
 	}
 
 	CUIPanel* FindChild( const std::string_view& id ) {

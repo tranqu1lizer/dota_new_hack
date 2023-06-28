@@ -34,9 +34,6 @@
     <Filter Include="core\util">
       <UniqueIdentifier>{6ae9609c-de2b-418f-891f-7c6e046d3e7a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="core\lua">
-      <UniqueIdentifier>{7c627c78-1efc-4894-a289-ce50e35313b3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="core\sdk_game\valve">
       <UniqueIdentifier>{7d89d06c-1e76-41aa-bb16-f341df6cfc15}</UniqueIdentifier>
     </Filter>
@@ -64,7 +61,7 @@
     <ClInclude Include="core\sdk_game\CGameEventManager.h">
       <Filter>core\sdk_game</Filter>
     </ClInclude>
-    <ClInclude Include="core\sdk_game\CGameRules.hpp">
+    <ClInclude Include="core\sdk_game\C_DOTAGamerules.hpp">
       <Filter>core\sdk_game</Filter>
     </ClInclude>
     <ClInclude Include="gui\gui.hpp">
@@ -85,7 +82,7 @@
     <ClInclude Include="core\hook\hook.hpp">
       <Filter>core\hook</Filter>
     </ClInclude>
-    <ClInclude Include="core\functions\functions.hpp">
+    <ClInclude Include="core\functions.hpp">
       <Filter>core\functions</Filter>
     </ClInclude>
     <ClInclude Include="core\util\util.hpp">
@@ -97,9 +94,6 @@
     <ClInclude Include="core\sdk_game\CEntityIdentity.hpp">
       <Filter>core\sdk_game</Filter>
     </ClInclude>
-    <ClInclude Include="core\sdk_game\IGameUIService.hpp">
-      <Filter>core\sdk_game</Filter>
-    </ClInclude>
     <ClInclude Include="core\sdk_game\CDOTA_ParticleManager.hpp">
       <Filter>core\sdk_game</Filter>
     </ClInclude>
@@ -107,12 +101,6 @@
       <Filter>core\sdk_game</Filter>
     </ClInclude>
     <ClInclude Include="core\sdk_game\CEconItem.hpp">
-      <Filter>core\sdk_game</Filter>
-    </ClInclude>
-    <ClInclude Include="core\sdk_game\CEntityInstance.hpp">
-      <Filter>core\sdk_game</Filter>
-    </ClInclude>
-    <ClInclude Include="core\sdk_game\CDOTA_RichPresence.hpp">
       <Filter>core\sdk_game</Filter>
     </ClInclude>
     <ClInclude Include="core\sdk_game\Data.hpp">
@@ -127,19 +115,10 @@
     <ClInclude Include="core\sdk_game\CDOTA_Camera.hpp">
       <Filter>core\sdk_game</Filter>
     </ClInclude>
-    <ClInclude Include="core\lua\events.hpp">
-      <Filter>core\lua</Filter>
-    </ClInclude>
-    <ClInclude Include="core\lua\scripts.hpp">
-      <Filter>core\lua</Filter>
-    </ClInclude>
     <ClInclude Include="core\global.hpp">
       <Filter>core</Filter>
     </ClInclude>
-    <ClInclude Include="core\sdk_game\DataTeamPlayer_t.hpp">
-      <Filter>core\sdk_game</Filter>
-    </ClInclude>
-    <ClInclude Include="core\sdk_game\C_CollisionProperty.hpp">
+    <ClInclude Include="core\sdk_game\C_Properties.hpp">
       <Filter>core\sdk_game</Filter>
     </ClInclude>
     <ClInclude Include="core\sdk_game\CDOTA_ModifierManager.hpp">
@@ -148,16 +127,10 @@
     <ClInclude Include="core\lib\minhook\MinHook.h">
       <Filter>core\lib\minhook</Filter>
     </ClInclude>
-    <ClInclude Include="core\sdk_game\CDOTA_BaseAbility.hpp">
-      <Filter>core\sdk_game</Filter>
-    </ClInclude>
     <ClInclude Include="core\sdk_game\C_BaseCombatCharacter.hpp">
       <Filter>core\sdk_game</Filter>
     </ClInclude>
     <ClInclude Include="core\sdk_game\CDOTA_BaseNPC.hpp">
-      <Filter>core\sdk_game</Filter>
-    </ClInclude>
-    <ClInclude Include="core\sdk_game\singleton.hpp">
       <Filter>core\sdk_game</Filter>
     </ClInclude>
     <ClInclude Include="core\sdk_game\vector.hpp">
@@ -427,7 +400,7 @@
     <ClInclude Include="core\sdk_game\valve\CUtlSymbol.hpp">
       <Filter>core\sdk_game\valve</Filter>
     </ClInclude>
-    <ClInclude Include="core\sdk_game\panorama\UIEngine.hpp">
+    <ClInclude Include="core\sdk_game\panorama\CPanoramaUIEngine.hpp">
       <Filter>core\sdk_game\panorama</Filter>
     </ClInclude>
     <ClInclude Include="core\sdk_game\panorama\CPanel2D.hpp">
@@ -444,6 +417,46 @@
     </ClInclude>
     <ClInclude Include="core\util\city.hpp" />
     <ClInclude Include="core\util\cityhash32.hxx" />
+    <ClInclude Include="core\util\undocumented.hpp">
+      <Filter>core\util</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\CSource2Client.hpp" />
+    <ClInclude Include="gui\panorama_gui.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\valve\bitstream.hpp">
+      <Filter>core\sdk_game\valve</Filter>
+    </ClInclude>
+    <ClInclude Include="core\util\address_wrapper.hxx">
+      <Filter>core\util</Filter>
+    </ClInclude>
+    <ClInclude Include="core\features\inventory_changer.h" />
+    <ClInclude Include="core\sdk_game\CDOTAItemDefintion.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\CNetworkMessages.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\C_DOTA_ProjectileManager.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\panorama\CUIRenderDeviceSource2.hpp">
+      <Filter>core\sdk_game\panorama</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\CRenderGameSystem.hh">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\valve\VMatrix.hpp">
+      <Filter>core\sdk_game\valve</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk_game\SomeFunction.h">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\features\hero_bar.h" />
+    <ClInclude Include="core\util\drawing.h" />
+    <ClInclude Include="core\sdk_game\C_DOTA_PlayerResource.h" />
+    <ClInclude Include="core\sdk_game\ISteamFriends.h" />
+    <ClInclude Include="core\sdk_game\panorama\CLayoutManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -453,9 +466,6 @@
     <ClCompile Include="core\hook\hook.cpp">
       <Filter>core\hook</Filter>
     </ClCompile>
-    <ClCompile Include="core\functions\functions.cpp">
-      <Filter>core\functions</Filter>
-    </ClCompile>
     <ClCompile Include="core\util\util.cpp">
       <Filter>core\util</Filter>
     </ClCompile>
@@ -464,12 +474,6 @@
     </ClCompile>
     <ClCompile Include="core\sdk_game\CDOTA_ParticleManager.cpp">
       <Filter>core\sdk_game</Filter>
-    </ClCompile>
-    <ClCompile Include="core\lua\events.cpp">
-      <Filter>core\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="core\lua\scripts.cpp">
-      <Filter>core\lua</Filter>
     </ClCompile>
     <ClCompile Include="core\lib\imgui\imgui.cpp">
       <Filter>core\lib\imgui</Filter>
@@ -704,6 +708,15 @@
     </ClCompile>
     <ClCompile Include="core\sdk_game\panorama\CPanelStyle.hpp" />
     <ClCompile Include="core\util\city.cpp" />
+    <ClCompile Include="core\util\mapbox.hxx" />
+    <ClCompile Include="core\sdk_game\panorama\CUIInput.hpp" />
+    <ClCompile Include="gui\panorama_gui.cc" />
+    <ClCompile Include="core\sdk_game\panorama\CUILength.hpp" />
+    <ClCompile Include="core\features\inventory_changer.cc" />
+    <ClCompile Include="core\features\hero_bar.cc" />
+    <ClCompile Include="core\util\drawing.cc">
+      <Filter>core\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="core\sdk_game\CGameEntitySystem.hpp">

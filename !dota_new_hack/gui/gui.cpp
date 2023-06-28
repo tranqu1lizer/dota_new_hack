@@ -13,7 +13,7 @@
 
 ID3D11DeviceContext* CGui::pContext = NULL;
 ID3D11RenderTargetView* CGui::pRenderTargetView = NULL;
-bool CGui::show = true;
+bool CGui::show = false;
 extern CheatData cheat_data;
 
 #define MAX(a, b)    (((a) < (b)) ? (b) : (a))
@@ -158,7 +158,7 @@ bool CGui::init( IDXGISwapChain* pSwapchain ) {
 		pDevice->CreateRenderTargetView( pBackBuffer, &desc, &this->pRenderTargetView );
 		pBackBuffer->Release( );
 
-		hook::original::fpWndProc = reinterpret_cast<hook::prototype::WndProc_t>( SetWindowLongPtrA( this->hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>( &hook::functions::WndProc ) ) );
+		hook::original::fpWndProc = reinterpret_cast<decltype( hook::original::fpWndProc )>( SetWindowLongPtrA( this->hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>( &hook::functions::WndProc ) ) );
 		ImGui::CreateContext( );
 
 		// this->ApplyStyle( );
@@ -172,6 +172,17 @@ bool CGui::init( IDXGISwapChain* pSwapchain ) {
 		this->menu_font = io.Fonts->AddFontFromFileTTF( "C:\\Windows\\Fonts\\tahomabd.ttf", 23.0f, 0, io.Fonts->GetGlyphRangesCyrillic( ) );
 		this->hp_mana_font = io.Fonts->AddFontDefault( );
 
+		// d2c paste
+		auto defaultFont = ImGui::GetIO( ).Fonts->AddFontDefault( );
+		{
+			ImFontConfig fontCfg{};
+			fontCfg.FontDataOwnedByAtlas = false;
+			for ( int i = 2; i < 30; i += 2 ) {
+				DrawData.Fonts["MSTrebuchet"][i] = ImGui::GetIO( ).Fonts->AddFontFromFileTTF( R"(C:\Windows\Fonts\trebuc.ttf)", i, nullptr, ImGui::GetIO( ).Fonts->GetGlyphRangesDefault( ) );
+				DrawData.Fonts["Monofonto"][i] = ImGui::GetIO( ).Fonts->AddFontFromMemoryTTF( (void*)Fonts::Monofonto, IM_ARRAYSIZE( Fonts::Monofonto ), i, &fontCfg, ImGui::GetIO( ).Fonts->GetGlyphRangesDefault( ) );
+			}
+		}
+		
 		ImGui_ImplWin32_Init( this->hWnd );
 		ImGui_ImplDX11_Init( this->pDevice, this->pContext );
 		return true;
@@ -180,146 +191,75 @@ bool CGui::init( IDXGISwapChain* pSwapchain ) {
 }
 
 void CGui::Render( ) {
-	if ( !global::inited ) {
-		this->pDrawList = ImGui::GetBackgroundDrawList( );
-		const auto center = vector2d{cheat_data.dotahud_actuallayoutwidth, cheat_data.dotahud_actuallayoutheight } / 2.f;
-		static ImColor fore_color( 200, 20, 20, 255 );
-		static ImColor back_color( 200, 20, 20, 40 );
-		static constexpr auto arc_size = 0.45f;
-		static constexpr auto radius = 40.f;
-		static constexpr auto thickness = 4.5f;
-
-		static float position = 0.f;
-		position = ImLerp( position, IM_PI * 2.f, ImGui::GetIO( ).DeltaTime * 2.3f );
-
-		this->pDrawList->PathClear( );
-		this->pDrawList->PathArcTo( ImVec2{ center.x, center.y }, radius, 0.f, 2.f * IM_PI, 40 );
-		this->pDrawList->PathStroke( ImGui::GetColorU32( back_color.Value ), 0, thickness );
-
-		this->pDrawList->PathClear( );
-		this->pDrawList->PathArcTo( ImVec2{ center.x, center.y }, radius, IM_PI * 1.5f + position, IM_PI * ( 1.5f + arc_size ) + position, 40 );
-		this->pDrawList->PathStroke( ImGui::GetColorU32( fore_color.Value ), 0, thickness );
-
-		this->pDrawList->AddText( ImVec2( center.x - 88, center.y + 55 ), 0xFFFFFFFF, "Loading resources..." );
-
-		if ( position >= IM_PI * 1.60f )
-			position = 0.f;
-		return;
-	}
 	if ( !show ) return;
 
-	ImGui::Begin( "dota 2 super mega hacksx", &show, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_AlwaysAutoResize ); {
-		if ( global::inited ) {
+	ImGui::Begin( "dota 2 super mega hacksx", &show, ImGuiWindowFlags_NoCollapse ); {
+		static char schema_buf[256];
+		ImGui::InputText( "##schemab", schema_buf, IM_ARRAYSIZE( schema_buf ) );
+		if ( ImGui::Button( "List class" ) ) {
+			schema::dump_class_offsets( schema_buf );
+		}
 
-			if ( ImGui::CollapsingHeader( "Panorama" ) ) {
-				static char buf2[128];
-				static char buf3[128];
-				static char buf4[128];
+		if ( ImGui::CollapsingHeader( "Panorama" ) ) {
+			static char buf2[128];
+			static char buf3[128];
+			static char buf4[128];
 
-				ImGui::InputText( "##text2", buf2, IM_ARRAYSIZE( buf2 ) );
-				if ( ImGui::Button( "Convert to string" ) ) {
-					using GetStringTable_t = const char* ( __fastcall* )( std::uint16_t* a1 ); const auto callstring_table = reinterpret_cast<GetStringTable_t>( util::get_absolute_address( util::find_pattern( "panorama.dll", "E8 ? ? ? ? 48 8B D8 EB 10", "GetStringTable" ), 1, 5 ) );
-					auto symbol = static_cast<uint16_t>( std::stoi( buf2 ) );
-					ImGui::Text( callstring_table( &symbol ) );
-				}
-				ImGui::InputText( "##text3", buf3, IM_ARRAYSIZE( buf3 ) );
-				if ( ImGui::Button( "Convert to symbol" ) ) {
-					auto res = CPanoramaUIEngine::GetInstance( ).m_pUIEngineSource2->MakeSymbol( buf3 );
-					ImGui::SameLine( );
-					ImGui::Text( std::format( "{}", res ).c_str( ) );
-				}
-				ImGui::Separator( );
-				ImGui::InputText( "##textmmr", buf4, IM_ARRAYSIZE( buf4 ) ); ImGui::SameLine( );
-				if ( ImGui::Button( "Set MMR value" ) ) {
-					auto& UIEngine = CPanoramaUIEngine::GetInstance( );
-					auto childs = UIEngine.find_panel( "DotaDashboard" )->find_children_traverse( "MMRNumber" );
-					if ( childs.size( ) ) {
-						CLabel* MMRLabel = childs.front( )->panel2d_as<CLabel*>( );
-						MMRLabel->set_label_text( buf4 );
-					}
-				}
+			ImGui::InputText( "##text2", buf2, IM_ARRAYSIZE( buf2 ) );
+			if ( ImGui::Button( "Convert to string" ) ) {
+				using GetStringTable_t = const char* ( __fastcall* )( std::uint16_t* a1 ); const auto callstring_table = reinterpret_cast<GetStringTable_t>( util::get_absolute_address( util::find_pattern( "panorama.dll", "E8 ? ? ? ? 48 8B D8 EB 10", "GetStringTable" ), 1, 5 ) );
+				auto symbol = static_cast<uint16_t>( std::stoi( buf2 ) );
+				ImGui::Text( callstring_table( &symbol ) );
 			}
-
-			if ( ImGui::CollapsingHeader( "Rich Presence" ) ) {
-				ImGui::InputText( "Presence text: ", &this->presence_text );
-				if ( ImGui::Button( "Apply text" ) ) {
-
-					CDOTARichPresence::SetRichPresence( this->presence_text.c_str( ) );
-				}
+			ImGui::InputText( "##text3", buf3, IM_ARRAYSIZE( buf3 ) );
+			if ( ImGui::Button( "Convert to symbol" ) ) {
+				auto res = CPanoramaUIEngine::GetInstance( )->engine_source2( )->make_symbol( buf3 );
+				ImGui::SameLine( );
+				ImGui::Text( std::format( "{}", res ).c_str( ) );
 			}
-
-			if ( ImGui::CollapsingHeader( "Maphack" ) ) {
-				ImGui::Checkbox( "Particle MapHack", &this->partial_maphack );
-			}
-
-			if ( ImGui::CollapsingHeader( "AutoAccept" ) ) {
-				ImGui::Checkbox( "Enabled##auto_accept", &this->auto_accept );
-				if ( this->auto_accept ) {
-					ImGui::Checkbox( "Accept last moment", &this->accept_in_last_moment );
-					if ( !this->accept_in_last_moment )
-						ImGui::SliderInt( "Accept delay (sec)", &this->auto_accept_delay, 0, 15, "%d", ImGuiSliderFlags_NoInput );
-				}
-			}
-
-			if ( ImGui::CollapsingHeader( "World rendering" ) ) {
-				constexpr const char* weather_list[] = { "Default", "Snow", "Rain", "Moonbeam", "Pestilence", "Ash", "Sirocco", "Snow #2", "Spring" };
-				constexpr const char* river_list[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" /* "Blood", "Chrome", "Dry", "Electric", "Oil", "Potion", "Slime"*/ };
-
-				ImGui::Checkbox( "Mouse distance change", &this->mouse_distance );
-				ImGui::Checkbox( "Disable fog", &this->fog );
-				if ( this->mouse_distance )
-					ImGui::SliderInt( "Camera step", &this->camera_step, 10, 300 );
-
-				if ( ImGui::Combo( "Weather", &this->current_weather, weather_list, IM_ARRAYSIZE( weather_list ) ) ) {
-					int idx;
-					ICVar::GetInstance( ).FindConVar( "cl_weather", idx )->value.i32 = this->current_weather;
-				}
-
-				if ( ImGui::Combo( "River type", &this->current_river, river_list, IM_ARRAYSIZE( river_list ) ) ) {
-					int idx;
-					auto river_type = ICVar::GetInstance( ).FindConVar( "dota_river_type", idx );
-					const auto old_val = river_type->value;
-					river_type->value.i32 = this->current_river;
-
-					if ( auto cb = ICVar::GetInstance( ).GetCVarCallback( river_type->CALLBACK_INDEX ); cb )
-						cb( ConVarID{ .impl = static_cast<std::uint64_t>( idx ), .var_ptr = (void*)&river_type },
-							0, &river_type->value, &old_val );
-				}
-			}
-
 			ImGui::Separator( );
-
-			if ( ImGui::CollapsingHeader( "Over hero visuals" ) ) {
-				ImGui::Checkbox( "Draw custom bar", &this->HackBars );
-				if ( this->HackBars ) {
-					ImGui::Checkbox( "Colored Bar Creeps", &this->ColoredBarCreeps );
-					ImGui::Checkbox( "Draw enemy health bar", &this->HealthBars );
-					if ( this->HealthBars ) {
-						ImGui::Checkbox( "HP Text", &this->HealthBarsText );
-					}
-					ImGui::Checkbox( "Draw enemy mana bar", &this->ManaBars );
-					if ( this->ManaBars ) {
-						ImGui::Checkbox( "HP Text", &this->ManaBarsText );
-					}
-				}
-
-				ImGui::Checkbox( "Ability panel", &this->AbilityPanel );
-				if ( this->AbilityPanel ) {
-					ImGui::SliderInt( "Alpha##ABIL_PANEL_ALPHA_MAIN", &this->AbilityPanelAlpha, 0, 255, "%d", ImGuiSliderFlags_NoInput );
-					ImGui::SliderInt( "Size##ABIL_PANEL_SIZE_MAIN", &this->AbilityPanelSize, 0, 255, "%d", ImGuiSliderFlags_NoInput );
-					ImGui::SliderInt( "Y offset##ABIL_PANEL_OFFSET_Y_MAIN", &this->AbilityPanelOffsetY, -555, 555, "%d", ImGuiSliderFlags_NoInput );
+			ImGui::InputText( "##textmmr", buf4, IM_ARRAYSIZE( buf4 ) ); ImGui::SameLine( );
+			if ( ImGui::Button( "Set MMR value" ) ) {
+				auto UIEngine = CPanoramaUIEngine::GetInstance( );
+				auto childs = UIEngine->engine_source2( )->find_panel( "DotaDashboard" )->find_children_traverse( "MMRNumber" );
+				if ( childs.size( ) ) {
+					CLabel* MMRLabel = childs.front( )->panel2d_as<CLabel>( );
+					MMRLabel->set_label_text( buf4 );
 				}
 			}
+		}
 
-			if ( ImGui::CollapsingHeader( "Illusion ESP" ) ) {
-				ImGui::Checkbox( "Enabled###checkbox_2", &this->illusion_esp );
-				if ( this->illusion_esp ) {
-					ImGui::SliderInt( "R###sliderint_1", &this->illusion_esp_r, 1, 255, "%d", ImGuiSliderFlags_NoInput );
-					ImGui::SliderInt( "G###sliderint_2", &this->illusion_esp_g, 1, 255, "%d", ImGuiSliderFlags_NoInput );
-					ImGui::SliderInt( "B###sliderint_3", &this->illusion_esp_b, 1, 255, "%d", ImGuiSliderFlags_NoInput );
+		if ( ImGui::CollapsingHeader( "AutoAccept" ) ) {
+			ImGui::Checkbox( "Enabled##auto_accept", &this->auto_accept );
+			if ( this->auto_accept ) {
+				ImGui::Checkbox( "Accept last moment", &this->accept_in_last_moment );
+				if ( !this->accept_in_last_moment )
+					ImGui::SliderInt( "Accept delay (sec)", &this->auto_accept_delay, 0, 15, "%d", ImGuiSliderFlags_NoInput );
+			}
+		}
 
-					ImGui::Checkbox( "Dont`t select illusions", &this->illusion_esp_can_select );
-				}
+		if ( ImGui::CollapsingHeader( "World rendering" ) ) {
+			constexpr const char* weather_list[] = { "Default", "Snow", "Rain", "Moonbeam", "Pestilence", "Ash", "Sirocco", "Snow #2", "Spring" };
+			constexpr const char* river_list[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" /* "Blood", "Chrome", "Dry", "Electric", "Oil", "Potion", "Slime"*/ };
+
+			ImGui::Checkbox( "Mouse distance change", &this->mouse_distance );
+			ImGui::Checkbox( "Disable fog", &this->fog );
+			if ( this->mouse_distance )
+				ImGui::SliderInt( "Camera step", &this->camera_step, 10, 300 );
+
+			if ( ImGui::Combo( "Weather", &this->current_weather, weather_list, IM_ARRAYSIZE( weather_list ) ) ) {
+				ICVar::get( )["cl_weather"]->m_value.i32 = this->current_weather;
+			}
+
+			if ( ImGui::Combo( "River type", &this->current_river, river_list, IM_ARRAYSIZE( river_list ) ) ) {
+				int idx;
+				auto river_type = ICVar::get( ).find_convar( "dota_river_type", idx );
+				const auto& old_val = river_type->m_value;
+				river_type->m_value.i32 = this->current_river;
+
+				if ( auto cb = ICVar::get( ).GetCVarCallback( river_type->CALLBACK_INDEX ); cb )
+					cb( ConVarID{ .impl = static_cast<std::uint64_t>( idx ), .var_ptr = (void*)&river_type },
+						0, &river_type->m_value, &old_val );
 			}
 		}
 	}
@@ -328,7 +268,7 @@ void CGui::Render( ) {
 
 void CGui::ApplyStyle( ) {
 	ImGuiStyle* style = &ImGui::GetStyle( );
-
+	
 	style->WindowBorderSize = 0;
 	style->WindowTitleAlign = ImVec2( 0.5, 0.5 );
 	style->WindowMinSize = ImVec2( 600, 400 );

@@ -29,8 +29,6 @@ public:
 	int current_weather = 0;
 	int current_river = 0;
 
-	bool partial_maphack = true;
-
 	bool mouse_distance = true;
 	int camera_step = 50;
 	bool fog = true;
@@ -39,33 +37,8 @@ public:
 	bool accept_in_last_moment = false;
 	int auto_accept_delay = 0;
 
-	std::string presence_text;
-
-	bool HackBars = true;
-
 	bool ColoredBarCreeps = true;
-
-	bool ManaBars = true;
-	bool ManaBarsText = true;
-
-	bool HealthBars = true;
-	bool HealthBarsText = true;
 	// =====================
-
-	bool AbilityPanel = true;
-	int AbilityPanelAlpha = 255;
-	int AbilityPanelSize = 30;
-	int AbilityPanelOffsetY = 95;
-
-	bool illusion_esp = false;
-	bool illusion_esp_can_select = false;
-	int illusion_esp_r = 0;
-	int illusion_esp_g = 0;
-	int illusion_esp_b = 255;
-
-	int pos1;
-	int pos2;
-
 	ID3D11Device* pDevice = nullptr;
 private:
 	HWND hWnd = nullptr;

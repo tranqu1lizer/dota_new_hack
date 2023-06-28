@@ -1,7 +1,26 @@
 #pragma once
 
-#include "C_BaseEntity.hpp"
+#include "CEntityIdentity.hpp"
 #include "EntityIndex.hpp"
+
+#undef DELETE
+
+enum class EntityPVS : int {
+	UPDATE,
+	LEAVE,
+	CREATE,
+	DELETE,
+};
+
+class C_DOTAPlayerController;
+
+class IEntityListener {
+public:
+	virtual void OnEntityCreated( C_BaseEntity* ) = 0;
+	virtual void OnEntitySpawned( C_BaseEntity* ) = 0;
+	virtual void OnEntityDeleted( C_BaseEntity* ) = 0;
+	virtual void OnEntityParentChanged( C_BaseEntity*, C_BaseEntity* parent ) = 0;
+};
 
 class CEntitySystem {
 public:
@@ -29,12 +48,21 @@ public:
 	virtual void n_21( ) = 0;
 };
 
-class CGameEntitySystem : public CEntitySystem
+class CGameEntitySystem : CEntitySystem
 {
+	//xd
+	template<typename T>
+	T& Field( int offset ) {
+		return *(T*)( (uintptr_t)this + offset );
+	}
+
 	void* m_vtable;
-	CEntityIdentities* m_entity_list[MAX_ENTITY_LISTS];
 public:
-	CEntityIdentity* GetIdentity( const int index )
+	CEntityIdentities* m_entity_list[MAX_ENTITY_LISTS];
+	char pad_0018[ 0x108 ]; // 0x18
+	CEntityIdentity* m_shit_entites;
+
+	CEntityIdentity* find_identity( const int index )
 	{
 		if ( index <= -1 || index >= ( MAX_TOTAL_ENTITIES - 1 ) )
 			return nullptr;
@@ -50,10 +78,11 @@ public:
 
 		return identity;
 	}
+	
 	template<typename T = C_BaseEntity>
 	T* find_entity( int index )
 	{
-		if ( auto identity = GetIdentity( index ); identity )
+		if ( auto identity = find_identity( index ); identity )
 			return (T*)identity->entity;
 		return nullptr;
 	}
@@ -61,15 +90,29 @@ public:
 	template<typename T = C_BaseEntity>
 	T* find_entity( EntityIndex_t index )
 	{
-		if ( !index.IsValid( ) ) return nullptr;
+		if ( !index.is_valid( ) ) return nullptr;
 		return (T*)this->find_entity( index.Get( ) );
 	}
-	int GetHighestEntityIndex( )
+
+	template<typename T = C_BaseEntity>
+	T* find_entity_by_handle( CHandle handle )
 	{
-		// IDA:
-		// xref "cl_showents" -> lea rax, [XXXXXXXX] above
-		// decompile it, there is a cycle using a variable initialized with the first call(to sub_18XXXXXX)
-		// that function will have this function
+		if ( !handle.is_valid( ) ) return nullptr;
+		return (T*)this->find_entity( handle.to_index() );
+	}
+
+	FIELD( CUtlVector<IEntityListener*>, entity_listeners, 0x1548 );
+
+	int highest_entityindex( )
+	{
 		return *(int*)( (uintptr_t)this + 0x1510 );
 	}
+};
+
+class C_DOTA_MapTree;
+
+class CDOTA_BinaryObjectSystem {
+public:
+	char pad[0x18];
+	CUtlVector<C_DOTA_MapTree*> m_trees;
 };

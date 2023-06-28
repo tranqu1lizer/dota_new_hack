@@ -1,36 +1,26 @@
 #pragma once
 
 #include "CEconItem.hpp"
-
-class CDOTAGCClientSystem : public CSharedObjectListener {
-public:
-	char pad_0000[192]; // 0x0
-	uint64_t m_pSteamUser; // 0xC0
-};
+#include "../functions.hpp"
+#include "../global.hpp"
 
 class CDOTAPlayerInventory : public CSharedObjectListener {
 public:
-	SOID_t m_pSOID; // 0x8
+	SOID_t m_soid; // 0x8
 	uint64_t m_pItems; // 0x20
 	char unk_028[128]; // 0x28
 	CGCClientSharedObjectCache* m_pSharedObjectCache; // 0xA0
 
-	CEconItem* FindItem( itemid_t id ){
-		if ( !this || !functions_call::GetSOCDataForItem ) return nullptr;
+	CEconItem* find_item_by_id( itemid_t id ){
+		if ( !this || !calls::GetSOCDataForItem ) return nullptr;
 
-		return (CEconItem*)functions_call::GetSOCDataForItem( this, id );
+		return (CEconItem*)calls::GetSOCDataForItem( this, id );
 	}
 	
 	CEconItem* CreateItemObject( ){
-		if ( this && functions_call::CreateEconItem ) {
+		if ( !this || !calls::CreateEconItemObject ) return nullptr;
 
-			if ( auto item = functions_call::CreateEconItem( ); item != nullptr ) {
-
-				item->m_unAccountID = this->m_pSOID.m_unSteamID & 0xFFFFFFFF;
-				return item;
-			}
-		}
-		return nullptr;
+		return calls::CreateEconItemObject( );
 	}
 
 	virtual void vfunc2( void ) = 0;

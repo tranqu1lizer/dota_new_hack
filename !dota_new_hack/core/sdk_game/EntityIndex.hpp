@@ -12,7 +12,7 @@ public:
 	{
 		return value;
 	}
-	bool IsValid( ) const noexcept
+	bool is_valid( ) const noexcept
 	{
 		return value >= 0;
 	}
