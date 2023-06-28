@@ -46,10 +46,19 @@ public:
     virtual void* GetDataKeys(void) = 0;
 };
 
+class CMsgSource1LegacyGameEvent;
+
 // xref "CGameEventManager::AddListener" to AddListener()
 class CGameEventManager
 {
 public:
+    static CGameEventManager* GetInstance( ) {
+        if ( auto source2client = CSource2Client::GetInstance( ); ( source2client ) ) {
+            return *(CGameEventManager**)util::get_absolute_address( util::vmt( (uintptr_t)source2client, 4 ) + 0x70, 3, 7 );
+        }
+
+        return nullptr;
+    }
     virtual ~CGameEventManager() {};
     virtual int LoadEventsFromFile(const char* filename) = 0;
     virtual void Reset(void) = 0;
@@ -62,8 +71,6 @@ public:
     virtual CGameEvent* DuplicateEvent(CGameEvent* event) = 0;
     virtual void FreeEvent(CGameEvent* event) = 0;
     virtual bool SerializeEvent(CGameEvent* event, void* Source1LegacyGameEvent) = 0;
-    virtual CGameEvent* UnserializeEvent(void const* Source1LegacyGameEvent) = 0;
+    virtual CGameEvent* UnserializeEvent(CMsgSource1LegacyGameEvent* ev) = 0;
     virtual bool LookupEventId(const char* id) = 0;
-    virtual void sub_2C16A80() = 0;
-    virtual void sub_2C69980() = 0;
 };

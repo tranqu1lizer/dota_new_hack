@@ -6,6 +6,8 @@
 
 #include <cstdint>
 
+class C_BaseEntity;
+
 class CEntityIdentity {
 public:
 	C_BaseEntity* entity;
@@ -30,7 +32,11 @@ public:
 	CEntityIdentity* m_pPrevByClass;
 	CEntityIdentity* m_pNextByClass;
 public:
-	const char* GetName( ) const {
+	const char* entity_name( ) const {
+		return internalName ? internalName : entityName;
+	}
+	
+	const std::string_view& entity_name_view( ) const {
 		return internalName ? internalName : entityName;
 	}
 

@@ -369,7 +369,25 @@ constexpr auto split_path_into_relative_paths( const std::string_view& FullPath 
 
 class schema {
 public:
-	static std::int32_t dynamic_field( const std::string& name )
+	static void dump_class_offsets( const std::string& name ) {
+		if ( const auto& paths = split_path_into_relative_paths( name ); paths.size( ) == 2 ) {
+			const auto& mod = paths.at( 0 );
+			const auto& cls = paths.at( 1 );
+
+			if ( const auto module_scope = CSchemaSystem::GetInstance( ).FindTypeScopeForModule( mod.c_str( ) ); module_scope ) {
+				if ( const auto class_info = module_scope->FindDeclaredClass( cls.c_str( ) ); class_info ) {
+					std::cout << "		class " << class_info->m_name << " (size: 0x" << std::hex << class_info->m_size << ")" << std::endl;
+					for ( auto k = 0; k < class_info->m_align; k++ ) {
+						if ( const auto& field = &class_info->m_fields[k]; field ) {
+							std::cout << field->m_type->m_name_ << " " << field->m_name << ": 0x" << std::hex << field->m_single_inheritance_offset << std::endl;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	static std::ptrdiff_t dynamic_field_offset( const std::string& name )
 	{
 		static std::unordered_map<std::string, std::int32_t> field_map{ };
 
@@ -386,7 +404,6 @@ public:
 				if ( const auto class_info = module_scope->FindDeclaredClass( cls.c_str( ) ); class_info ) {
 					for ( auto k = 0; k < class_info->m_align; k++ ) {
 						if ( const auto& field = &class_info->m_fields[k]; field ) {
-
 							if ( field->m_name == var ) {
 								field_map[name] = field->m_single_inheritance_offset;
 								return field->m_single_inheritance_offset;

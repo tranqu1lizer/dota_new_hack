@@ -3,24 +3,73 @@
 #include "NormalClass.hpp"
 #include <span>
 
-enum class EConvarType : std::uint8_t
-{
-	BOOL = 0,
-	INT32,
-	UINT32,
-	INT64,
-	UINT64,
-	FLOAT,
-	DOUBLE,
-	STRING,
-	COLOR_RGBA,
-	UNK_SOME_TWO_FLOATS,
-	UNK_SOME_THREE_FLOATS,
-	UNK_SOME_FOUR_FLOATS,
-	UNK_SOME_THREE_FLOATS_AGAIN,
+#define FCVAR_NONE 0
+#define FCVAR_LINKED_CONCOMMAND (1 << 0)
+#define FCVAR_DEVELOPMENTONLY (1 << 1)
+#define FCVAR_GAMEDLL (1 << 2)
+#define FCVAR_CLIENTDLL (1 << 3)
+#define FCVAR_HIDDEN (1 << 4)
+#define FCVAR_PROTECTED (1 << 5)
+#define FCVAR_SPONLY (1 << 6)
+#define FCVAR_ARCHIVE (1 << 7)
+#define FCVAR_NOTIFY (1 << 8)
+#define FCVAR_USERINFO (1 << 9)
+#define FCVAR_SOMETHING_THAT_HIDES (1 << 10) // Actual name unavailable
+#define FCVAR_UNLOGGED (1 << 11)
+#define FCVAR_MISSING1 (1 << 12)
+#define FCVAR_REPLICATED (1 << 13)
+#define FCVAR_CHEAT (1 << 14)
+#define FCVAR_PER_USER (1 << 15)
+#define FCVAR_DEMO (1 << 16)
+#define FCVAR_DONTRECORD (1 << 17)
+#define FCVAR_MISSING2 (1 << 18)
+#define FCVAR_RELEASE (1 << 19)
+#define FCVAR_MENUBAR_ITEM (1 << 20)
+#define FCVAR_MISSING3 (1 << 21)
+#define FCVAR_NOT_CONNECTED (1 << 22)
+#define FCVAR_VCONSOLE_FUZZY_MATCHING (1 << 23)
+#define FCVAR_SERVER_CAN_EXECUTE (1 << 24)
+#define FCVAR_MISSING4 (1 << 25)
+#define FCVAR_SERVER_CANNOT_QUERY (1 << 26)
+#define FCVAR_VCONSOLE_SET_FOCUS (1 << 27)
+#define FCVAR_CLIENTCMD_CAN_EXECUTE (1 << 28)
+#define FCVAR_EXECUTE_PER_TICK (1 << 29)
+
+struct ConCommand {
+public:
+	char* m_name; // 0x0
+	char* m_description; // 0x8
+	std::int32_t m_flags; // 0x10
+private:
+	std::int32_t unk0; // 0x14
+public:
+	void* m_member_accessor_ptr; // 0x18
+	some_function m_callback; // 0x20
+private:
+	void* unk1; // 0x28
+	void* unk2; // 0x30
 };
 
-union ConVarValue
+enum class EConvarType : std::uint8_t
+{
+	Bool,
+	Int16,
+	UInt16,
+	Int32,
+	UInt32,
+	Int64,
+	UInt64,
+	Float32,
+	Float64,
+	String,
+	Color,
+	Vector2,
+	Vector3,
+	Vector4,
+	Qangle
+};
+
+union ConVarValue_t
 {
 	bool boolean{};
 	std::uint64_t u64;
@@ -31,9 +80,10 @@ union ConVarValue
 	double dbl;
 	const char* str;
 	std::uint32_t clr_rgba;
-	std::array<float, 2> two_floats;
-	std::array<float, 3> three_floats;
-	std::array<float, 4> four_floats;
+	vector2d vec2d;
+	vector3d vec3d;
+	std::array<float, 4> vec4d;
+	QAngle qangle;
 };
 
 struct ConVariable
@@ -49,7 +99,7 @@ struct ConVariable
 	int unk4{};
 	int CALLBACK_INDEX{};
 	int unk5{};
-	ConVarValue value{};
+	ConVarValue_t m_value;
 };
 
 struct CvarNode
@@ -64,57 +114,67 @@ struct ConVarID
 	std::uint64_t impl{};
 	void* var_ptr{};
 
-	bool IsGood( ) const noexcept
-	{
+	bool IsGood( ) const noexcept {
 		return impl != BAD_ID;
 	}
 
-	void Invalidate( ) noexcept
-	{
+	void invalidate( ) noexcept {
 		impl = BAD_ID;
 	}
 };
 
-using t_CvarCallback = void(*)(const ConVarID& id, int unk1, const ConVarValue* val, const ConVarValue* old_val);
+using t_CvarCallback = void(*)(const ConVarID& id, int unk1, const ConVarValue_t* val, const ConVarValue_t* old_val);
 
-class ICVar : NormalClass {
+class ICVar : VClass {
 	static auto GetInstanceImpl( )
 	{
-		static ICVar* inst = nullptr;
-		if ( !inst ) inst = static_cast<ICVar*>( util::get_interface( "tier0.dll", "VEngineCvar007" ) );
-		
+		static ICVar* inst = static_cast<ICVar*>( util::get_interface( "tier0.dll", "VEngineCvar007" ) );
 		return inst;
 	}
 public:
-	static auto& GetInstance( )
+	static auto& get( )
 	{
 		return *GetInstanceImpl( );
 	}
 
-	std::span<const CvarNode> ICVar::GetCvarList( )
-	{
-		return std::span<const CvarNode>{ Member<const CvarNode*>( 0x40 ), Member<std::uint16_t>( 0x58 ) };
+	std::span<CvarNode> cvars( ) {
+		return std::span<CvarNode>{ Member<CvarNode*>( 0x40 ), Member<std::uint16_t>( 0x58 ) };
+	}
+
+	std::span<ConCommand> ccommands( ) {
+		return std::span<ConCommand>{ Member<ConCommand*>( 0xD8 ), Member<std::uint16_t>( 0xF0 ) };
 	}
 
 	t_CvarCallback GetCVarCallback( int index )
 	{
-		if ( index )
-		{
-			auto table = Member<void*>( 0x80 );
-			if ( table )
+		if ( index ) {
+			if ( auto table = Member<void*>( 0x80 ); table )
 				return *reinterpret_cast<t_CvarCallback*>(reinterpret_cast<std::uintptr_t>(table) + 24 * static_cast<unsigned long long>(index));
 		}
+
 		return nullptr;
 	}
 
-	ConVariable* FindConVar( const std::string_view& name, int& index ) {
-		for ( const auto& [cvar_node, idx] : this->GetCvarList( ) )
+	ConVariable* find_convar( const std::string_view& name, int& index ) {
+		for ( const auto& [cvar_node, idx] : this->cvars( ) )
 		{
 			if ( cvar_node && name == cvar_node->name ) {
 				index = idx;
 				return cvar_node;
 			}
 		}
+
+		return nullptr;
+	}
+
+	ConVariable* operator[]( const std::string_view& name ) {
+		for ( const auto& [cvar_node, idx] : this->cvars( ) )
+		{
+			if ( cvar_node && name == cvar_node->name ) {
+				return cvar_node;
+			}
+		}
+
 		return nullptr;
 	}
 };

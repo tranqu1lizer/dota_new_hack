@@ -3,14 +3,39 @@
 #include "../../main.hpp"
 #include "CDOTA_ModifierManager.hpp"
 #include "CHandle.hpp"
-#include "../functions/functions.hpp"
-#include "C_CollisionProperty.hpp"
+#include "../functions.hpp"
+#include "C_Properties.hpp"
 #include "CEntityIdentity.hpp"
 #include "CGameEntitySystem.hpp"
 
 #include "NormalClass.hpp"
 
-enum DOTATeam_t : int {
+enum DataUpdateType_t {
+	DATA_UPDATE_CREATED = 0,  // indicates it was created +and+ entered the pvs
+	//  DATA_UPDATE_ENTERED_PVS,
+	DATA_UPDATE_DATATABLE_CHANGED,
+	//  DATA_UPDATE_LEFT_PVS,
+	//  DATA_UPDATE_DESTROYED,    // FIXME: Could enable this, but it's a little worrying
+					// since it changes a bunch of existing code
+};
+
+enum RenderMode_t {
+	kRenderNormal = 0,		// src
+	kRenderTransColor,		// c*a+dest*(1-a)
+	kRenderTransTexture,	// src*a+dest*(1-a)
+	kRenderGlow,			// src*a+dest -- No Z buffer checks -- Fixed size in screen space
+	kRenderTransAlpha,		// src*srca+dest*(1-srca)
+	kRenderTransAdd,		// src*a+dest
+	kRenderEnvironmental,	// not drawn, used for environmental effects
+	kRenderTransAddFrameBlend, // use a fractional frame value to blend between animation frames
+	kRenderTransAlphaAdd,	// src + dest*(1-a)
+	kRenderWorldGlow,		// Same as kRenderGlow but not fixed size in screen space
+	kRenderNone,			// Don't render.
+
+	kRenderModeCount,		// must be last
+};
+
+enum class DOTATeam_t : int {
 	DOTA_TEAM_INVALID = -1,
 	DOTA_TEAM_FIRST = 2,
 	DOTA_TEAM_GOODGUYS = 2, //Radiant team.
@@ -31,78 +56,111 @@ enum DOTATeam_t : int {
 	DOTA_TEAM_COUNT = 14
 };
 
-class C_BaseEntity : public VClass {
+class C_BaseEntity : public SchemaVClass {
 public:
+	CSchemaClassBinding* schema_dynamic_binding( ) {
+		return CallVFunc<0, CSchemaClassBinding*>( );
+	}
+
+	ClientClass* client_class( ) {
+		return CallVFunc<33, ClientClass*>( );
+	}
+
+	////////////////////
+
 	int index( ) {
-		if ( !util::does_exists( this ) ) return -1;
+		if ( !util::exists( this ) ) return -1;
 		return this->identity( )->entHandle & 0x7FFF;
 	}
 
 	CHandle owner( ) {
-		if ( !util::does_exists( this ) ) return CHandle{};
-		static const auto offset = schema::dynamic_field( "client.dll/C_BaseEntity/m_hOwnerEntity" );
+		if ( !util::exists( this ) ) return CHandle{};
+		static const auto offset = schema::dynamic_field_offset( "client.dll/C_BaseEntity/m_hOwnerEntity" );
 		return Member<CHandle>( offset );
 	}
 
 	DOTATeam_t team_number( ) {
-		if ( !util::does_exists( this ) ) return DOTA_TEAM_INVALID;
-		static const auto offset = schema::dynamic_field( "client.dll/C_BaseEntity/m_iTeamNum" );
+		if ( !util::exists( this ) ) return DOTATeam_t::DOTA_TEAM_INVALID;
+		static const auto offset = schema::dynamic_field_offset( "client.dll/C_BaseEntity/m_iTeamNum" );
 		return Member<DOTATeam_t>( offset );
 	}
 
 	vector3d abs_origin( )
 	{
-		if ( !util::does_exists( this ) ) return vector3d{ -1,-1,-1 };
-		return Member<VClass*>( schema::dynamic_field( "client.dll/C_BaseEntity/m_pGameSceneNode" ) )
-			->Member<vector3d>( schema::dynamic_field( "client.dll/CGameSceneNode/m_vecAbsOrigin" ) );
+		if ( !util::exists( this ) ) return vector3d{ -1,-1,-1 };
+
+		const auto scene = *(uintptr_t*)( (uintptr_t)this + schema::dynamic_field_offset( "client.dll/C_BaseEntity/m_pGameSceneNode" ) );
+
+		return *(vector3d*)( scene + schema::dynamic_field_offset( "client.dll/CGameSceneNode/m_vecAbsOrigin" ) );
+	}
+
+	float rotation( ) {
+		return schema_member<SchemaVClass*>( "client.dll/C_BaseEntity/m_pGameSceneNode" )
+			->schema_member<QAngle>( "client.dll/CGameSceneNode/m_angRotation" ).roll_deg;
+	}
+
+	// Gets the point in front of the entity at the specified distance
+	vector3d forward_vector( float dist ) {
+		const auto rot = rotation( );
+		const float casted_rot = rotation( ) * M_PI / 180;
+
+		const float sine = sinf( casted_rot ), cosine = cosf( casted_rot );
+		return abs_origin( ) + vector3d( cosine * dist, sine * dist, 0 );
 	}
 
 	void set_abs_origin( vector3d abs_origin )
 	{
-		if ( !util::does_exists( this ) ) return;
-		static const auto scene_offset = schema::dynamic_field( "client.dll/C_BaseEntity/m_pGameSceneNode" );
-		static const auto offset = schema::dynamic_field( "client.dll/CGameSceneNode/m_vecAbsOrigin" );
+		if ( !util::exists( this ) ) return;
+		static const auto scene_offset = schema::dynamic_field_offset( "client.dll/C_BaseEntity/m_pGameSceneNode" );
+		static const auto offset = schema::dynamic_field_offset( "client.dll/CGameSceneNode/m_vecAbsOrigin" );
 
 		Member<VClass*>( scene_offset )->Member<vector3d>( offset ) = abs_origin;
 	}
 
 	int max_health( ) {
-		if ( !util::does_exists( this ) ) return -1;
-		static const auto offset = schema::dynamic_field( "client.dll/C_BaseEntity/m_iMaxHealth" );
+		if ( !util::exists( this ) ) return -1;
+		static const auto offset = schema::dynamic_field_offset( "client.dll/C_BaseEntity/m_iMaxHealth" );
 		return Member<int>( offset );
 	}
 
 	int health( ) {
-		if ( !util::does_exists( this ) ) return -1;
-		static const auto offset = schema::dynamic_field( "client.dll/C_BaseEntity/m_iHealth" );
-		return Member<int>(offset);
+		if ( !util::exists( this ) ) return -1;
+		static const auto offset = schema::dynamic_field_offset( "client.dll/C_BaseEntity/m_iHealth" );
+		return Member<int>( offset );
+	}
+
+	std::int8_t life_state( ) {
+		if ( !util::exists( this ) ) return -1;
+		return schema_member<std::int8_t>( "client.dll/C_BaseEntity/m_lifeState" );
 	}
 
 	////////////////////
 
 	bool ally( ) {
-		if ( !util::does_exists( this ) ) return false;
+		if ( !util::exists( this ) || !util::exists( global::g_LocalEntity ) ) return false;
 		return reinterpret_cast<C_BaseEntity*>( global::g_LocalEntity )->team_number( ) == this->team_number( );
 	}
 
-	__declspec( restrict ) __declspec( noalias ) const CEntityIdentity* identity( ) noexcept {
-		if ( !util::does_exists( this ) ) return nullptr;
+	CEntityIdentity* identity( ) noexcept {
+		if ( !util::exists( this ) ) return nullptr;
+
 		return Member<CEntityIdentity*>( 0x10 );
 	}
+};
 
-	__declspec( noalias ) const CSchemaClassBinding* schema_dynamic_binding( ) noexcept {
-		if ( !util::does_exists( this ) ) return nullptr;
-		const auto aDynamicBindingEntity = util::vmt( reinterpret_cast<uintptr_t>( this ), 0 );
-		if ( !aDynamicBindingEntity ) return nullptr;
-
-		return reinterpret_cast<CSchemaClassBinding * ( __fastcall* )( )>( aDynamicBindingEntity )( );
+class C_BaseModelEntity : public C_BaseEntity {
+public:
+	C_CollisionProperty* collision( ) {
+		return Member< C_CollisionProperty* >( 0x310 );
 	}
+};
+class C_DOTA_MapTree : public C_BaseModelEntity {
+public:
+	void set_model( const std::string_view& model_name ) {
+		const auto C_DOTA_MapTree__Spawn = util::vmt( (std::uintptr_t)this, 7 );
+		some_function C_BaseModelEntity__SetModel = util::get_absolute_address( C_DOTA_MapTree__Spawn + 0x1c0, 1, 5 );
+		if ( !C_BaseModelEntity__SetModel.ptr ) return;
 
-	__declspec( noalias ) const C_CollisionProperty* collideable( ) noexcept {
-		if ( !util::does_exists( this ) ) return nullptr;
-		const auto aCollideable = util::vmt( reinterpret_cast<uintptr_t>( this ), 50 );
-		if ( !aCollideable ) return nullptr;
-
-		return reinterpret_cast<C_CollisionProperty * ( __fastcall* )( )>( aCollideable )( );
+		C_BaseModelEntity__SetModel( this, model_name.data( ) );
 	}
 };

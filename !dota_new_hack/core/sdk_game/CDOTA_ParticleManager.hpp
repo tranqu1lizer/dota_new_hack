@@ -58,47 +58,43 @@ public:
 	CNewParticleEffect* GetNewPacticle( ) {
 		return Member<CNewParticleEffect*>( 0x130 );
 	}
+	void SetControlPoint( int ControlPoint, vector3d& cp ) {
+		CallVFunc<16, void>( ControlPoint, cp );
+	}
 
-	virtual CSchemaClassBinding* Schema_DynamicBinding( void ) = 0;
-	virtual void* GetOwner( void ) = 0;
-	virtual void SetAssociatedObj( void* ) = 0;
-	virtual void* GetAssociatedObj( ) = 0;
-	virtual void SetSomethingElse( void* ) = 0;
-	virtual void* GetSomethingElse( ) = 0;
-	virtual bool IsValid( void ) = 0;
-	virtual void* unk1( void ) = 0;
-	virtual void* GetDefinition( void ) = 0;
-	virtual C_ParticleCollection* GetParentCollection( void ) = 0;
-	virtual C_ParticleCollection* GetFirstChildCollection( void ) = 0;
-	virtual C_ParticleCollection* GetNextSiblingCollection( void ) = 0;
-	virtual C_ParticleCollection* GetNextCollectionUsingSameDef( void ) = 0;
-	virtual bool UsesPowerOfTwoFrameBufferTexture( bool ) = 0;
-	virtual void sub_105ED0( ) = 0;
-	virtual void sub_1062B0( ) = 0;
-	virtual void* SetParticleControl( int control_point_idx, vector3d& );
-	virtual void SetOrientationFLU( ) = 0;
-	virtual void sub_105C60( ) = 0;
-	virtual void sub_107C90( ) = 0;
-	virtual void sub_1073F0( ) = 0;
-	virtual vector3d* GetControlPointPosition( int ControlPoint ) = 0; // 21
-	virtual void sub_105861( ) = 0;
-	virtual void* GetControlPointObject( int ControlPoint ) = 0;
+	vector3d* GetControlPointPosition( int ControlPoint ) {
+		return CallVFunc<22, vector3d*>( ControlPoint );
+	}
+
+	void SetDormant( bool state ) {
+		CallVFunc<63, void>( state );
+	}
+
+	bool GetRenderingEnabled( ) {
+		return CallVFunc<91, bool>( );
+	}
+
+	void SetRenderingEnabled( bool state ) {
+		CallVFunc<92, void>( state );
+	}
 };
-
 
 class CNewParticleEffect : VClass {
 public:
-	C_ParticleCollection* GetParticleCollection( ) {
-		return Member<C_ParticleCollection*>( 0x20 );
-	}
+	char pad_0000[32]; // 0x0
+	C_ParticleCollection* m_pCollection; // 0x20
+	char pad_0028[32]; // 0x28
+	uint8_t m_bDeleteFlag; // 0x48
 
 	C_BaseEntity* GetEntityForParticle( ) {
 		return Member<C_BaseEntity*>( Member<uintptr_t>( 0x58 ) + 0x170 );
 	}
 
 	CNewParticleEffect* SetControlPoint( int idx, const vector3d& pos ) {
-		auto collection = GetParticleCollection( );
-		collection->CallVFunc<16>( idx, &pos );
+		if ( !m_pCollection )
+			return nullptr;
+
+		m_pCollection->CallVFunc<16>( idx, &pos );
 		return this;
 	}
 };
@@ -123,7 +119,7 @@ struct ParticleWrapper {
 	CNewParticleEffect* particle{};
 	std::uint32_t handle{};
 
-	void Invalidate( ) {
+	void invalidate( ) {
 		particle = nullptr;
 		handle = std::numeric_limits<std::uint32_t>::max( );
 		info = CreateParticleInfo{};
@@ -131,16 +127,12 @@ struct ParticleWrapper {
 };
 
 class CDOTA_ParticleManager : public VClass {
+public:
 	static inline std::vector<ParticleWrapper> particles{};
-	static auto GetInstanceImpl( )
+
+	static CDOTA_ParticleManager* GetInstance( )
 	{
 		return *reinterpret_cast<CDOTA_ParticleManager**>( global::patterns::DOTAParticleManager );
-	}
-public:
-	static auto& GetInstance( )
-	{
-		static CDOTA_ParticleManager& instance = *GetInstanceImpl( );
-		return instance;
 	}
 
 	struct ParticleContainer : NormalClass {
@@ -148,15 +140,12 @@ public:
 			return Member<CNewParticleEffect*>( 0x10 );
 		}
 	};
-	int GetParticleCount( );
-	ParticleContainer** GetParticleArray( );
+	GETTER( CUtlVector<ParticleContainer*>, GetParticles, 0x80 );
+	FIELD( uint32_t, handle, 0xb8 );
 
-	uint32_t GetHandle( );
-	void IncHandle( );
-
-	std::uint32_t CreateParticle( const char* name, ParticleAttachment_t attachType, C_BaseEntity* ent );
-	void DestroyParticle( const char* name, C_BaseEntity* entity );
-	void DestroyParticle( uint32_t handle );
-	void DestroyParticle( ParticleWrapper& info );
-	void DestroyAllParticles( );
+	ParticleWrapper create_particle( const char* name, ParticleAttachment_t attachType, C_BaseEntity* ent );
+	void destroy_particle( const char* name, C_BaseEntity* entity );
+	void destroy_particle( uint32_t handle );
+	void destroy_particle( ParticleWrapper& info );
+	void destroy_own_particles( );
 };

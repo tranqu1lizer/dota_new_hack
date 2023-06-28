@@ -2,96 +2,104 @@
 
 #include "C_BaseCombatCharacter.hpp"
 
+#include "CNetworkMessages.hpp"
+
 class C_DOTA_BaseNPC : public C_BaseCombatCharacter
 {
 public:
 	float max_mana( ) {
-		if ( !util::does_exists( this ) ) return -1;
-		static const auto offset = schema::dynamic_field( "client.dll/C_DOTA_BaseNPC/m_flMaxMana" );
-		return Member<float>(offset);
-	}
-
-	float mana( ) {
-		if ( !util::does_exists( this ) ) return -1;
-		static const auto offset = schema::dynamic_field( "client.dll/C_DOTA_BaseNPC/m_flMana" );
+		if ( !util::exists( this ) ) return -1;
+		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_flMaxMana" );
 		return Member<float>( offset );
 	}
 
+	float mana( ) {
+		if ( !util::exists( this ) ) return -1;
+		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_flMana" );
+		return Member<float>( offset );
+	}
+
+	bool moving( ) {
+		if ( !util::exists( this ) ) return -1;
+		
+		return schema_member<bool>( "client.dll/C_DOTA_BaseNPC/m_bIsMoving" );
+	}
+
+	int movespeed( ) {
+		if ( !util::exists( this ) ) return -1;
+
+		return schema_member<int>( "client.dll/C_BaseEntity/m_iMoveSpeed" );
+	}
+
 	uint64_t GetUnitState( ) {
-		if ( !util::does_exists( this ) ) return -1;
-		static const auto offset = schema::dynamic_field( "client.dll/C_DOTA_BaseNPC/m_nUnitState64" );
+		if ( !util::exists( this ) ) return -1;
+		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_nUnitState64" );
 		return Member<uint64_t>( offset );
 	}
 
 	int32_t GetUnitType( ) {
-		if ( !util::does_exists( this ) ) return -1;
-		static const auto offset = schema::dynamic_field( "client.dll/C_DOTA_BaseNPC/m_iUnitType" );
+		if ( !util::exists( this ) ) return -1;
+		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_iUnitType" );
 		return Member<int32_t>( offset );
 	}
 
 	CDOTA_ModifierManager* GetModifierManager( ) {
-		if ( !util::does_exists( this ) ) return nullptr;
-		static const auto offset = schema::dynamic_field( "client.dll/C_DOTA_BaseNPC/m_ModifierManager" );
+		if ( !util::exists( this ) ) return nullptr;
+		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_ModifierManager" );
 		return MemberNotPtr<CDOTA_ModifierManager>( offset );
 	}
 
 	int health_bar_offset( ) noexcept {
-		if ( !util::does_exists( this ) ) return -1;
-		static const auto offset = schema::dynamic_field( "client.dll/C_DOTA_BaseNPC/m_iHealthBarOffset" );
-		return Member<int>( offset );
+		if ( !util::exists( this ) ) return -1;
+
+		return schema_member<int>( "client.dll/C_DOTA_BaseNPC/m_iHealthBarOffset" );
 	}
 
-	void SetEntityColor( const unsigned short r, const unsigned short g, const unsigned short b, const unsigned short a = 255 ) {
-		if ( !util::does_exists( this ) ) return;
-		static const auto offset = schema::dynamic_field( "client.dll/C_BaseModelEntity/m_clrRender" );
+	void set_color( const unsigned short r, const unsigned short g, const unsigned short b, const unsigned short a = 255 ) {
+		if ( !util::exists( this ) ) return;
+		static const auto offset = schema::dynamic_field_offset( "client.dll/C_BaseModelEntity/m_clrRender" );
+		const auto base = ( (std::uintptr_t)this + offset );
+		*(std::uint8_t*)( base + 0 ) = static_cast<BYTE>( r );
+		*(std::uint8_t*)( base + 1 ) = static_cast<BYTE>( g );
+		*(std::uint8_t*)( base + 2 ) = static_cast<BYTE>( b );
+		*(std::uint8_t*)( base + 3 ) = static_cast<BYTE>( a );
 
-		Member<int>( offset ) = r | ( g << 8 ) | ( b << 16 ) | ( a << 24 );
-		functions_helper::OnColorChanged( this );
+		CNetworkMessages::get( )->find_network_callback( "OnColorChanged" )( this );
 	}
 
-	void SetIllusionManaBarVision( bool state ) {
-		if ( !util::does_exists( this ) ) return;
-		static const auto offset = schema::dynamic_field( "client.dll/C_DOTA_BaseNPC/m_bHasClientSeenIllusionModifier" );
-
-		Member<bool>( offset ) = state;
-	}
-
-	bool IsHero( ) {
-		if ( !util::does_exists( this ) ) return false;
-		return this->GetUnitType( ) == 1;
-	}
-
-	bool IsLaneCreep( ) {
-		if ( !util::does_exists( this ) ) return false;
-		return this->GetUnitType( ) == 1152;
-	}
-
-	float GetPhysicalArmorValue( ) {
-		if ( !util::does_exists( this ) ) return -1;
+	float physical_armor( ) {
+		if ( !util::exists( this ) ) return -1;
 		return CallVFunc<271, float>( );
 	}
 
-	float GetMagicalArmorValue( ) {
-		if ( !util::does_exists( this ) ) return -1;
+	float magical_armor( ) {
+		if ( !util::exists( this ) ) return -1;
 		return CallVFunc<272, float>( );
 	}
 
-	EntityIndex_t GetAbility( const int idx )
-	{
-		if ( !util::does_exists( this ) ) return -1;
-		static const auto offset = schema::dynamic_field( "client.dll/C_DOTA_BaseNPC/m_hAbilities" );
-		const auto& ability = Member<CHandle>( offset + ( 4 * idx ) );
-		return ability.GetIndex( );
+	CUtlVector<CHandle> old_wearables( ) {
+		if ( !util::exists( this ) ) return CUtlVector<CHandle>{};
+
+		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_hOldWearables" );
+		return *( CUtlVector<CHandle>* )( (uintptr_t)this + offset );
 	}
 
-	EntityIndex_t GetItem( const int idx )
+	EntityIndex_t ability_at( const int idx )
 	{
-		if ( !util::does_exists( this ) ) return -1;
-		if ( Member<bool>( schema::dynamic_field( "client.dll/C_DOTA_BaseNPC/bHasInventory" ) ) ) {
-			static const auto offset = schema::dynamic_field( "client.dll/C_DOTA_BaseNPC/m_Inventory" );
+		if ( !util::exists( this ) ) return -1;
+		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_hAbilities" );
+		const auto& ability = Member<CHandle>( offset + ( 4 * idx ) );
+		return ability.to_index( );
+	}
+
+	EntityIndex_t item_in_slot( const int idx )
+	{
+		if ( !util::exists( this ) ) return -1;
+		if ( Member<bool>( schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_bHasInventory" ) ) ) {
+			static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_Inventory" );
 
 			const auto item = Member<CHandle>( offset + ( 4 * idx ) );
-			if ( item.IsValid( ) ) return item.GetIndex( );
+			if ( item.is_valid( ) ) return item.to_index( );
 		}
 		return -1;
 	}
@@ -100,9 +108,20 @@ public:
 
 class C_DOTA_BaseNPC_Hero : public C_DOTA_BaseNPC {
 public:
-	bool IsIllusion( ) {
-		if ( !util::does_exists( this ) ) return false;
-		static const auto offset = schema::dynamic_field( "client.dll/C_DOTA_BaseNPC_Hero/m_hReplicatingOtherHeroModel" );
-		return Member<uintptr_t>( offset ) != 0xFFFFFFFF;
+	int ClientThink( ) {
+		return CallVFunc<127, int>( );
+	}
+
+	bool illusion( ) {
+		if ( !util::exists( this ) ) return false;
+		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC_Hero/m_hReplicatingOtherHeroModel" );
+		const auto state = Member<uintptr_t>( offset ) != 0xFFFFFFFF;
+		return state;
+	}
+
+	int32_t hero_id( ) {
+		if ( !util::exists( this ) ) return -1;
+
+		return schema_member<int32_t>( "client.dll/C_DOTA_BaseNPC_Hero/m_iHeroID" );
 	}
 };

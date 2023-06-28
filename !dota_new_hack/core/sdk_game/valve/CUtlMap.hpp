@@ -49,7 +49,7 @@ public:
 	bool  IsValidIndex(IndexType_t i) const { return m_Tree.IsValidIndex(i); }
 
 	// Checks if the map as a whole is valid
-	bool  IsValid() const { return m_Tree.IsValid(); }
+	bool  is_valid() const { return m_Tree.is_valid(); }
 
 	// Invalid index
 	static IndexType_t InvalidIndex() { return CTree::InvalidIndex(); }

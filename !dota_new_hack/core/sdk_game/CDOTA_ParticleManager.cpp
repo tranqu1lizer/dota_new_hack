@@ -1,63 +1,45 @@
 #include "CDOTA_ParticleManager.hpp"
 
-int CDOTA_ParticleManager::GetParticleCount( ) {
-	return Member<uint32_t>( 0x80 );
-}
 
-CDOTA_ParticleManager::ParticleContainer** CDOTA_ParticleManager::GetParticleArray( ) {
-	return Member<ParticleContainer**>( 0x88 );
-}
-
-uint32_t CDOTA_ParticleManager::GetHandle( ) {
-	return Member<uint32_t>( 0xb8 );
-}
-
-void CDOTA_ParticleManager::IncHandle( ) {
-	*(uint32_t*)( (uintptr_t)this + 0xb8 ) = GetHandle( ) + 1;
-}
-
-std::uint32_t CDOTA_ParticleManager::CreateParticle( const char* name, ParticleAttachment_t attachType, C_BaseEntity* ent ) {
-	static_assert( sizeof( CreateParticleInfo ) == 0x40 );
+ParticleWrapper CDOTA_ParticleManager::create_particle( const char* name, ParticleAttachment_t attachType, C_BaseEntity* ent ) {
 	CreateParticleInfo info{};
 	info.m_szParticleName = name;
 	info.m_particleAttachment = attachType;
 	info.m_pTargetEntity = ent;
 
-	auto h = GetHandle( );
-	IncHandle( );
-	CallVFunc<9>( h, &info );
+	CallVFunc<9>( handle( ), &info );
 
 	ParticleWrapper result{};
 	result.info = info;
-	result.particle = GetParticleArray( )[GetParticleCount( ) - 1]->GetParticle( );
-	result.handle = h;
+	result.particle = GetParticles( ).last()->GetParticle( );
+	result.handle = handle( )++;
 
 	particles.push_back( result );
 
-	return result.handle;
+	return result;
 }
 
-void CDOTA_ParticleManager::DestroyParticle( uint32_t handle ) {
-	functions_call::DestroyParticle( this, handle, 1 );
+void CDOTA_ParticleManager::destroy_particle( uint32_t handle ) {
+	calls::destroy_particle( this, handle, 1 );
 }
 
-void CDOTA_ParticleManager::DestroyParticle( const char* name, C_BaseEntity* entity ) {
+void CDOTA_ParticleManager::destroy_particle( const char* name, C_BaseEntity* entity ) {
 	for ( auto& particle : particles ) {
 		if ( particle.info.m_szParticleName == name && particle.info.m_pTargetEntity == entity ) {
-			DestroyParticle( particle );
+			destroy_particle( particle );
 		}
 	}
 }
 
-void CDOTA_ParticleManager::DestroyParticle( ParticleWrapper& particleWrap ) {
+void CDOTA_ParticleManager::destroy_particle( ParticleWrapper& particleWrap ) {
 	if ( particleWrap.handle == std::numeric_limits<std::uint32_t>::max( ) ) return;
-	functions_call::DestroyParticle( this, particleWrap.handle, 1 );
-	particleWrap.Invalidate( );
+	calls::destroy_particle( this, particleWrap.handle, 1 );
+	particleWrap.invalidate( );
 }
 
-void CDOTA_ParticleManager::DestroyAllParticles( ) {
+void CDOTA_ParticleManager::destroy_own_particles( ) {
 	for ( auto& pw : particles )
-		DestroyParticle( pw );
+		destroy_particle( pw );
 
 	particles.clear( );
 }

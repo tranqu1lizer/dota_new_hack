@@ -4,7 +4,7 @@
 #include <cstdint>
 #include "valve/CUtlVector.hpp"
 #include "CGCClient.hpp"
-
+#include "../global.hpp"
 #define INVALID_EQUIPPED_SLOT ((equipped_slot_t)-1)
 
 typedef uint16_t equipped_class_t;
@@ -30,30 +30,26 @@ struct dirty_bits_t
 };
 
 class CEconItemCustomData;
+class CSOEconItem;
 
+// https://github.com/lua9520/source-engine-2018-hl2_src/blob/3bf9df6b2785fa6d951086978a3e66f49427166a/game/shared/econ/econ_item.h#L641
 class CEconItem : public CGCClientSharedObject
 {
 public:
-	// https://github.com/lua9520/source-engine-2018-hl2_src/blob/3bf9df6b2785fa6d951086978a3e66f49427166a/game/shared/econ/econ_item.h#L641
-	void* vmt2; // 0x8
-	uint64_t m_ulID; // 0x10 (Item ID)
-	uint64_t unknown; // 0x18
-	uint32_t m_unAccountID; // 0x20 (Account owner ID)
-	uint32_t m_numInventory; // 0x24
-	item_definition_index_t m_unDefIndex; // 0x28
+	void* unkx; // 0x0
+	uint64_t m_ulID; // 0x10
+	uint64_t unk; // 0x18
+	uint32_t m_unAccountID; // 0x20
+	uint32_t m_unInventory; // 0x24
+	int16_t m_unDefIndex; // 0x28
+	uint8_t m_nQuality;
+	uint8_t m_Level;
+	uint8_t m_unFlags;
+	uint8_t m_unOrigin;
+	char m_unStyle;
 
-	uint16_t& Flag( ) {
-		return Member<uint16_t>( 0x30 );
-	}
-	uint16_t& Class( ) {
-		return Member<uint16_t>( 0x32 );
-	}
-	uint16_t& Slot( ) {
-		return Member<uint16_t>( 0x34 );
-	}
-
-	dirty_bits_t m_dirtyBits;	// dirty bits
-
+	dirty_bits_t m_dirtyBits;
+	
 	struct EquippedInstance_t
 	{
 		EquippedInstance_t( ) : m_unEquippedClass( 0 ), m_unEquippedSlot( INVALID_EQUIPPED_SLOT ) {}
@@ -61,7 +57,6 @@ public:
 		equipped_class_t m_unEquippedClass;
 		equipped_slot_t m_unEquippedSlot;
 	};
-
 	struct attribute_t
 	{
 		attrib_definition_index_t m_unDefinitionIndex;
@@ -73,6 +68,23 @@ public:
 
 	// optional data (custom name, additional attributes, etc.)
 	CEconItemCustomData* m_pCustomData;
+
+	uint8_t& style( ) {
+		return Field<uint8_t>( 0x30 );
+	}
+	uint8_t& flags( ) {
+		return Field<uint8_t>( 0x31 );
+	}
+	uint16_t& un_class( ) {
+		return Field<uint16_t>( 0x32 );
+	}
+	uint16_t& un_slot( ) {
+		return Field<uint16_t>( 0x34 );
+	}
+
+	void DeserializeFromProto( CSOEconItem* proto ) {
+		return reinterpret_cast<void ( * )( CEconItem*, CSOEconItem* )>( global::patterns::CEconItem__DeserializeItemProtobuf )( this, proto );
+	}
 
 	void EnsureCustomDataExists( );
 	void UnequipFromClass( equipped_class_t unClass ) noexcept;
@@ -98,4 +110,101 @@ public:
 	CUtlVector<CEconItem::EquippedInstance_t> m_vecEquipped;
 
 	// static void FreeAttributeMemory(CEconItem::attribute_t* pAttrib);
+};
+
+enum eEconItemOrigin : std::uint32_t
+{
+	kEconItemOrigin_Invalid = -1,
+	kEconItemOrigin_Drop = 0x0,
+	kEconItemOrigin_Achievement = 0x1,
+	kEconItemOrigin_Purchased = 0x2,
+	kEconItemOrigin_Traded = 0x3,
+	kEconItemOrigin_Crafted = 0x4,
+	kEconItemOrigin_StorePromotion = 0x5,
+	kEconItemOrigin_Gifted = 0x6,
+	kEconItemOrigin_SupportGranted = 0x7,
+	kEconItemOrigin_FoundInCrate = 0x8,
+	kEconItemOrigin_Earned = 0x9,
+	kEconItemOrigin_ThirdPartyPromotion = 0xa,
+	kEconItemOrigin_GiftWrapped = 0xb,
+	kEconItemOrigin_HalloweenDrop = 0xc,
+	kEconItemOrigin_PackageItem = 0xd,
+	kEconItemOrigin_Foreign = 0xe,
+	kEconItemOrigin_CDKey = 0xf,
+	kEconItemOrigin_CollectionReward = 0x10,
+	kEconItemOrigin_PreviewItem = 0x11,
+	kEconItemOrigin_SteamWorkshopContribution = 0x12,
+	kEconItemOrigin_PeriodicScoreReward = 0x13,
+	kEconItemOrigin_Recycling = 0x14,
+	kEconItemOrigin_TournamentDrop = 0x15,
+	kEconItemOrigin_PassportReward = 0x16,
+	kEconItemOrigin_TutorialDrop = 0x17,
+	kEconItemOrigin_RecipeOutput = 0x18,
+	kEconItemOrigin_GemExtract = 0x19,
+	kEconItemOrigin_EventPointReward = 0x1a,
+	kEconItemOrigin_ItemRedemption = 0x1b,
+	kEconItemOrigin_FantasyTicketRefund = 0x1c,
+	kEconItemOrigin_VictoryPredictionReward = 0x1d,
+	kEconItemOrigin_AssassinEventReward = 0x1e,
+	kEconItemOrigin_CompendiumReward = 0x1f,
+	kEconItemOrigin_CompendiumDrop = 0x20,
+	kEconItemOrigin_MysteryItem = 0x21,
+	kEconItemOrigin_UnpackedFromBundle = 0x22,
+	kEconItemOrigin_WonFromWeeklyGame = 0x23,
+	kEconItemOrigin_SeasonalItemGrant = 0x24,
+	kEconItemOrigin_PackOpening = 0x25,
+	kEconItemOrigin_InitialGrant = 0x26,
+	kEconItemOrigin_MarketPurchase = 0x27,
+	kEconItemOrigin_MarketRefunded = 0x28,
+	kEconItemOrigin_LimitedDraft = 0x29,
+	kEconItemOrigin_GauntletReward = 0x2a,
+	kEconItemOrigin_CompendiumGift = 0x2b,
+	kEconItemOrigin_CandyShopPurchase = 0x2c,
+	kEconItemOrigin_Max = 0x2d,
+};
+
+class C_EconItemView
+{
+public:
+	void* pad;
+	item_definition_index_t m_iItemDefinitionIndex; // 0x8	
+	// MNetworkEnable
+	int32_t m_iEntityQuality; // 0xc	
+	// MNetworkEnable
+	uint32_t m_iEntityLevel; // 0x10	
+private:
+	[[maybe_unused]] uint8_t __pad0014[0x4]; // 0x14
+public:
+	// MNetworkEnable
+	itemid_t m_iItemID; // 0x18	
+	// MNetworkEnable
+	uint32_t m_iAccountID; // 0x20	
+	// MNetworkEnable
+	uint32_t m_iInventoryPosition; // 0x24	
+private:
+	[[maybe_unused]] uint8_t __pad0028[0x8]; // 0x28
+public:
+	// MNetworkEnable
+	bool m_bInitialized; // 0x30	
+	// MNetworkEnable
+	style_index_t m_nOverrideStyle; // 0x31	
+	bool m_bIsStoreItem; // 0x32	
+	bool m_bIsTradeItem; // 0x33	
+	bool m_bHasComputedAttachedParticles; // 0x34	
+	bool m_bHasAttachedParticles; // 0x35	
+private:
+	[[maybe_unused]] uint8_t __pad0036[0x2]; // 0x36
+public:
+	int32_t m_iEntityQuantity; // 0x38	
+	uint8_t m_unClientFlags; // 0x3c	
+private:
+	[[maybe_unused]] uint8_t __pad003d[0x3]; // 0x3d
+public:
+	eEconItemOrigin m_unOverrideOrigin; // 0x40	
+private:
+	[[maybe_unused]] uint8_t __pad0044[0xc]; // 0x44
+public:
+	char* m_pszGrayedOutReason; // 0x50	
+	// MNetworkEnable
+	void* m_AttributeList; // 0x58	
 };

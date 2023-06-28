@@ -22,7 +22,7 @@ public:
 	bool operator==( CUtlSymbol const& src ) const { return m_Id == src.m_Id; }
 	
 	// Is valid?
-	bool IsValid() const { return m_Id != UTL_INVAL_SYMBOL; }
+	bool is_valid() const { return m_Id != UTL_INVAL_SYMBOL; }
 	
 	// Gets at the symbol
 	operator UtlSymId_t const() const { return m_Id; }

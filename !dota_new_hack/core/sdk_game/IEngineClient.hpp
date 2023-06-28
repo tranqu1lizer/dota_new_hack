@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../main.hpp"
-#include "NormalClass.hpp"
 
 typedef struct player_t
 {
@@ -41,12 +40,21 @@ public:
 		return *GetInstanceImpl( );
 	}
 
-	int GetLocalPlayerSlot( ) {
-		int idx = 0;
-		CallVFunc<20>( &idx, 0, 0 );
-		return idx;
+	int localplayer_index( )
+	{
+		int idx = -1;
+		CallVFunc<26, DWORD>( &idx, 0 );
+		return idx == -1 ? -1 : idx + 1;
 	}
-	bool IsInGame( ) {
+
+	bool in_game( ) {
 		return static_cast<bool>(CallVFunc<30, unsigned char>( ));
+	}
+
+	vector2d screen_size( ) {
+		int x, y;
+		CallVFunc<48, void>( &x, &y );
+
+		return vector2d{ (float)x, (float)y };
 	}
 };

@@ -66,7 +66,7 @@ public:
 	vector3d( void );
 	vector3d( float X, float Y, float Z );
 	void Init( float ix = 0.0f, float iy = 0.0f, float iz = 0.0f );
-	bool IsValid( ) const;
+	bool is_valid( ) const;
 	float operator[]( int i ) const;
 	float& operator[]( int i );
 	inline void Zero( );
@@ -342,7 +342,7 @@ inline float vector3d::NormalizeInPlace( )
 //===============================================
 inline float VectorNormalize( vector3d& v )
 {
-	Assert( v.IsValid( ) );
+	Assert( v.is_valid( ) );
 	float l = v.Length( );
 	if ( l != 0.0f )
 	{
@@ -554,7 +554,7 @@ public:
 	void Init( float ix = 0.0f, float iy = 0.0f );
 
 	// Got any nasty NAN's?
-	bool IsValid( ) const;
+	bool is_valid( ) const;
 
 	// array access...
 	float operator[]( int i ) const;
@@ -718,14 +718,14 @@ inline vector2d::vector2d( void )
 inline vector2d::vector2d( float X, float Y )
 {
 	x = X; y = Y;
-	Assert( IsValid( ) );
+	Assert( is_valid( ) );
 }
 
 inline vector2d::vector2d( const float* pFloat )
 {
 	Assert( pFloat );
 	x = pFloat[0]; y = pFloat[1];
-	Assert( IsValid( ) );
+	Assert( is_valid( ) );
 }
 
 
@@ -735,7 +735,7 @@ inline vector2d::vector2d( const float* pFloat )
 
 inline vector2d::vector2d( const vector2d& vOther )
 {
-	Assert( vOther.IsValid( ) );
+	Assert( vOther.is_valid( ) );
 	x = vOther.x; y = vOther.y;
 }
 
@@ -746,7 +746,7 @@ inline vector2d::vector2d( const vector2d& vOther )
 inline void vector2d::Init( float ix, float iy )
 {
 	x = ix; y = iy;
-	Assert( IsValid( ) );
+	Assert( is_valid( ) );
 }
 
 inline void vector2d::Random( float minVal, float maxVal )
@@ -766,7 +766,7 @@ inline void Vector2DClear( vector2d& a )
 
 inline vector2d& vector2d::operator=( const vector2d& vOther )
 {
-	Assert( vOther.IsValid( ) );
+	Assert( vOther.is_valid( ) );
 	x = vOther.x; y = vOther.y;
 	return *this;
 }
@@ -805,7 +805,7 @@ inline float const* vector2d::Base( ) const
 // IsValid?
 //-----------------------------------------------------------------------------
 
-inline bool vector2d::IsValid( ) const
+inline bool vector2d::is_valid( ) const
 {
 	return IsFinite( x ) && IsFinite( y );
 }
@@ -816,13 +816,13 @@ inline bool vector2d::IsValid( ) const
 
 inline bool vector2d::operator==( const vector2d& src ) const
 {
-	Assert( src.IsValid( ) && IsValid( ) );
+	Assert( src.is_valid( ) && is_valid( ) );
 	return (src.x == x) && (src.y == y);
 }
 
 inline bool vector2d::operator!=( const vector2d& src ) const
 {
-	Assert( src.IsValid( ) && IsValid( ) );
+	Assert( src.is_valid( ) && is_valid( ) );
 	return (src.x != x) || (src.y != y);
 }
 
@@ -833,14 +833,14 @@ inline bool vector2d::operator!=( const vector2d& src ) const
 
 inline void Vector2DCopy( const vector2d& src, vector2d& dst )
 {
-	Assert( src.IsValid( ) );
+	Assert( src.is_valid( ) );
 	dst.x = src.x;
 	dst.y = src.y;
 }
 
 inline void	vector2d::CopyToArray( float* rgfl ) const
 {
-	Assert( IsValid( ) );
+	Assert( is_valid( ) );
 	Assert( rgfl );
 	rgfl[0] = x; rgfl[1] = y;
 }
@@ -851,20 +851,20 @@ inline void	vector2d::CopyToArray( float* rgfl ) const
 
 inline void vector2d::Negate( )
 {
-	Assert( IsValid( ) );
+	Assert( is_valid( ) );
 	x = -x; y = -y;
 }
 
 inline vector2d& vector2d::operator+=( const vector2d& v )
 {
-	Assert( IsValid( ) && v.IsValid( ) );
+	Assert( is_valid( ) && v.is_valid( ) );
 	x += v.x; y += v.y;
 	return *this;
 }
 
 inline vector2d& vector2d::operator-=( const vector2d& v )
 {
-	Assert( IsValid( ) && v.IsValid( ) );
+	Assert( is_valid( ) && v.is_valid( ) );
 	x -= v.x; y -= v.y;
 	return *this;
 }
@@ -873,7 +873,7 @@ inline vector2d& vector2d::operator*=( float fl )
 {
 	x *= fl;
 	y *= fl;
-	Assert( IsValid( ) );
+	Assert( is_valid( ) );
 	return *this;
 }
 
@@ -881,7 +881,7 @@ inline vector2d& vector2d::operator*=( const vector2d& v )
 {
 	x *= v.x;
 	y *= v.y;
-	Assert( IsValid( ) );
+	Assert( is_valid( ) );
 	return *this;
 }
 
@@ -891,7 +891,7 @@ inline vector2d& vector2d::operator/=( float fl )
 	float oofl = 1.0f / fl;
 	x *= oofl;
 	y *= oofl;
-	Assert( IsValid( ) );
+	Assert( is_valid( ) );
 	return *this;
 }
 
@@ -900,34 +900,34 @@ inline vector2d& vector2d::operator/=( const vector2d& v )
 	Assert( v.x != 0.0f && v.y != 0.0f );
 	x /= v.x;
 	y /= v.y;
-	Assert( IsValid( ) );
+	Assert( is_valid( ) );
 	return *this;
 }
 
 inline void Vector2DAdd( const vector2d& a, const vector2d& b, vector2d& c )
 {
-	Assert( a.IsValid( ) && b.IsValid( ) );
+	Assert( a.is_valid( ) && b.is_valid( ) );
 	c.x = a.x + b.x;
 	c.y = a.y + b.y;
 }
 
 inline void Vector2DSubtract( const vector2d& a, const vector2d& b, vector2d& c )
 {
-	Assert( a.IsValid( ) && b.IsValid( ) );
+	Assert( a.is_valid( ) && b.is_valid( ) );
 	c.x = a.x - b.x;
 	c.y = a.y - b.y;
 }
 
 inline void Vector2DMultiply( const vector2d& a, float b, vector2d& c )
 {
-	Assert( a.IsValid( ) && IsFinite( b ) );
+	Assert( a.is_valid( ) && IsFinite( b ) );
 	c.x = a.x * b;
 	c.y = a.y * b;
 }
 
 inline void Vector2DMultiply( const vector2d& a, const vector2d& b, vector2d& c )
 {
-	Assert( a.IsValid( ) && b.IsValid( ) );
+	Assert( a.is_valid( ) && b.is_valid( ) );
 	c.x = a.x * b.x;
 	c.y = a.y * b.y;
 }
@@ -935,7 +935,7 @@ inline void Vector2DMultiply( const vector2d& a, const vector2d& b, vector2d& c 
 
 inline void Vector2DDivide( const vector2d& a, float b, vector2d& c )
 {
-	Assert( a.IsValid( ) );
+	Assert( a.is_valid( ) );
 	Assert( b != 0.0f );
 	float oob = 1.0f / b;
 	c.x = a.x * oob;
@@ -944,7 +944,7 @@ inline void Vector2DDivide( const vector2d& a, float b, vector2d& c )
 
 inline void Vector2DDivide( const vector2d& a, const vector2d& b, vector2d& c )
 {
-	Assert( a.IsValid( ) );
+	Assert( a.is_valid( ) );
 	Assert( (b.x != 0.0f) && (b.y != 0.0f) );
 	c.x = a.x / b.x;
 	c.y = a.y / b.y;
@@ -952,7 +952,7 @@ inline void Vector2DDivide( const vector2d& a, const vector2d& b, vector2d& c )
 
 inline void Vector2DMA( const vector2d& start, float s, const vector2d& dir, vector2d& result )
 {
-	Assert( start.IsValid( ) && IsFinite( s ) && dir.IsValid( ) );
+	Assert( start.is_valid( ) && IsFinite( s ) && dir.is_valid( ) );
 	result.x = start.x + s * dir.x;
 	result.y = start.y + s * dir.y;
 }
@@ -976,7 +976,7 @@ inline void Vector2DLerp( const vector2d& src1, const vector2d& src2, float t, v
 //-----------------------------------------------------------------------------
 inline float DotProduct2D( const vector2d& a, const vector2d& b )
 {
-	Assert( a.IsValid( ) && b.IsValid( ) );
+	Assert( a.is_valid( ) && b.is_valid( ) );
 	return(a.x * b.x + a.y * b.y);
 }
 
@@ -992,13 +992,13 @@ inline float vector2d::Dot( const vector2d& vOther ) const
 //-----------------------------------------------------------------------------
 inline float Vector2DLength( const vector2d& v )
 {
-	Assert( v.IsValid( ) );
+	Assert( v.is_valid( ) );
 	return (float)FastSqrt( v.x * v.x + v.y * v.y );
 }
 
 inline float vector2d::LengthSqr( void ) const
 {
-	Assert( IsValid( ) );
+	Assert( is_valid( ) );
 	return (x * x + y * y);
 }
 
@@ -1042,7 +1042,7 @@ inline void Vector2DMax( const vector2d& a, const vector2d& b, vector2d& result 
 //-----------------------------------------------------------------------------
 inline float Vector2DNormalize( vector2d& v )
 {
-	Assert( v.IsValid( ) );
+	Assert( v.is_valid( ) );
 	float l = v.Length( );
 	if ( l != 0.0f )
 	{
@@ -1233,8 +1233,8 @@ public:
 	void Random( float minVal, float maxVal );
 
 	// Got any nasty NAN's?
-	bool IsValid( ) const;
-	void Invalidate( );
+	bool is_valid( ) const;
+	void invalidate( );
 
 	// array access...
 	float operator[]( int i ) const;

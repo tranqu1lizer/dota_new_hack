@@ -34,6 +34,8 @@ typedef void( __cdecl* SteamAPIWarningMessageHook_t )(int, const char*);
 typedef void(*SteamAPI_PostAPIResultInProcess_t)(SteamAPICallHandle callHandle, void*, uint32_t unCallbackSize, int iCallbackNum);
 typedef uint32_t( *SteamAPI_CheckCallbackRegistered_t )(int iCallbackNum);
 
+constexpr auto proto_size = 8; //sizeof( ProtoBufMsgHeader_t );
+
 enum EGCResults
 {
 	k_EGCResultOK = 0,
@@ -86,10 +88,13 @@ class ISteamClient
 		return inst;
 	}
 public:
-	static auto& GetInstance( )
+	static auto& get( )
 	{
 		return *GetInstanceImpl( );
 	}
+
+	inline static HSteamPipe( *GetHSteamPipe )( ) = nullptr;
+	inline static HSteamUser( *GetHSteamUser )( ) = nullptr;
 
 	virtual HSteamPipe CreateSteamPipe( ) = 0;
 	virtual bool BReleaseSteamPipe( HSteamPipe hSteamPipe ) = 0;
@@ -132,6 +137,32 @@ public:
 class ISteamGameCoordinator
 {
 public:
+	template<class T = google::protobuf::Message>
+	bool send_msg( T message, int message_id ) {
+		void* ptr = malloc( message.ByteSizeLong( ) + proto_size );
+		if ( !ptr ) return false;
+		uint32_t msgtype = message_id | ( 1 << 31 );
+		util::memcpy( ptr, &msgtype, sizeof( uint32_t ) );
+		reinterpret_cast<uint32_t*>( ptr )[1] = 0;
+		message.SerializeToArray( reinterpret_cast<void*>( reinterpret_cast<uintptr_t>( ptr ) + proto_size ), message.ByteSizeLong( ) );
+
+		return SendMessage_( msgtype, ptr, message.ByteSizeLong( ) + 8 ) == k_EGCResultOK;
+	}
+
+	// Not working(returns k_buffertosmall) i think need to hook IsMessageAvailable and return true with stealing pcubMsgSize;
+	template<class T = google::protobuf::Message>
+	bool retrieve_msg( T message, int message_id ) {
+		void* ptr = malloc( message.ByteSizeLong( ) + proto_size );
+		if ( !ptr ) return false;
+		uint32_t msgtype = message_id | ( 1 << 31 );
+		util::memcpy( ptr, &msgtype, sizeof( uint32_t ) );
+		reinterpret_cast<uint32_t*>( ptr )[1] = 0;
+		message.SerializeToArray( reinterpret_cast<void*>( reinterpret_cast<uintptr_t>( ptr ) + proto_size ), message.ByteSizeLong( ) );
+		uint32 cubData = message.ByteSizeLong( );
+
+		return RetrieveMessage( &msgtype, ptr, message.ByteSizeLong( ) + 8, &cubData ) == k_EGCResultOK;
+	}
+
 	virtual EGCResults SendMessage_( uint32_t unMsgType, const void* pubData, uint32_t cubData ) = 0;
 	virtual bool IsMessageAvailable( uint32_t* pcubMsgSize ) = 0;
 	virtual EGCResults RetrieveMessage( uint32_t* punMsgType, void* pubDest, uint32_t cubDest, uint32_t* pcubMsgSize ) = 0;

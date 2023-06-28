@@ -1,25 +1,27 @@
-#include <cstdint>
+class CStyleProperty;
+
+class CStyleSymbol;
+class CUILength;
 
 class CStyleFactoryWrapper {
 public:
-	virtual bool BRegisteredProperty( __int8* a2 ) = 0; // 0x0
-	virtual bool BRegisteredAlias( unsigned __int8* a2 ) = 0; // 0x8
-	virtual unsigned long long* GetPropertyNameForAlias( unsigned __int8* a2, unsigned __int8* a3 ) = 0; // 0x10
-	virtual void* CreateStyleProperty( __int8* a2 ) = 0; // 0x18
-	virtual void func4( ) = 0; // 0x20
-	virtual void func5( ) = 0; // 0x28
-	virtual void func6( ) = 0; // 0x30
+	virtual bool BRegisteredProperty( CStyleSymbol symName ) = 0;
+	virtual CStyleSymbol BRegisteredAlias( CStyleSymbol symName ) = 0;
+	virtual CStyleSymbol GetPropertyNameForAlias( unsigned __int8* a2, unsigned __int8* a3 ) = 0;
+	virtual CStyleProperty* CreateStyleProperty( CStyleSymbol symName ) = 0;
+	virtual void FreeStyleProperty( CStyleProperty* pProperty ) = 0;
+	// virtual const CUtlVector< CUtlString >& GetSortedPropertyAndAliasNames( ) = 0;
 };
 
 class CPanelStyle {
 public:
-	virtual void func0( ) = 0; // 0x0
-	virtual void func1( ) = 0; // 0x8
-	virtual void func2( ) = 0; // 0x10
-	virtual void func3( ) = 0; // 0x18
-	virtual void func4( ) = 0; // 0x20
-	virtual void func5( ) = 0; // 0x28
-	virtual void func6( ) = 0; // 0x30
+	virtual void Clear( bool idk ) = 0; // 0x0
+	virtual void* GetUIScaleFactor( void ) = 0; // 0x8
+	virtual bool BHasAnyStyleDataForProperty( CStyleSymbol hSymbolProperty ) = 0;  // 0x10
+	virtual void GetPosition( CUILength& x, CUILength& y, CUILength& z, bool bIncludeUIScaleFactor = true ) = 0;// 0x18
+	virtual void GetInterpolatedPosition( CUILength& x, CUILength& y, CUILength& z, bool bFinal, bool bIncludeUIScaleFactor = true ) = 0; // 0x20
+	virtual void SetPosition( CUILength x, CUILength y, CUILength z, bool bPreScaledByUIScaleFactor = false ) = 0; // 0x28
+	virtual void SetPositionWithoutTransition( CUILength x, CUILength y, CUILength z, bool bPreScaledByUIScaleFactor = false ) = 0; // 0x30
 	virtual void func7( ) = 0; // 0x38
 	virtual void func8( ) = 0; // 0x40
 	virtual void func9( ) = 0; // 0x48
@@ -102,7 +104,7 @@ public:
 	virtual void func86( ) = 0; // 0x2b0
 	virtual void func87( ) = 0; // 0x2b8
 	virtual bool GetVisiblity( bool* out ) = 0; // 0x2c0
-	virtual void SetVisibility( bool vis ) = 0; // 0x2c8
+	virtual void set_visibility( bool vis ) = 0; // 0x2c8
 	virtual void func90( ) = 0; // 0x2d0
 	virtual void func91( ) = 0; // 0x2d8
 	virtual void func92( ) = 0; // 0x2e0
