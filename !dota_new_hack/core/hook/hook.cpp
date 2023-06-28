@@ -3,7 +3,6 @@
 #include "../../gui/panorama_gui.h"
 #include "../features/inventory_changer.h"
 #include "../features/hero_bar.h"
-#include <Psapi.h>
 
 extern CGui* pGui;
 extern CPanoramaGUI panorama_gui;
@@ -243,7 +242,8 @@ long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UI
 	ImGui_ImplWin32_NewFrame( );
 	ImGui::NewFrame( );
 
-	// pGui->Render( );
+	// OLD IMGUI MENU
+	// pGui->Render( ); 
 
 	if ( panorama_gui.draw_health && g_pGameRules && ( g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS ||
 		 g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_PRE_GAME ) )

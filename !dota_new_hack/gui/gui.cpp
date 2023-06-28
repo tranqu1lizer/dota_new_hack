@@ -248,18 +248,18 @@ void CGui::Render( ) {
 				ImGui::SliderInt( "Camera step", &this->camera_step, 10, 300 );
 
 			if ( ImGui::Combo( "Weather", &this->current_weather, weather_list, IM_ARRAYSIZE( weather_list ) ) ) {
-				ICVar::get( )["cl_weather"]->value.i32 = this->current_weather;
+				ICVar::get( )["cl_weather"]->m_value.i32 = this->current_weather;
 			}
 
 			if ( ImGui::Combo( "River type", &this->current_river, river_list, IM_ARRAYSIZE( river_list ) ) ) {
 				int idx;
 				auto river_type = ICVar::get( ).find_convar( "dota_river_type", idx );
-				const auto old_val = river_type->value;
-				river_type->value.i32 = this->current_river;
+				const auto& old_val = river_type->m_value;
+				river_type->m_value.i32 = this->current_river;
 
 				if ( auto cb = ICVar::get( ).GetCVarCallback( river_type->CALLBACK_INDEX ); cb )
 					cb( ConVarID{ .impl = static_cast<std::uint64_t>( idx ), .var_ptr = (void*)&river_type },
-						0, &river_type->value, &old_val );
+						0, &river_type->m_value, &old_val );
 			}
 		}
 	}

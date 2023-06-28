@@ -167,13 +167,26 @@ public:
 		return nullptr;
 	}
 
-	ConVariable* operator[]( const std::string_view& name ) {
+	template<typename T = ConVariable>
+	T* operator[]( const std::string_view& name ) {
 		for ( const auto& [cvar_node, idx] : this->cvars( ) )
 		{
-			if ( cvar_node && name == cvar_node->name ) {
+			if ( !cvar_node || !cvar_node->name )
+				continue;
+
+			if ( name == cvar_node->name )
 				return cvar_node;
-			}
 		}
+
+		for ( auto& ccmd : this->ccommands( ) ) {
+
+			if ( !( &ccmd ) || !ccmd.m_name )
+				continue;
+
+			if ( name == ccmd.m_name )
+				return (T*)&ccmd;
+		}
+
 
 		return nullptr;
 	}
