@@ -274,28 +274,17 @@ void hook::functions::OnMouseWheeled( CDOTA_Camera* rcx, int delta ) {
 	}
 }
 
-#define LAST_IND_IDA(x,part_type)    (sizeof(x)/sizeof(part_type) - 1)
-#define HIGH_IND_IDA(x,part_type)  LAST_IND_IDA(x,part_type)
-#define BYTEn_IDA(x, n)   (*((_BYTE*)&(x)+n))
-#define HIBYTE_IDA(x)  BYTEn_IDA(x,HIGH_IND_IDA(x,_BYTE))
-
 LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int uMsg, const uintptr_t wParam, const uintptr_t lParam ) {
 	if ( uMsg == WM_KEYUP ) {
 		if ( wParam == VK_F1 ) {
-			// url("s2r://panorama/images/front_page/ti6_video_bg_psd.vtex")
 			auto bg = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaDashboard" )->find_child_traverse( "DashboardBackgroundManager" )->children( )[ 0 ];
 			bg->set_style( "background-image: url(\"file://{resources}/ambg.vtex\");" );
 		}
 		if ( wParam == VK_F2 ) {
-			// some_function RegisterConVar_0 = util::find_pattern( global::client, "48 89 5C 24 ? 48 89 74 24 ? 55 48 8D 6C 24 ? 48 81 EC ? ? ? ? 33 C0" );
-			
-			CVar* camera_dist_ = ICVar::get( ).register_convar( "camera_dist_" );
-
-			camera_dist_->m_description = "desc";
-			camera_dist_->m_var_type = EConvarType::String;
-			camera_dist_->m_values.str = " 123232 dasdas";
-
-			spdlog::critical( "camera_dist_ var: {}\n", (void*)camera_dist_ );
+			int idx;
+			if ( CVar* ptr = ICVar::get( ).register_convar( "dota2", &idx ); ptr ) {
+				spdlog::debug( "Registered cvar: {}, ptr: {}\n", idx, (void*)ptr->m_name );
+			}
 		}
 		if ( wParam == VK_F3 ) {
 			panorama_gui.show( );
