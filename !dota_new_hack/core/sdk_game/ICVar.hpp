@@ -89,7 +89,7 @@ union CVarValue_t
 class CVar
 {
 public:
-	const char* name;
+	const char* m_name;
 	CVar* m_nextnode;
 	CVarValue_t* m_minvalue;
 	CVarValue_t* m_maxvalue;
@@ -110,8 +110,8 @@ public:
 
 struct CvarNode
 {
-	CVar* var{};
-	int index{};
+	CVar* var;
+	std::int32 index;
 };
 
 struct ConVarID
@@ -129,7 +129,7 @@ struct ConVarID
 	}
 };
 
-using t_CvarCallback = void(*)(const ConVarID& id, int unk1, const CVarValue_t* val, const CVarValue_t* old_val);
+using t_CvarCallback = void( * )( const ConVarID& id, int unk1, const CVarValue_t* val, const CVarValue_t* old_val );
 
 class ICVar : VClass {
 	static auto GetInstanceImpl( )
@@ -143,17 +143,16 @@ public:
 		return *GetInstanceImpl( );
 	}
 
-	inline static void* ( *aRegisterConVar )( uint64*, const char*, unsigned short ) = nullptr;
-
-	CVar* register_convar( const char* name, std::int32_t flags = FCVAR_CLIENTDLL ) {
+	CVar* register_convar( const char* name, std::int32_t* index = nullptr ) {
+		static some_function RegisterConVar = util::get_absolute_address( util::find_pattern( global::client, "\xE8\xCC\xCC\xCC\xCC\x48\x63\x6E\x40", "", false ), 1, 5 );
+		if ( !RegisterConVar.ptr ) return nullptr;
 		uint64 cvar_[ 2 ];
-		aRegisterConVar( cvar_, name, 0 );
-		CVar* registered = (CVar*)cvar_[ 1 ];
-		registered->m_flags &= flags;
+		RegisterConVar( cvar_, name, 0 );
 
-		return registered;
+		if ( index ) *index = cvar_[ 0 ];
+		return (CVar*)cvar_[ 1 ];
 	}
-	
+
 	std::span<CvarNode> cvars( ) {
 		return std::span<CvarNode>{ Member<CvarNode*>( 0x40 ), Member<std::uint16_t>( 0x58 ) };
 	}
@@ -166,7 +165,7 @@ public:
 	{
 		if ( index ) {
 			if ( auto table = Member<void*>( 0x80 ); table )
-				return *reinterpret_cast<t_CvarCallback*>(reinterpret_cast<std::uintptr_t>(table) + 24 * static_cast<unsigned long long>(index));
+				return *reinterpret_cast<t_CvarCallback*>( reinterpret_cast<std::uintptr_t>( table ) + 24 * static_cast<unsigned long long>( index ) );
 		}
 
 		return nullptr;
@@ -175,7 +174,7 @@ public:
 	CVar* find_convar( const std::string_view& name, int& index ) {
 		for ( const auto& [cvar_node, idx] : this->cvars( ) )
 		{
-			if ( cvar_node && name == cvar_node->name ) {
+			if ( cvar_node && name == cvar_node->m_name ) {
 				index = idx;
 				return cvar_node;
 			}
@@ -188,10 +187,10 @@ public:
 	T* operator[]( const std::string_view& name ) {
 		for ( const auto& [cvar_node, idx] : this->cvars( ) )
 		{
-			if ( !cvar_node || !cvar_node->name )
+			if ( !cvar_node || !cvar_node->m_name )
 				continue;
 
-			if ( name == cvar_node->name )
+			if ( name == cvar_node->m_name )
 				return cvar_node;
 		}
 
