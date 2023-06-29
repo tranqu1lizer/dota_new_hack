@@ -126,6 +126,7 @@ bool start_init( ) {
 		FIND_FUNC_CLIENT_CALL( calls::GetLevelSpecialValueFor, "E8 ?? ?? ?? ?? F3 0F 5A C0", "C_BaseEntity::FindLevelSpecialValueFor" );
 		FIND_FUNC_CLIENT_CALL( calls::CDOTA_Hud_Top_Bar__UpdateNetWorthDifference, "E8 ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B C8 E8 ?? ?? ?? ?? 84 C0 0F 84 ?? ?? ?? ?? E8", "CDOTA_Hud_Top_Bar::UpdateNetWorthDifference" );
 		FIND_FUNC_CLIENT_CALL( CDOTAItemSchema::GetItemDefByIndex, "E8 ?? ?? ?? ?? 8B 4E 64", "CDOTAItemSchema::GetItemDefByIndex" );
+		FIND_FUNC_CLIENT_CALL( ICVar::aRegisterConVar, "E8 ?? ?? ?? ?? 48 63 6E 40", "ICVar::RegisterConVar" );
 
 		FIND_FUNC_CLIENT_CALL( C_DOTA_PlayerResource::aGetNetWorthOfPlayer, "E8 ?? ?? ?? ?? F3 0F 5F F7", "C_DOTA_PlayerResource::GetNetWorthOfPlayer" );
 		FIND_FUNC_CLIENT_CALL( C_DOTA_PlayerResource::aGetLastHits, "E8 ?? ?? ?? ?? 3B F0 7C 5A", "C_DOTA_PlayerResource::GetLastHits" );
@@ -181,14 +182,14 @@ bool start_init( ) {
 		if ( !cvar_node || !cvar_node->name )
 			continue;
 
-		if ( cvar_node->flags & FCVAR_DEVELOPMENTONLY )
-			cvar_node->flags &= ~FCVAR_DEVELOPMENTONLY;
+		if ( cvar_node->m_flags & FCVAR_DEVELOPMENTONLY )
+			cvar_node->m_flags &= ~FCVAR_DEVELOPMENTONLY;
 
-		if ( cvar_node->flags & FCVAR_HIDDEN )
-			cvar_node->flags &= ~FCVAR_HIDDEN;
+		if ( cvar_node->m_flags & FCVAR_HIDDEN )
+			cvar_node->m_flags &= ~FCVAR_HIDDEN;
 
 #ifdef _DEBUG
-		cvar_node->flags &= FCVAR_NOTIFY;
+		cvar_node->m_flags &= FCVAR_NOTIFY;
 #endif
 	}
 

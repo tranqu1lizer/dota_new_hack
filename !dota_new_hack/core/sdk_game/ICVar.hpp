@@ -69,7 +69,7 @@ enum class EConvarType : std::uint8_t
 	Qangle
 };
 
-union ConVarValue_t
+union CVarValue_t
 {
 	bool boolean{};
 	std::uint64_t u64;
@@ -86,25 +86,31 @@ union ConVarValue_t
 	QAngle qangle;
 };
 
-struct ConVariable
+class CVar
 {
-	const char* name{};
-	void* next_convar_node_like_shit{};
-	void* unk1{};
-	void* unk2{};
-	const char* help{};
-	EConvarType type{};
-	int unk3{};
-	int flags{};
-	int unk4{};
-	int CALLBACK_INDEX{};
-	int unk5{};
-	ConVarValue_t m_value;
+public:
+	const char* name;
+	CVar* m_nextnode;
+	CVarValue_t* m_minvalue;
+	CVarValue_t* m_maxvalue;
+	const char* m_description;
+	EConvarType m_var_type;
+	std::uint32_t m_times_changed;
+	std::int32_t m_flags;
+private:
+	int unk1;
+public:
+	int m_callbackindex;
+private:
+	int unk2;
+public:
+	CVarValue_t m_values;
+	CVarValue_t m_defaultvalue;
 };
 
 struct CvarNode
 {
-	ConVariable* var{};
+	CVar* var{};
 	int index{};
 };
 
@@ -123,7 +129,7 @@ struct ConVarID
 	}
 };
 
-using t_CvarCallback = void(*)(const ConVarID& id, int unk1, const ConVarValue_t* val, const ConVarValue_t* old_val);
+using t_CvarCallback = void(*)(const ConVarID& id, int unk1, const CVarValue_t* val, const CVarValue_t* old_val);
 
 class ICVar : VClass {
 	static auto GetInstanceImpl( )
@@ -137,6 +143,17 @@ public:
 		return *GetInstanceImpl( );
 	}
 
+	inline static void* ( *aRegisterConVar )( uint64*, const char*, unsigned short ) = nullptr;
+
+	CVar* register_convar( const char* name, std::int32_t flags = FCVAR_CLIENTDLL ) {
+		uint64 cvar_[ 2 ];
+		aRegisterConVar( cvar_, name, 0 );
+		CVar* registered = (CVar*)cvar_[ 1 ];
+		registered->m_flags &= flags;
+
+		return registered;
+	}
+	
 	std::span<CvarNode> cvars( ) {
 		return std::span<CvarNode>{ Member<CvarNode*>( 0x40 ), Member<std::uint16_t>( 0x58 ) };
 	}
@@ -155,7 +172,7 @@ public:
 		return nullptr;
 	}
 
-	ConVariable* find_convar( const std::string_view& name, int& index ) {
+	CVar* find_convar( const std::string_view& name, int& index ) {
 		for ( const auto& [cvar_node, idx] : this->cvars( ) )
 		{
 			if ( cvar_node && name == cvar_node->name ) {
@@ -167,7 +184,7 @@ public:
 		return nullptr;
 	}
 
-	template<typename T = ConVariable>
+	template<typename T = CVar>
 	T* operator[]( const std::string_view& name ) {
 		for ( const auto& [cvar_node, idx] : this->cvars( ) )
 		{

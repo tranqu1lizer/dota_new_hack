@@ -149,7 +149,7 @@ bool CPanel2D__OnMouseButtonDown( CPanel2D* rcx, const MouseData_t& code ) {
 			else if ( rcx == panorama_gui.camera_draw_button->panel2d_as( ) )
 				panorama_gui.draw_particles ^= true;
 			else if ( rcx == panorama_gui.misc_unlock_emoticons->panel2d_as( ) )
-				ICVar::get( )[ "dota_hud_chat_enable_all_emoticons" ]->m_value.boolean ^= true;
+				ICVar::get( )[ "dota_hud_chat_enable_all_emoticons" ]->m_values.boolean ^= true;
 			else if ( rcx == panorama_gui.misc_networth_delta->panel2d_as( ) ) {
 				MiscGoldDisplay_Handler( );
 			}
