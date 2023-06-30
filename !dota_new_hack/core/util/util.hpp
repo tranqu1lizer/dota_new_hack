@@ -34,6 +34,7 @@ namespace util {
 	int fast_strcmp( char* s1, char* s2 );
 	FARPROC find_export_address( HMODULE hModule, const char* lpProcName );
 	void* memset( void* src, int val, unsigned __int64 count );
+	int memcmp( const void* buf1,const void* buf2,size_t count );
 	void* memcpy( void* dest, const void* src, unsigned __int64 count );
 	void* find_game_system( const char* name );
 	std::size_t fast_strlen( const char* str );

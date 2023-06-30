@@ -86,6 +86,7 @@
 #include "core/sdk_game/CRenderGameSystem.hh"
 #include "core/sdk_game/Data.hpp"
 #include "core/sdk_game/CDOTAItemDefintion.hpp"
+#include "core/sdk_game/CDOTAInput.h"
 #include "core/functions.hpp"
 
 #ifdef _DEBUG

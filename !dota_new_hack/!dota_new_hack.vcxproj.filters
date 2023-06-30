@@ -457,6 +457,7 @@
     <ClInclude Include="core\sdk_game\C_DOTA_PlayerResource.h" />
     <ClInclude Include="core\sdk_game\ISteamFriends.h" />
     <ClInclude Include="core\sdk_game\panorama\CLayoutManager.h" />
+    <ClInclude Include="core\sdk_game\CDOTAInput.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
