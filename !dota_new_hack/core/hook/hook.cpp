@@ -188,6 +188,10 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 	if ( global::in_game = IEngineClient::GetInstance( ).in_game( ); global::in_game ) {
 
 		if ( !global::g_LocalEntity ) {
+			if ( calls::GetCurrentCamera ) {
+				aGetInput = util::get_absolute_address( reinterpret_cast<VClass*>( calls::GetCurrentCamera( ) )->GetVF( 3 ) + 0x1d8, 1, 5 );
+			}
+
 			static C_DOTAPlayerController** players = (decltype( players ))util::get_absolute_address( util::find_pattern( global::client, "\x48\x8B\x05\xCC\xCC\xCC\xCC\x89\xBE", "", false ), 3, 7 );
 
 			if ( const auto local_controller = players[ 0 ]; local_controller ) {
@@ -201,9 +205,9 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 		}
 
 		static bool camera_hooked = false;
-		if ( !camera_hooked && calls::GetCurrentCamera ) {
+		if ( !camera_hooked ) {
 			if ( auto camera = reinterpret_cast<VClass*>( calls::GetCurrentCamera( ) ); camera ) {
-				hook::install_hook( camera->GetVF( 9 ), &hook::functions::OnMouseWheeled, &hook::original::fpOnMouseWheeled, "C_DOTACamera::OnMouseWheeled" );
+				hook::install_hook( camera->GetVF( 9 ), &hook::functions::OnMouseWheeled, &hook::original::fpOnMouseWheeled, "CDOTA_Camera::OnMouseWheeled" );
 				camera_hooked = true;
 			}
 		}
@@ -264,7 +268,6 @@ long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UI
 		if ( panorama_gui.draw_health )
 			features::hero_bar.draw_health( panorama_gui.draw_mana_bar );
 
-
 		vector2d scr;
 
 		if ( !cheat_data.traced_cursor.IsZero( ) && CRenderGameSystem::GetInstance( )->GetVectorInScreenSpace( cheat_data.traced_cursor, scr ) ) {
@@ -303,10 +306,13 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 			//auto bg = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaDashboard" )->find_child_traverse( "DashboardBackgroundManager" )->children( )[ 0 ];
 			//bg->set_style( "background-image: url(\"file://{resources}/ambg.vtex\");" );
 
-			auto radiant_players = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "TopBarRadiantPlayersContainer" );
-			auto dire_players = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "TopBarDirePlayersContainer" );
+			//auto radiant_players = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "TopBarRadiantPlayersContainer" );
+			//auto dire_players = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "TopBarDirePlayersContainer" );
 
-
+			void* ptr = util::get_interface( "engine2.dll", "InputService_001" );
+			void* ptr1 = util::get_interface( "inputsystem.dll", "InputSystemVersion001" );
+			void* ptr2 = util::get_interface( "inputsystem.dll", "InputStackSystemVersion001" );
+			spdlog::debug( "ptr: {}, ptr1: {}, ptr2: {}\n", ptr, ptr1, ptr2 );
 		}
 		if ( wParam == VK_F2 ) {
 			int idx;
