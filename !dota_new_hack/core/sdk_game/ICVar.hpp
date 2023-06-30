@@ -111,7 +111,7 @@ public:
 struct CvarNode
 {
 	CVar* var;
-	std::int32 index;
+	std::int32_t index;
 };
 
 struct ConVarID

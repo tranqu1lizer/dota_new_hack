@@ -13,6 +13,7 @@ namespace hook {
 	void uninstall_all_hooks( );
 
 	namespace original {
+		inline void* fpCreateMove;
 		inline void* fpBAsyncSendProto;
 		inline void* fpOnMouseWheeled;
 		inline void* fpSGCRetrieveMessage;
@@ -23,6 +24,7 @@ namespace hook {
 	}
 
 	namespace functions {
+		void CreateMove( CDOTAInput* rcx, int unk, bool unk1 );
 		bool BAsyncSendProto( CProtoBufMsgBase* protobufMsg, IProtoBufSendHandler* handler, google::protobuf::Message* responseMsg, unsigned int respMsgID );
 		EGCResults SGCRetrieveMessage( ISteamGameCoordinator* thisptr, uint32* punMsgType, ProtoBufMsgHeader_t* pubDest, uint32 cubDest, uint32* pcubMsgSize );
 		bool SendNetMessage( INetChannel* thisptr, NetMessageHandle_t* messageHandle, google::protobuf::Message* msg, NetChannelBufType_t type );

@@ -151,6 +151,7 @@ bool start_init( ) {
 		CHECK_VAR_RET( aSteamGC );
 
 		DETOUR_PATTERN( "client.dll", "E8 ?? ?? ?? ?? 48 8B 4D 90 48 89 7C 24", "CGCClient::BAsyncSendProto", BAsyncSendProto, true, true );
+		DETOUR_PATTERN( "client.dll", "44 88 44 24 ?? 89 54 24 ?? 55 53 56 57 41 54", "CDOTAInput::CreateMove", CreateMove, true, false );
 		DETOUR_PATTERN( "GameOverlayRenderer64.dll", "48 89 6C 24 ?? 48 89 74 24 ?? 41 56 48 83 EC ?? 41 8B E8", "SteamOverlayPresent", Present, true, false );
 
 		DETOUR_VF( GAB( aNetchanVMT + 0x15, 3, 7 ), 86, PostReceivedNetMessage, true );

@@ -32,6 +32,19 @@ void EntityEventListener::OnEntityDeleted( C_BaseEntity* rcx ) {
 	}
 }
 
+void hook::functions::CreateMove( CDOTAInput* rcx, int always_null, bool always_true ) {
+	reinterpret_cast<decltype( &CreateMove )>( hook::original::fpCreateMove )( rcx, always_null, always_true );
+
+	auto user_cmd = (CDota2UserCmdPB*)( (char*)rcx + 0x68 * ( rcx->m_sequence_number % 150 ) + always_null + 0x10 );
+
+	if ( user_cmd->has_crosshairtrace( ) && user_cmd->has_cameraposition_x( ) && user_cmd->has_cameraposition_y( ) ) {
+		cheat_data.traced_cursor = vector3d{ user_cmd->crosshairtrace( ).x( ), user_cmd->crosshairtrace( ).y( ), user_cmd->crosshairtrace( ).z( ) };
+	}
+	else {
+		cheat_data.traced_cursor.Zero( );
+	}
+}
+
 bool hook::functions::BAsyncSendProto( CProtoBufMsgBase* protobufMsg, IProtoBufSendHandler* handler, google::protobuf::Message* responseMsg, unsigned int respMsgID ) {
 	//spdlog::debug( "sent message to GC: {}\n", protobufMsg->msgID );
 
@@ -201,16 +214,17 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 				util::set_timer( []( ) {
 					CUIPanel* DotaHud = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" );
 					CPanel2D* topbar = DotaHud->find_child_traverse( "topbar" )->panel2d_as( );
+					C_DOTA_PlayerResource* resource = C_DOTA_PlayerResource::get( );
 
 					int goodguys_top = 0;
 					int badguys_top = 0;
 					for ( int i = 0; i != 64; ++i )
 					{
-						const int TeamNum = C_DOTA_PlayerResource::get( )->GetTeam( i );
+						const int TeamNum = resource->GetTeam( i );
 						if ( TeamNum == 2 ) // radiant
-							goodguys_top += C_DOTA_PlayerResource::get( )->GetNetWorthOfPlayer( i );
+							goodguys_top += resource->GetNetWorthOfPlayer( i );
 						else if ( TeamNum == 3 ) // dire
-							badguys_top += C_DOTA_PlayerResource::get( )->GetNetWorthOfPlayer( i );
+							badguys_top += resource->GetNetWorthOfPlayer( i );
 					}
 					calls::CDOTA_Hud_Top_Bar__UpdateNetWorthDifference( topbar, goodguys_top, badguys_top );
 				}, 4000 );
@@ -245,9 +259,18 @@ long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UI
 	// OLD IMGUI MENU
 	pGui->Render( );
 
-	if ( panorama_gui.draw_health && g_pGameRules && ( g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS ||
-		 g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_PRE_GAME ) )
-		features::hero_bar.draw_health( panorama_gui.draw_mana_bar );
+	if ( global::in_game && g_pGameRules && ( g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS || g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_PRE_GAME ) ) {
+
+		if ( panorama_gui.draw_health )
+			features::hero_bar.draw_health( panorama_gui.draw_mana_bar );
+
+
+		vector2d scr;
+
+		if ( !cheat_data.traced_cursor.IsZero( ) && CRenderGameSystem::GetInstance( )->GetVectorInScreenSpace( cheat_data.traced_cursor, scr ) ) {
+			ImGui::GetForegroundDrawList( )->AddText( ImVec2{ scr.x, scr.y }, 0xFFFFFFFF, " trace" );
+		}
+	}
 
 	ImGui::Render( );
 
@@ -277,8 +300,13 @@ void hook::functions::OnMouseWheeled( CDOTA_Camera* rcx, int delta ) {
 LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int uMsg, const uintptr_t wParam, const uintptr_t lParam ) {
 	if ( uMsg == WM_KEYUP ) {
 		if ( wParam == VK_F1 ) {
-			auto bg = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaDashboard" )->find_child_traverse( "DashboardBackgroundManager" )->children( )[ 0 ];
-			bg->set_style( "background-image: url(\"file://{resources}/ambg.vtex\");" );
+			//auto bg = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaDashboard" )->find_child_traverse( "DashboardBackgroundManager" )->children( )[ 0 ];
+			//bg->set_style( "background-image: url(\"file://{resources}/ambg.vtex\");" );
+
+			auto radiant_players = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "TopBarRadiantPlayersContainer" );
+			auto dire_players = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "TopBarDirePlayersContainer" );
+
+
 		}
 		if ( wParam == VK_F2 ) {
 			int idx;

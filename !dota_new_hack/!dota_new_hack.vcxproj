@@ -332,6 +332,7 @@
     <ClInclude Include="core\lib\protobuf\files\usercmd.pb.h" />
     <ClInclude Include="core\lib\protobuf\files\usermessages.pb.h" />
     <ClInclude Include="core\lib\protobuf\files\valveextensions.pb.h" />
+    <ClInclude Include="core\sdk_game\CDOTAInput.h" />
     <ClInclude Include="core\sdk_game\CDOTAItemDefintion.hpp" />
     <ClInclude Include="core\sdk_game\CDOTA_InventoryManager.hpp" />
     <ClInclude Include="core\sdk_game\CGCClient.hpp" />
