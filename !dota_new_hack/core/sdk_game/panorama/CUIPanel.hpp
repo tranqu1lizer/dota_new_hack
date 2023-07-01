@@ -12,9 +12,20 @@ class CUIPanel : public VClass
 		}
 	}
 
+	void _FindChildrenWithClassTraverse( uint16_t unClass, std::vector<CUIPanel*>& result ) {
+		for ( auto panel : children( ) ) {
+			if ( panel->has_class( unClass ) )
+				result.push_back( panel );
+			panel->_FindChildrenWithClassTraverse( unClass, result );
+		}
+	}
+
 public:
 	template<class T = CPanel2D>
-	GETTER( T*, panel2d_as, 0x8 );
+	T* panel2d_as( ) {
+		if ( !util::exists( this ) ) return nullptr;
+		return Member<T*>( 0x8 );
+	}
 	GETTER( CUIPanel*, parent, 0x18 );
 	GETTER( CUtlVector<CUIPanel*>, children, 0x28 );
 	GETTER( CUtlVector<CPanoramaSymbol>, classes, 0x160 );
@@ -112,11 +123,14 @@ public:
 	}
 
 	bool has_class( CPanoramaSymbol unClass ) {
-		auto class_ = classes( );
-		for ( auto& c : class_ )
+		for ( auto& c : classes( ) )
 			if ( unClass == c )
 				return true;
 		return false;
+	}
+
+	bool has_class( const std::string_view& cl ) {
+		return has_class( CPanoramaUIEngine::GetInstance( )->engine_source2( )->make_symbol( cl.data( ) ) );
 	}
 
 	void add_class( const char* class_ ) {
@@ -127,6 +141,13 @@ public:
 	inline bool layed_out( )
 	{
 		return CallVFunc<345, bool>( );
+	}
+
+	[[nodiscard]]
+	std::vector<CUIPanel*> find_children_with_class_traverse( uint16_t unClass ) {
+		std::vector<CUIPanel*> result;
+		_FindChildrenWithClassTraverse( unClass, result );
+		return result;
 	}
 
 	[[nodiscard]] std::vector<CUIPanel*> find_children_traverse( const std::string_view& id ) {
@@ -143,7 +164,20 @@ public:
 			return result.size( ) > 0 ? result.front( ) : nullptr;
 		}
 		catch ( std::exception& ex ) {
-			std::cout << ex.what( ) << std::endl;
+			spdlog::error( "{}\n", ex.what( ) );
+			return nullptr;
+		}
+	}
+	
+	[[nodiscard]] CUIPanel* find_child_with_class_traverse( uint16_t unClass ) {
+		try {
+			std::vector<CUIPanel*> result;
+			_FindChildrenWithClassTraverse( unClass, result );
+
+			return result.size( ) > 0 ? result.front( ) : nullptr;
+		}
+		catch ( std::exception& ex ) {
+			spdlog::error( "{}\n", ex.what( ) );
 			return nullptr;
 		}
 	}

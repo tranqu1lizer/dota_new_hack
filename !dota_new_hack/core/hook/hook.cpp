@@ -32,10 +32,10 @@ void EntityEventListener::OnEntityDeleted( C_BaseEntity* rcx ) {
 	}
 }
 
-void hook::functions::CreateMove( CDOTAInput* rcx, int always_null, bool always_true ) {
-	reinterpret_cast<decltype( &CreateMove )>( hook::original::fpCreateMove )( rcx, always_null, always_true );
+void hook::functions::CreateMove( CDOTAInput* rcx, int slot, bool should_fill_weaponselect ) {
+	reinterpret_cast<decltype( &CreateMove )>( hook::original::fpCreateMove )( rcx, slot, should_fill_weaponselect );
 
-	auto user_cmd = (CDota2UserCmdPB*)( (char*)rcx + 0x68 * ( rcx->m_sequence_number % 150 ) + always_null + 0x10 );
+	auto user_cmd = (CDota2UserCmdPB*)( (char*)rcx + 0x68 * ( rcx->m_sequence_number % 150 ) + slot + 0x10 );
 
 	if ( user_cmd->has_crosshairtrace( ) && user_cmd->has_cameraposition_x( ) && user_cmd->has_cameraposition_y( ) ) {
 		cheat_data.traced_cursor = vector3d{ user_cmd->crosshairtrace( ).x( ), user_cmd->crosshairtrace( ).y( ), user_cmd->crosshairtrace( ).z( ) };
@@ -188,10 +188,6 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 	if ( global::in_game = IEngineClient::GetInstance( ).in_game( ); global::in_game ) {
 
 		if ( !global::g_LocalEntity ) {
-			if ( calls::GetCurrentCamera ) {
-				aGetInput = util::get_absolute_address( reinterpret_cast<VClass*>( calls::GetCurrentCamera( ) )->GetVF( 3 ) + 0x1d8, 1, 5 );
-			}
-
 			static C_DOTAPlayerController** players = (decltype( players ))util::get_absolute_address( util::find_pattern( global::client, "\x48\x8B\x05\xCC\xCC\xCC\xCC\x89\xBE", "", false ), 3, 7 );
 
 			if ( const auto local_controller = players[ 0 ]; local_controller ) {
@@ -205,9 +201,9 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 		}
 
 		static bool camera_hooked = false;
-		if ( !camera_hooked ) {
+		if ( !camera_hooked && calls::GetCurrentCamera ) {
 			if ( auto camera = reinterpret_cast<VClass*>( calls::GetCurrentCamera( ) ); camera ) {
-				hook::install_hook( camera->GetVF( 9 ), &hook::functions::OnMouseWheeled, &hook::original::fpOnMouseWheeled, "CDOTA_Camera::OnMouseWheeled" );
+				hook::install_hook( camera->GetVF( 9 ), &hook::functions::OnMouseWheeled, &hook::original::fpOnMouseWheeled, "C_DOTACamera::OnMouseWheeled" );
 				camera_hooked = true;
 			}
 		}
@@ -268,10 +264,48 @@ long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UI
 		if ( panorama_gui.draw_health )
 			features::hero_bar.draw_health( panorama_gui.draw_mana_bar );
 
-		vector2d scr;
 
-		if ( !cheat_data.traced_cursor.IsZero( ) && CRenderGameSystem::GetInstance( )->GetVectorInScreenSpace( cheat_data.traced_cursor, scr ) ) {
-			ImGui::GetForegroundDrawList( )->AddText( ImVec2{ scr.x, scr.y }, 0xFFFFFFFF, " trace" );
+		C_DOTA_BaseNPC_Hero* closest_hero = nullptr;
+		double lowest_distance = DBL_MAX;
+
+		for ( C_DOTA_BaseNPC_Hero* hero : cheat_data.heroes ) {
+
+			if ( hero->health( ) <= 0 && hero->identity( )->dormant( ) && hero->illusion( ) )
+				continue;
+
+			vector2d scr;
+			vector3d pos = hero->abs_origin( );
+			pos.z += hero->health_bar_offset( );
+
+			if ( CRenderGameSystem::GetInstance( )->GetVectorInScreenSpace( pos, scr ) ) {
+				std::uint16_t cc = 0;
+
+				for ( auto modifier : hero->modifier_manager( )->GetModifiers( ) ) {
+					cc += 30;
+					char mod_buf[ 128 ];
+					sprintf_s( mod_buf, "mod: %s", modifier->GetBuffName( ) );
+					ImGui::GetForegroundDrawList( )->AddText( ImVec2{ scr.x, scr.y + cc }, 0xFFFFFFFF, mod_buf );
+				}
+			}
+
+			if ( const double distance = hero->abs_origin( ).dist_to( cheat_data.traced_cursor ); distance < lowest_distance ) {
+				lowest_distance = distance;
+				closest_hero = hero;
+			}
+		}
+
+		if ( closest_hero && lowest_distance < 300.f ) {
+			vector2d scr;
+			vector3d pos = closest_hero->abs_origin( );
+			pos.z += closest_hero->health_bar_offset( );
+
+			if ( CRenderGameSystem::GetInstance( )->GetVectorInScreenSpace( pos, scr ) ) {
+				std::uint16_t cc = 0;
+				char buf[ 256 ];
+				sprintf_s( buf, "closest: %s, dist: %2.f", closest_hero->identity( )->entity_name( ), lowest_distance );
+				ImGui::GetForegroundDrawList( )->AddText( ImVec2{ scr.x, scr.y }, 0xFFFFFFFF, buf );
+			}
+
 		}
 	}
 
@@ -306,13 +340,29 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 			//auto bg = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaDashboard" )->find_child_traverse( "DashboardBackgroundManager" )->children( )[ 0 ];
 			//bg->set_style( "background-image: url(\"file://{resources}/ambg.vtex\");" );
 
-			//auto radiant_players = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "TopBarRadiantPlayersContainer" );
-			//auto dire_players = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "TopBarDirePlayersContainer" );
+			auto radiant_players = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "TopBarRadiantPlayersContainer" );
+			auto dire_players = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "TopBarDirePlayersContainer" );
 
-			void* ptr = util::get_interface( "engine2.dll", "InputService_001" );
-			void* ptr1 = util::get_interface( "inputsystem.dll", "InputSystemVersion001" );
-			void* ptr2 = util::get_interface( "inputsystem.dll", "InputStackSystemVersion001" );
-			spdlog::debug( "ptr: {}, ptr1: {}, ptr2: {}\n", ptr, ptr1, ptr2 );
+			for ( auto img : radiant_players->find_children_traverse( "HeroImage" ) ) {
+
+				const auto src = img->panel2d_as<CDOTA_UI_HeroImage>( )->image_src( );
+				if ( !src ) continue;
+
+				std::string src2 = { std::string_view{src}.substr( 23 ).data( ) };
+				const auto formatted_name = src2.erase( src2.size( ) - 4 );
+
+				spdlog::info( "Radiant player: {}\n", formatted_name );
+			}
+			for ( auto img : dire_players->find_children_traverse( "HeroImage" ) ) {
+
+				const auto src = img->panel2d_as<CDOTA_UI_HeroImage>( )->image_src( );
+				if ( !src ) continue;
+
+				std::string src2 = { std::string_view{src}.substr( 23 ).data( ) };
+				const auto formatted_name = src2.erase( src2.size( ) - 4 );
+
+				spdlog::info( "Dire player: {}\n", formatted_name );
+			}
 		}
 		if ( wParam == VK_F2 ) {
 			int idx;

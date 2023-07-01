@@ -65,7 +65,7 @@ void ChangerTreeChanged_Handler( ) {
 		{ "models/props_diretide/pumpkin_head.vmdl", 3 },
 		{ "models/props_gameplay/pumpkin_bucket.vmdl", 1 },
 		{ "maps/jungle_assets/trees/pitcher/jungle_pitcher_tree.vmdl", 2 },
-		{ "models/props_garden/tree_garden001.vmdl", 0.5 },
+		{ "models/props_garden/tree_garden001.vmdl", 3 },
 		{ "maps/journey_assets/props/trees/journey_armandpine/journey_armandpine_02_stump.vmdl", 4.5 },
 		{ "models/props_tree/frostivus_tree.vmdl", 0.85 },
 		{ "models/props_tree/ti7/ggbranch.vmdl", 1 },

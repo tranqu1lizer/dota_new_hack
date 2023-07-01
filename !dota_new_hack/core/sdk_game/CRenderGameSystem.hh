@@ -78,6 +78,9 @@ public:
 		screen[0] = ((float)resolut[0] / 2.f) + 0.5f * screen[0] * (float)resolut[0] + 0.5f;
 		screen[1] = ((float)resolut[1] / 2.f) - 0.5f * screen[1] * (float)resolut[1] + 0.5f;
 
+		if ( screen.x > resolut[ 0 ] || screen.y > resolut[ 1 ] )
+			return false;
+
 		return true;
 	}
 };

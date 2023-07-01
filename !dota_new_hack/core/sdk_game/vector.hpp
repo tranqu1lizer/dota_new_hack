@@ -94,7 +94,7 @@ public:
 	}
 	vector3d	Normalize( );
 	float	NormalizeInPlace( );
-	inline float	DistTo( const vector3d& vOther ) const;
+	inline float	dist_to( const vector3d& vOther ) const;
 	inline float	DistToSqr( const vector3d& vOther ) const;
 	float	Dot( const vector3d& vOther ) const;
 	float	Length2D( void ) const;
@@ -289,7 +289,7 @@ inline vector3d CrossProduct( const vector3d& a, const vector3d& b )
 	return vector3d( a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x );
 }
 //===============================================
-float vector3d::DistTo( const vector3d& vOther ) const
+float vector3d::dist_to( const vector3d& vOther ) const
 {
 	vector3d delta;
 
@@ -605,7 +605,7 @@ public:
 	bool	IsLengthLessThan( float val ) const;
 
 	// Get the distance from this Vector2D to the other one.
-	float	DistTo( const vector2d& vOther ) const;
+	float	dist_to( const vector2d& vOther ) const;
 
 	// Get the distance from this Vector2D to the other one squared.
 	float	DistToSqr( const vector2d& vOther ) const;
@@ -1059,7 +1059,7 @@ inline float Vector2DNormalize( vector2d& v )
 //-----------------------------------------------------------------------------
 // Get the distance from this Vector2D to the other one
 //-----------------------------------------------------------------------------
-inline float vector2d::DistTo( const vector2d& vOther ) const
+inline float vector2d::dist_to( const vector2d& vOther ) const
 {
 	vector2d delta;
 	Vector2DSubtract( *this, vOther, delta );

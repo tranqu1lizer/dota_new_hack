@@ -15,6 +15,15 @@
 #define SPDLOG_WCHAR_TO_UTF8_SUPPORT
 #define SPDLOG_EOL ""
 
+#define PPCAT_NX(a,b) a##b
+#define PPCAT(a,b) PPCAT_NX(a,b)
+#define PAD(sz)\
+private:\
+std::byte PPCAT( _pad, __COUNTER__ )[ sz ];\
+public:
+
+#define PPAD(sz) std::byte PPCAT(_pad, __COUNTER__)[sz];
+
 #include <windows.h>
 #include <iostream>
 #include <format>
@@ -83,6 +92,7 @@
 #include "core/sdk_game/CNetworkMessages.hpp"
 #include "core/sdk_game/valve/CBaseFileSystem.hpp"
 #include "core/sdk_game/C_DOTA_ProjectileManager.hpp"
+#include "core/sdk_game/CLocalize.h"
 #include "core/sdk_game/CRenderGameSystem.hh"
 #include "core/sdk_game/Data.hpp"
 #include "core/sdk_game/CDOTAItemDefintion.hpp"

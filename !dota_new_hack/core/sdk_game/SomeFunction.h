@@ -1,17 +1,17 @@
 #include <cstdint>
 
 class some_function {
-public:
 	void* ptr;
-	some_function( std::uintptr_t ptr ) : ptr( (void*)ptr ) {
+public:
+	some_function( std::uintptr_t ptr ) : ptr( (void*)ptr ) { }
+	some_function( void* ptr ) : ptr( ptr ) { }
 
-	}
-	some_function( void* ptr ) : ptr( ptr ) {
-
-	}
-	operator void* ( )
-	{
+	operator void* ( ) {
 		return ptr;
+	}
+
+	bool valid( ) {
+		return ptr != nullptr;
 	}
 
 	template<typename ...T>

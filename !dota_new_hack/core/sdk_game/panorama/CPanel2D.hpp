@@ -112,6 +112,10 @@ public:
 		if ( !global::patterns::CDOTA_UI_HeroImage__SetHeroName ) return nullptr;
 		return reinterpret_cast<C_DOTAGameManager * ( __fastcall* )( CDOTA_UI_HeroImage*, const char* )>( global::patterns::CDOTA_UI_HeroImage__SetHeroName )( this, hero_name );
 	}
+
+	const char* image_src( ) {
+		return Member<const char*>( 0x98 );
+	}
 };
 
 class CDOTA_DB_SettingsCheckbox : public CButton {

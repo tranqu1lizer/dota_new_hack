@@ -52,6 +52,7 @@ namespace util {
 
 	void patch( void* address, const void* bytes );
 	void patch( void* address, const void* bytes, int byteSize );
+	char* fast_strcat( char* dest, const char* src );
 	inline void set_console_color( int text = 0x7 /*ConColor::White*/, int background = 0x0 /*ConColor::Black*/ );
 	bool exists( void* ptr ) noexcept;
 	bool IsBadReadPtr( void* p );

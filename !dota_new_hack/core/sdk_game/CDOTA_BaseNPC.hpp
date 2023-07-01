@@ -43,7 +43,7 @@ public:
 		return Member<int32_t>( offset );
 	}
 
-	CDOTA_ModifierManager* GetModifierManager( ) {
+	CDOTA_ModifierManager* modifier_manager( ) {
 		if ( !util::exists( this ) ) return nullptr;
 		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_ModifierManager" );
 		return MemberNotPtr<CDOTA_ModifierManager>( offset );

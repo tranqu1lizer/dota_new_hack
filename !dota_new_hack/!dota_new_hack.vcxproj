@@ -336,6 +336,7 @@
     <ClInclude Include="core\sdk_game\CDOTAItemDefintion.hpp" />
     <ClInclude Include="core\sdk_game\CDOTA_InventoryManager.hpp" />
     <ClInclude Include="core\sdk_game\CGCClient.hpp" />
+    <ClInclude Include="core\sdk_game\CLocalize.h" />
     <ClInclude Include="core\sdk_game\CNetworkMessages.hpp" />
     <ClInclude Include="core\sdk_game\CRenderGameSystem.hh" />
     <ClInclude Include="core\sdk_game\C_DOTA_PlayerResource.h" />
@@ -396,6 +397,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="core\sdk_game\CGameEntitySystem.hpp" />
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="core\lib\minhook\libMinHook.x64.lib" />

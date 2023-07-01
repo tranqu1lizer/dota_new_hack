@@ -458,6 +458,7 @@
     <ClInclude Include="core\sdk_game\ISteamFriends.h" />
     <ClInclude Include="core\sdk_game\panorama\CLayoutManager.h" />
     <ClInclude Include="core\sdk_game\CDOTAInput.h" />
+    <ClInclude Include="core\sdk_game\CLocalize.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -723,6 +724,7 @@
     <None Include="core\sdk_game\CGameEntitySystem.hpp">
       <Filter>core\sdk_game</Filter>
     </None>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="core\lib\minhook\libMinHook.x64.lib">

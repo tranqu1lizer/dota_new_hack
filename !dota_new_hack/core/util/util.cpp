@@ -11,11 +11,19 @@ void util::patch( void* address, const void* bytes, int byteSize )
 	VirtualProtect( address, byteSize, NewProtection, &NewProtection );
 }
 
-void util::patch( void* address, const void* bytes )
-{
+void util::patch( void* address, const void* bytes ) {
 	util::patch( address, bytes, util::fast_strlen( (const char*)bytes ) );
 }
+char* util::fast_strcat( char* dest, const char* src )
+{
+	char* rdest = dest;
 
+	while ( *dest )
+		dest++;
+	while ( *dest++ = *src++ )
+		;
+	return rdest;
+}
 void util::allocate_console( ) {
 	AllocConsole( );
 
