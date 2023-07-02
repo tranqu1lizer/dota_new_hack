@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include "C_BaseCombatCharacter.hpp"
-
 #include "CNetworkMessages.hpp"
+#include "NormalClass.hpp"
 
 class C_DOTA_BaseNPC : public C_BaseCombatCharacter
 {
@@ -43,7 +43,7 @@ public:
 		return Member<int32_t>( offset );
 	}
 
-	CDOTA_ModifierManager* GetModifierManager( ) {
+	CDOTA_ModifierManager* modifier_manager( ) {
 		if ( !util::exists( this ) ) return nullptr;
 		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_ModifierManager" );
 		return MemberNotPtr<CDOTA_ModifierManager>( offset );
@@ -53,18 +53,6 @@ public:
 		if ( !util::exists( this ) ) return -1;
 
 		return schema_member<int>( "client.dll/C_DOTA_BaseNPC/m_iHealthBarOffset" );
-	}
-
-	void set_color( const unsigned short r, const unsigned short g, const unsigned short b, const unsigned short a = 255 ) {
-		if ( !util::exists( this ) ) return;
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_BaseModelEntity/m_clrRender" );
-		const auto base = ( (std::uintptr_t)this + offset );
-		*(std::uint8_t*)( base + 0 ) = static_cast<BYTE>( r );
-		*(std::uint8_t*)( base + 1 ) = static_cast<BYTE>( g );
-		*(std::uint8_t*)( base + 2 ) = static_cast<BYTE>( b );
-		*(std::uint8_t*)( base + 3 ) = static_cast<BYTE>( a );
-
-		CNetworkMessages::get( )->find_network_callback( "OnColorChanged" )( this );
 	}
 
 	float physical_armor( ) {

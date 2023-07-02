@@ -3,6 +3,7 @@
 #include "../../gui/panorama_gui.h"
 #include "../features/inventory_changer.h"
 #include "../features/hero_bar.h"
+#include "../features/camera_hack.h"
 
 extern CGui* pGui;
 extern CPanoramaGUI panorama_gui;
@@ -18,8 +19,9 @@ void EntityEventListener::OnEntityCreated( C_BaseEntity* rcx ) {
 		}
 
 		if ( class_name.starts_with( "C_DOTA_Unit_Hero" ) || class_name.starts_with( "CDOTA_Unit_Hero" ) )
-			cheat_data.heroes.insert( static_cast<C_DOTA_BaseNPC_Hero*>( rcx ) );
+			context.heroes.insert( static_cast<C_DOTA_BaseNPC_Hero*>( rcx ) );
 
+		context.entities[ rcx->index( ) ] = rcx;
 	}
 }
 
@@ -27,22 +29,21 @@ void EntityEventListener::OnEntityDeleted( C_BaseEntity* rcx ) {
 	if ( const auto client_class = rcx->client_class( ); ( client_class && client_class->m_pNetworkName ) ) {
 		const auto class_name = std::string_view( client_class->m_pNetworkName );
 
-		if ( class_name.starts_with( "C_DOTA_Unit_Hero" ) || class_name.starts_with( "CDOTA_Unit_Hero" ) && cheat_data.heroes.contains( static_cast<C_DOTA_BaseNPC_Hero*>( rcx ) ) )
-			cheat_data.heroes.erase( static_cast<C_DOTA_BaseNPC_Hero*>( rcx ) );
+		if ( class_name.starts_with( "C_DOTA_Unit_Hero" ) || class_name.starts_with( "CDOTA_Unit_Hero" ) && context.heroes.contains( static_cast<C_DOTA_BaseNPC_Hero*>( rcx ) ) )
+			context.heroes.erase( static_cast<C_DOTA_BaseNPC_Hero*>( rcx ) );
+
+		context.entities.erase( rcx->index( ) );
 	}
 }
 
-void hook::functions::CreateMove( CDOTAInput* rcx, int always_null, bool always_true ) {
-	reinterpret_cast<decltype( &CreateMove )>( hook::original::fpCreateMove )( rcx, always_null, always_true );
+void hook::functions::CreateMove( CDOTAInput* rcx, int slot, bool should_fill_weaponselect ) {
+	reinterpret_cast<decltype( &CreateMove )>( hook::original::fpCreateMove )( rcx, slot, should_fill_weaponselect );
 
-	auto user_cmd = (CDota2UserCmdPB*)( (char*)rcx + 0x68 * ( rcx->m_sequence_number % 150 ) + always_null + 0x10 );
+	auto user_cmd = (CDota2UserCmdPB*)( (char*)rcx + 0x68 * ( rcx->m_sequence_number % 150 ) + slot + 0x10 );
 
-	if ( user_cmd->has_crosshairtrace( ) && user_cmd->has_cameraposition_x( ) && user_cmd->has_cameraposition_y( ) ) {
-		cheat_data.traced_cursor = vector3d{ user_cmd->crosshairtrace( ).x( ), user_cmd->crosshairtrace( ).y( ), user_cmd->crosshairtrace( ).z( ) };
-	}
-	else {
-		cheat_data.traced_cursor.Zero( );
-	}
+	if ( user_cmd->has_crosshairtrace( ) && user_cmd->has_cameraposition_x( ) && user_cmd->has_cameraposition_y( ) )
+		context.traced_cursor = vector3d{ user_cmd->crosshairtrace( ).x( ), user_cmd->crosshairtrace( ).y( ), user_cmd->crosshairtrace( ).z( ) };
+	else context.traced_cursor.Zero( );
 }
 
 bool hook::functions::BAsyncSendProto( CProtoBufMsgBase* protobufMsg, IProtoBufSendHandler* handler, google::protobuf::Message* responseMsg, unsigned int respMsgID ) {
@@ -124,40 +125,11 @@ EGCResults hook::functions::SGCRetrieveMessage( ISteamGameCoordinator* thisptr, 
 
 bool hook::functions::SendNetMessage( INetChannel* thisptr, NetMessageHandle_t* rdx, google::protobuf::Message* msg, NetChannelBufType_t type ) {
 	bool ret = reinterpret_cast<decltype( &SendNetMessage )>( hook::original::fpSendNetMessage )( thisptr, rdx, msg, type );
-
-	auto msg_handle = (CNetworkSerializerPB*)rdx;
-	std::string messageName{ msg_handle->unscopedName };
-	std::transform( messageName.begin( ), messageName.end( ), messageName.begin( ),
-		[]( unsigned char c ) { return std::tolower( c ); } );
-
-	if ( messageName.find( "cvar" ) != -1 || messageName.find( "convar" ) != -1 ) {
-		char b[ 256 ]{ '\0' };
-		spdlog::info( "sent {}:\n{}\n\n", msg_handle->unscopedName, msg_handle->protobufBinding->ToString( msg, &b ) );
-	}
-
 	return ret;
 }
 
 void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSerializerPB* rdx, google::protobuf::Message* r8, NetChannelBufType_t* r9 ) {
-
-	// if ( rdx->messageID != clc_Move && rdx->messageID != net_Tick && rdx->messageID != svc_PacketEntities && rdx->messageID != svc_UpdateStringTable
-	// && rdx->messageID != 207 && rdx->messageID != 488 && rdx->messageID != 350 && rdx->messageID != 154 && rdx->messageID != 145 && rdx->messageID != 521 && rdx->messageID != 522 ) {
-		// char b[ 256 ]{ '\0' };
-		// spdlog::info( "received {}:\n{}\n\n", rdx->unscopedName, rdx->protobufBinding->ToString( r8, &b ) );
-	// }
-
-	std::string messageName{ rdx->unscopedName };
-	std::transform( messageName.begin( ), messageName.end( ), messageName.begin( ),
-		[]( unsigned char c ) { return std::tolower( c ); } );
-
-	if ( messageName.find( "cvar" ) != -1 || messageName.find( "convar" ) != -1 ) {
-		char b[ 256 ]{ '\0' };
-		spdlog::info( "received {}:\n{}\n\n", rdx->unscopedName, rdx->protobufBinding->ToString( r8, &b ) );
-	}
-
-	if ( rdx->messageID == DOTA_UM_TE_DotaBloodImpact ) {
-		return 0;
-	}
+	if ( rdx->messageID == DOTA_UM_TE_DotaBloodImpact ) return 0;
 	else if ( rdx->messageID == GE_SosStartSoundEvent ) {
 		auto msg_ = (CMsgSosStartSoundEvent*)r8;
 		C_BaseEntity* ent;
@@ -181,6 +153,36 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 		CGameEvent* deserialized = CGameEventManager::GetInstance( )->UnserializeEvent( (CMsgSource1LegacyGameEvent*)r8 );
 		spdlog::info( "{}\n", deserialized->GetName( ) );
 	}
+	/*else if ( rdx->messageID == svc_PacketEntities ) {
+		CSVCMsg_PacketEntities* packet_entities = (CSVCMsg_PacketEntities*)r8;
+		auto _data = proto_string( packet_entities->entity_data( ) );
+		if ( !util::exists( (void*)_data ) ) goto end;
+		auto updated_entries = packet_entities->updated_entries( );
+
+		while ( updated_entries-- != 0 ) {
+
+			bitstream bs{ _data };
+			while ( bs.good( ) ) {
+				C_BaseEntity* entity = context.entities[ bs.readUBitVar( ) ];
+
+				if ( !entity || !entity->identity( ) || !entity->identity( )->entity_name( ) )
+					break;
+
+				int32_t etype = 0;
+				if ( bs.readBool( ) ) {
+					if ( bs.readBool( ) ) etype = 4;
+					else etype = 3;
+				}
+				else {
+					if ( bs.readBool( ) ) etype = 1;
+					else etype = 2;
+				}
+
+				if ( util::fast_strstr( entity->identity( )->entity_name( ), "hero" ) )
+					spdlog::debug( "{}: {}, delta: {}\n", entity->identity( )->entity_name( ), etype );
+			}
+		}
+	}*/
 
 	if ( rdx->messageID != net_Tick )
 		goto end;
@@ -188,10 +190,6 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 	if ( global::in_game = IEngineClient::GetInstance( ).in_game( ); global::in_game ) {
 
 		if ( !global::g_LocalEntity ) {
-			if ( calls::GetCurrentCamera ) {
-				aGetInput = util::get_absolute_address( reinterpret_cast<VClass*>( calls::GetCurrentCamera( ) )->GetVF( 3 ) + 0x1d8, 1, 5 );
-			}
-
 			static C_DOTAPlayerController** players = (decltype( players ))util::get_absolute_address( util::find_pattern( global::client, "\x48\x8B\x05\xCC\xCC\xCC\xCC\x89\xBE", "", false ), 3, 7 );
 
 			if ( const auto local_controller = players[ 0 ]; local_controller ) {
@@ -205,9 +203,9 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 		}
 
 		static bool camera_hooked = false;
-		if ( !camera_hooked ) {
+		if ( !camera_hooked && calls::GetCurrentCamera ) {
 			if ( auto camera = reinterpret_cast<VClass*>( calls::GetCurrentCamera( ) ); camera ) {
-				hook::install_hook( camera->GetVF( 9 ), &hook::functions::OnMouseWheeled, &hook::original::fpOnMouseWheeled, "CDOTA_Camera::OnMouseWheeled" );
+				hook::install_hook( camera->GetVF( 9 ), &hook::functions::OnMouseWheeled, &hook::original::fpOnMouseWheeled, "C_DOTACamera::OnMouseWheeled" );
 				camera_hooked = true;
 			}
 		}
@@ -222,8 +220,7 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 
 					int goodguys_top = 0;
 					int badguys_top = 0;
-					for ( int i = 0; i != 64; ++i )
-					{
+					for ( int i = 0; i != 64; ++i ) {
 						const int TeamNum = resource->GetTeam( i );
 						if ( TeamNum == 2 ) // radiant
 							goodguys_top += resource->GetNetWorthOfPlayer( i );
@@ -239,15 +236,14 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 		if ( !global::g_LocalEntity )
 			goto end;
 
-		global::camera_distance = 1200;
+		features::camera_hack.change_distance( );
 		global::g_LocalEntity = 0;
 		g_pGameRules = nullptr;
-		cheat_data.heroes.clear( );
+		context.heroes.clear( );
 	}
 
 end:
-	void* ret = reinterpret_cast<decltype( &PostReceivedNetMessage )>( hook::original::fpPostReceivedNetMessage )( rcx, rdx, r8, r9 );
-	return ret;
+	return reinterpret_cast<decltype( &PostReceivedNetMessage )>( hook::original::fpPostReceivedNetMessage )( rcx, rdx, r8, r9 );
 }
 
 long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UINT Flags ) {
@@ -268,10 +264,46 @@ long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UI
 		if ( panorama_gui.draw_health )
 			features::hero_bar.draw_health( panorama_gui.draw_mana_bar );
 
-		vector2d scr;
 
-		if ( !cheat_data.traced_cursor.IsZero( ) && CRenderGameSystem::GetInstance( )->GetVectorInScreenSpace( cheat_data.traced_cursor, scr ) ) {
-			ImGui::GetForegroundDrawList( )->AddText( ImVec2{ scr.x, scr.y }, 0xFFFFFFFF, " trace" );
+		C_DOTA_BaseNPC_Hero* closest_hero = nullptr;
+		double lowest_distance = DBL_MAX;
+
+		for ( C_DOTA_BaseNPC_Hero* hero : context.heroes ) {
+
+			if ( hero->health( ) <= 0 && hero->identity( )->dormant( ) && hero->illusion( ) )
+				continue;
+
+			vector2d scr;
+			vector3d pos = hero->abs_origin( );
+			pos.z += hero->health_bar_offset( );
+
+			if ( CRenderGameSystem::GetInstance( )->GetVectorInScreenSpace( pos, scr ) ) {
+				std::uint16_t cc = 0;
+
+				for ( auto modifier : hero->modifier_manager( )->GetModifiers( ) ) {
+					cc += 25;
+					ImGui::GetForegroundDrawList( )->AddText( ImVec2{ scr.x - 30, scr.y + cc }, 0xFFFFFFFF, modifier->GetBuffName( ) );
+				}
+			}
+
+			if ( const double distance = hero->abs_origin( ).dist_to( context.traced_cursor ); distance < lowest_distance ) {
+				lowest_distance = distance;
+				closest_hero = hero;
+			}
+		}
+
+		if ( closest_hero && lowest_distance < 1000.f ) {
+			vector2d scr;
+			vector3d pos = closest_hero->abs_origin( );
+			pos.z += closest_hero->health_bar_offset( );
+
+			if ( CRenderGameSystem::GetInstance( )->GetVectorInScreenSpace( pos, scr ) ) {
+				std::uint16_t cc = 0;
+				char buf[ 256 ];
+				sprintf_s( buf, "closest: %s, dist: %2.f", closest_hero->identity( )->entity_name( ), lowest_distance );
+				ImGui::GetForegroundDrawList( )->AddText( ImVec2{ scr.x, scr.y }, 0xFFFFFFFF, buf );
+			}
+
 		}
 	}
 
@@ -286,17 +318,11 @@ void hook::functions::OnMouseWheeled( CDOTA_Camera* rcx, int delta ) {
 	reinterpret_cast<decltype( &OnMouseWheeled )>( hook::original::fpOnMouseWheeled )( rcx, delta );
 
 	if ( pGui->mouse_distance && !pGui->show && global::in_game ) {
-		if ( delta == -1 ) global::camera_distance += pGui->camera_step;
-		else if ( delta == 1 ) global::camera_distance -= pGui->camera_step;
-		if ( global::camera_distance > 3500 ) global::camera_distance = 3500;
-		if ( global::camera_distance < 1100 ) global::camera_distance = 1100;
-
+		features::camera_hack.on_mouse_wheeled( rcx, delta );
 		if ( panorama_gui.camera_dist_slider ) {
-			const auto casted2volvotype = static_cast<float>( global::camera_distance - 1100 ) / ( 3500 - 1100 );
+			const auto casted2volvotype = static_cast<float>( features::camera_hack.get_distance( ) - features::camera_hack.get_min_distance( ) ) / ( features::camera_hack.get_max_distance( ) - features::camera_hack.get_min_distance( ) );
 			panorama_gui.camera_dist_slider->children( )[ 1 ]->panel2d_as<CSlider>( )->set_fl( casted2volvotype );
 		}
-
-		rcx->set_distance( static_cast<float>( global::camera_distance ) );
 	}
 }
 
@@ -306,13 +332,29 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 			//auto bg = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaDashboard" )->find_child_traverse( "DashboardBackgroundManager" )->children( )[ 0 ];
 			//bg->set_style( "background-image: url(\"file://{resources}/ambg.vtex\");" );
 
-			//auto radiant_players = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "TopBarRadiantPlayersContainer" );
-			//auto dire_players = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "TopBarDirePlayersContainer" );
+			auto radiant_players = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "TopBarRadiantPlayersContainer" );
+			auto dire_players = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "TopBarDirePlayersContainer" );
 
-			void* ptr = util::get_interface( "engine2.dll", "InputService_001" );
-			void* ptr1 = util::get_interface( "inputsystem.dll", "InputSystemVersion001" );
-			void* ptr2 = util::get_interface( "inputsystem.dll", "InputStackSystemVersion001" );
-			spdlog::debug( "ptr: {}, ptr1: {}, ptr2: {}\n", ptr, ptr1, ptr2 );
+			for ( auto img : radiant_players->find_children_traverse( "HeroImage" ) ) {
+
+				const auto src = img->panel2d_as<CDOTA_UI_HeroImage>( )->image_src( );
+				if ( !src ) continue;
+
+				std::string src2 = { std::string_view{src}.substr( 23 ).data( ) };
+				const auto formatted_name = src2.erase( src2.size( ) - 4 );
+
+				spdlog::info( "Radiant player: {}\n", formatted_name );
+			}
+			for ( auto img : dire_players->find_children_traverse( "HeroImage" ) ) {
+
+				const auto src = img->panel2d_as<CDOTA_UI_HeroImage>( )->image_src( );
+				if ( !src ) continue;
+
+				std::string src2 = { std::string_view{src}.substr( 23 ).data( ) };
+				const auto formatted_name = src2.erase( src2.size( ) - 4 );
+
+				spdlog::info( "Dire player: {}\n", formatted_name );
+			}
 		}
 		if ( wParam == VK_F2 ) {
 			int idx;
@@ -323,6 +365,10 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 		if ( wParam == VK_F3 ) {
 			panorama_gui.show( );
 		}
+		if ( wParam == VK_F4 ) {
+			CVScriptGameSystem* sys = (CVScriptGameSystem*)util::find_game_system( "DOTA_VScriptGameSystem" );
+			sys->RunScript( "draw" ); // steamapps\common\dota 2 beta\game\dota\scripts\vscripts\draw.lua
+		}
 		if ( wParam == VK_INSERT ) {
 			CPanoramaUIEngine::GetInstance( )->engine_source2( )->play_sound_effect( "ui_menu_activate_open" );
 			pGui->show ^= true;
@@ -332,7 +378,7 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 			CDOTA_ParticleManager::GetInstance( )->destroy_own_particles( );
 
 			constexpr auto unhook = []( void* ) -> unsigned long {
-				global::camera_distance = 1200;
+				features::camera_hack.change_distance( );
 				global::g_LocalEntity = 0;
 				global::g_mapItemIcons.clear( );
 				global::g_mapSpellIcons.clear( );

@@ -1,5 +1,10 @@
 #pragma once
 
+#include "NormalClass.hpp"
+#include "valve/CUtlVector.hpp"
+#include "ISchemaSystem.hpp"
+#include "CHandle.hpp"
+
 class CDOTA_Buff : public VClass {
 public:
 	const char* GetBuffName( ) noexcept {
@@ -45,7 +50,7 @@ public:
 
 		for ( auto modifier : GetModifiers( ) ) {
 			if ( const auto name = modifier->GetBuffName( ); name ) {
-				if ( !strcmp( name, modifier_name ) ) return true;
+				if ( !util::fast_strcmp( (char*)name, (char*)modifier_name ) ) return true;
 			}
 		}
 		return false;

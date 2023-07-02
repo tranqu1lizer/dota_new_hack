@@ -11,11 +11,19 @@ void util::patch( void* address, const void* bytes, int byteSize )
 	VirtualProtect( address, byteSize, NewProtection, &NewProtection );
 }
 
-void util::patch( void* address, const void* bytes )
-{
+void util::patch( void* address, const void* bytes ) {
 	util::patch( address, bytes, util::fast_strlen( (const char*)bytes ) );
 }
+char* util::fast_strcat( char* dest, const char* src )
+{
+	char* rdest = dest;
 
+	while ( *dest )
+		dest++;
+	while ( *dest++ = *src++ )
+		;
+	return rdest;
+}
 void util::allocate_console( ) {
 	AllocConsole( );
 
@@ -52,15 +60,14 @@ void* util::memset( void* src, int val, unsigned __int64 count )
 }
 
 void* util::find_game_system( const char* name ) {
-	static IGameSystemFactory* factory_it = nullptr;
-	if ( !factory_it ) {
-		factory_it = *AddressWrapper{ util::find_pattern( "client.dll", "E8 ? ? ? ? 84 C0 74 D3 48 8D 0D" ) }
+	static IGameSystemFactory* factory_first = *AddressWrapper{ util::find_pattern( "client.dll", "E8 ? ? ? ? 84 C0 74 D3 48 8D 0D" ) }
 			.get_address_from_instruction_ptr( 1 )
 			.get_offset( 0xE )
 			.get_address_from_instruction_ptr<IGameSystemFactory**>( 3 );
-	}
 
-	while ( factory_it && factory_it->m_name ) {
+	auto factory_it = factory_first;
+
+	while ( factory_it && util::exists((void*)factory_it->m_name) ) {
 		if ( !util::fast_strcmp( (char*)factory_it->m_name, (char*)name ) ) {
 			const auto res = factory_it->game_system( );
 			return res ? res : factory_it->get_game_system();
@@ -130,7 +137,7 @@ void* util::memcpy( void* dest, const void* src, unsigned __int64 count ) {
 }
 
 bool util::exists( void* ptr ) noexcept {
-	return ptr && *reinterpret_cast<std::uintptr_t*>( ptr ) != 0xdddddddddddddddd && !IsBadReadPtr( ptr );
+	return ptr && !IsBadReadPtr( ptr ) && *reinterpret_cast<std::uintptr_t*>( ptr ) != 0xdddddddddddddddd;
 }
 
 bool util::IsBadReadPtr( void* p )
@@ -234,7 +241,7 @@ char* util::fast_strstr( const char* haystack, const char* needle )
 		if (
 			sums_diff == 0
 			&& needle_first == *sub_start
-			&& memcmp( sub_start, needle, needle_len_1 ) == 0
+			&& util::memcmp( sub_start, needle, needle_len_1 ) == 0
 			)
 			return (char*)sub_start;
 	}
@@ -339,28 +346,6 @@ HINSTANCE __stdcall util::get_module_base_ansi( const char* lpModuleName )
 	const auto ret = util::get_module_base_wchar( wide_str.c_str( ) );
 	return ret;
 }
-
-constexpr int UBV_COUNT[] = { 0, 4, 8, 28 };
-
-constexpr unsigned long long MASKS[] = {
-	   0x0L,               0x1L,                0x3L,                0x7L,
-	   0xfL,               0x1fL,               0x3fL,               0x7fL,
-	   0xffL,              0x1ffL,              0x3ffL,              0x7ffL,
-	   0xfffL,             0x1fffL,             0x3fffL,             0x7fffL,
-	   0xffffL,            0x1ffffL,            0x3ffffL,            0x7ffffL,
-	   0xfffffL,           0x1fffffL,           0x3fffffL,           0x7fffffL,
-	   0xffffffL,          0x1ffffffL,          0x3ffffffL,          0x7ffffffL,
-	   0xfffffffL,         0x1fffffffL,         0x3fffffffL,         0x7fffffffL,
-	   0xffffffffL,        0x1ffffffffL,        0x3ffffffffL,        0x7ffffffffL,
-	   0xfffffffffL,       0x1fffffffffL,       0x3fffffffffL,       0x7fffffffffL,
-	   0xffffffffffL,      0x1ffffffffffL,      0x3ffffffffffL,      0x7ffffffffffL,
-	   0xfffffffffffL,     0x1fffffffffffL,     0x3fffffffffffL,     0x7fffffffffffL,
-	   0xffffffffffffL,    0x1ffffffffffffL,    0x3ffffffffffffL,    0x7ffffffffffffL,
-	   0xfffffffffffffL,   0x1fffffffffffffL,   0x3fffffffffffffL,   0x7fffffffffffffL,
-	   0xffffffffffffffL,  0x1ffffffffffffffL,  0x3ffffffffffffffL,  0x7ffffffffffffffL,
-	   0xfffffffffffffffL, 0x1fffffffffffffffL, 0x3fffffffffffffffL, 0x7fffffffffffffffL,
-	   0xffffffffffffffffL
-};
 
 void* util::get_interface( const char* dllname, const char* interfacename ) {
 	const auto module_handle = util::get_module_base_ansi( dllname );

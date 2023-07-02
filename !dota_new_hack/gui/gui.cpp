@@ -14,7 +14,7 @@
 ID3D11DeviceContext* CGui::pContext = NULL;
 ID3D11RenderTargetView* CGui::pRenderTargetView = NULL;
 bool CGui::show = false;
-extern CheatData cheat_data;
+extern CheatData context;
 
 #define MAX(a, b)    (((a) < (b)) ? (b) : (a))
 #define INTERNAL     static

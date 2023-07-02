@@ -1,14 +1,14 @@
 ﻿#pragma once
 
-#include "../../main.hpp"
 #include "CDOTA_ModifierManager.hpp"
 #include "CHandle.hpp"
-#include "../functions.hpp"
-#include "C_Properties.hpp"
 #include "CEntityIdentity.hpp"
 #include "CGameEntitySystem.hpp"
 
 #include "NormalClass.hpp"
+#include "ISchemaSystem.hpp"
+#include "CSource2Client.hpp"
+#include "../util/util.hpp"
 
 enum DataUpdateType_t {
 	DATA_UPDATE_CREATED = 0,  // indicates it was created +and+ entered the pvs
@@ -145,22 +145,5 @@ public:
 		if ( !util::exists( this ) ) return nullptr;
 
 		return Member<CEntityIdentity*>( 0x10 );
-	}
-};
-
-class C_BaseModelEntity : public C_BaseEntity {
-public:
-	C_CollisionProperty* collision( ) {
-		return Member< C_CollisionProperty* >( 0x310 );
-	}
-};
-class C_DOTA_MapTree : public C_BaseModelEntity {
-public:
-	void set_model( const std::string_view& model_name ) {
-		const auto C_DOTA_MapTree__Spawn = util::vmt( (std::uintptr_t)this, 7 );
-		some_function C_BaseModelEntity__SetModel = util::get_absolute_address( C_DOTA_MapTree__Spawn + 0x1c0, 1, 5 );
-		if ( !C_BaseModelEntity__SetModel.ptr ) return;
-
-		C_BaseModelEntity__SetModel( this, model_name.data( ) );
 	}
 };

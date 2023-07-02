@@ -1,9 +1,9 @@
 #pragma once
 
-#include "C_BaseEntity.hpp"
 #include "CEconItem.hpp"
+#include "C_BaseModelEntity.hpp"
 
-class C_BaseCombatCharacter : public C_BaseEntity
+class C_BaseCombatCharacter : public C_BaseModelEntity
 {
 public:
 	CUtlVector<CHandle> wearables( ) {

@@ -15,6 +15,15 @@
 #define SPDLOG_WCHAR_TO_UTF8_SUPPORT
 #define SPDLOG_EOL ""
 
+#define PPCAT_NX(a,b) a##b
+#define PPCAT(a,b) PPCAT_NX(a,b)
+#define PAD(sz)\
+private:\
+std::byte PPCAT( _pad, __COUNTER__ )[ sz ];\
+public:
+
+#define PPAD(sz) std::byte PPCAT(_pad, __COUNTER__)[sz];
+
 #include <windows.h>
 #include <iostream>
 #include <format>
@@ -42,6 +51,7 @@
 #include "core/util/drawing.h"
 
 #include "core/sdk_game/NormalClass.hpp"
+#include "core/sdk_game/SomeFunction.h"
 
 #include "core/sdk_game/valve/CUtlSymbol.hpp"
 #include "core/sdk_game/valve/CUtlTSHash.hpp"
@@ -67,7 +77,10 @@
 #include "core/sdk_game/IEngineClient.hpp"
 #include "core/sdk_game/CSource2Client.hpp"
 #include "core/sdk_game/C_BaseEntity.hpp"
+#include "core/sdk_game/C_BaseModelEntity.hpp"
+#include "core/sdk_game/C_BaseCombatCharacter.hpp"
 #include "core/sdk_game/CDOTA_BaseNPC.hpp"
+#include "core/sdk_game/C_DOTA_MapTree.hpp"
 #include "core/sdk_game/CGameEventManager.h"
 #include "core/sdk_game/CDOTA_Camera.hpp"
 #include "core/sdk_game/ICVar.hpp"
@@ -83,6 +96,8 @@
 #include "core/sdk_game/CNetworkMessages.hpp"
 #include "core/sdk_game/valve/CBaseFileSystem.hpp"
 #include "core/sdk_game/C_DOTA_ProjectileManager.hpp"
+#include "core/sdk_game/CVScriptGameSystem.hpp"
+#include "core/sdk_game/CLocalize.h"
 #include "core/sdk_game/CRenderGameSystem.hh"
 #include "core/sdk_game/Data.hpp"
 #include "core/sdk_game/CDOTAItemDefintion.hpp"

@@ -394,3 +394,125 @@ private:
     /** Whether we own the data memory */
     bool owns;
 };
+
+template<typename T = void, typename TT = T> T* GetPointer( TT* data, size_t pos ) {
+    return (T*)( (byte*)data + pos );
+}
+struct custom_stream {
+    FORCEINLINE custom_stream( std::string_view view ) : data( view.data( ) ), size_( view.size( ) ), pos( 0 ) {}
+    FORCEINLINE custom_stream( const void* data, size_t size ) : data( data ), size_( size ), pos( 0 ) {}
+    FORCEINLINE custom_stream( ) : data( nullptr ), size_( 0 ), pos( 0 ) {}
+
+    FORCEINLINE bool good( ) { return this->pos < this->size_; }
+    FORCEINLINE void invalidate( ) { this->pos = this->size_; }
+    FORCEINLINE size_t position( ) { return this->pos; }
+    FORCEINLINE void set_position( size_t pos ) { this->pos = pos; }
+    FORCEINLINE size_t size( ) { return this->size_; }
+    FORCEINLINE size_t remaining( ) {
+        return this->good( )
+            ? this->size_ - this->pos
+            : 0;
+    }
+    template<typename T> FORCEINLINE bool read( T& out ) {
+        if ( sizeof( T ) > this->remaining( ) ) {
+            this->invalidate( );
+            return false;
+        }
+        out = *GetPointer<T>( this->data, this->pos );
+        this->pos += sizeof( T );
+        return true;
+    }
+    template<> FORCEINLINE bool read( bool& out ) {
+        if ( !this->good( ) )
+            return false;
+        out = *GetPointer<uint8_t>( this->data, this->pos ) != 0;
+        this->pos++;
+        return true;
+    }
+    template<typename T> FORCEINLINE bool readUint64( T& out ) {
+        uint64_t ret = 0;
+        if ( !this->read( ret ) )
+            return false;
+        out = ret;
+        return true;
+    }
+    FORCEINLINE bool readBytes( void* dst, size_t size ) {
+        if ( size > this->remaining( ) ) {
+            this->invalidate( );
+            return false;
+        }
+        memcpy( dst, GetPointer( this->data, this->pos ), size );
+        this->pos += size;
+        return true;
+    }
+    FORCEINLINE bool readBytesNoCopy( void*& out, size_t size ) {
+        out = GetPointer( this->data, this->pos );
+        if ( size > this->remaining( ) ) {
+            this->invalidate( );
+            return false;
+        }
+        this->pos += size;
+        return true;
+    }
+    FORCEINLINE bool readNullTerminatedString( std::string_view& out ) {
+        auto start = GetPointer<const char>( this->data, this->pos );
+        size_t size = 0;
+        while ( true ) {
+            uint8_t c = 0;
+            if ( !this->read( c ) )
+                return false;
+            if ( c == 0 )
+                break;
+            size++;
+        }
+        out = { start, size };
+        return true;
+    }
+    FORCEINLINE bool readOffsetString( std::string_view& out ) {
+        uint32_t offset = 0;
+        if ( !this->read( offset ) )
+            return false;
+        if ( offset == 0 ) {
+            out = "";
+            return true;
+        }
+        auto saved_pos = this->position( );
+        this->set_position( saved_pos - 4 + offset );
+        auto res = this->readNullTerminatedString( out );
+        this->set_position( saved_pos );
+        return res;
+    }
+    template<typename T> FORCEINLINE bool readVarUint( T& out ) {
+        out = 0;
+        uint8_t shift = 0;
+        uint8_t b;
+        do {
+            if ( !this->read( b ) ) {
+                this->invalidate( );
+                return false;
+            }
+            out |= ( b & 0x7FLu ) << shift;
+            shift += 7;
+        } while ( ( b & 0x80 ) != 0 );
+        return true;
+    }
+    FORCEINLINE bool readString( std::string_view& out ) {
+        size_t size = 0;
+        if ( !this->readVarUint( size ) )
+            return false;
+        void* ptr = nullptr;
+        if ( !this->readBytesNoCopy( ptr, size ) )
+            return false;
+        out = { (const char*)ptr, size };
+        return true;
+    }
+
+    FORCEINLINE custom_stream createNestedStream( size_t size ) {
+        return { GetPointer( this->data, std::min( this->size( ), this->pos ) ), std::min( this->remaining( ), size ) };
+    }
+
+private:
+    const void* data;
+    size_t size_;
+    size_t pos;
+};

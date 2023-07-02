@@ -5,7 +5,7 @@
 
 #undef DELETE
 
-enum class EntityPVS : int {
+enum class EntityPVS : uint8_t {
 	UPDATE,
 	LEAVE,
 	CREATE,

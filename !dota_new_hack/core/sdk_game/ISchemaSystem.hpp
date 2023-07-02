@@ -2,6 +2,8 @@
 
 #include "../global.hpp"
 
+#include "valve/CUtlTSHash.hpp"
+
 #define CSCHEMATYPE_GETSIZES_INDEX 3
 #define SCHEMASYSTEM_TYPE_SCOPES_OFFSET 0x190
 #define SCHEMASYSTEMTYPESCOPE_OFF1 0x450
@@ -387,12 +389,13 @@ public:
 		}
 	}
 
-	static std::ptrdiff_t dynamic_field_offset( const std::string& name )
+	static std::ptrdiff_t dynamic_field_offset( const std::string_view& name )
 	{
-		static std::unordered_map<std::string, std::int32_t> field_map{ };
+		static std::unordered_map<std::uint32_t, std::int32_t> field_map{ };
+		const auto hashed = __detail::city32impl( name.data( ), name.size( ) );
 
-		if ( field_map.contains( name ) )
-			return field_map[name];
+		if ( field_map.contains( hashed ) )
+			return field_map[ hashed ];
 
 		if ( const auto& paths = split_path_into_relative_paths( name ); paths.size( ) == 3 )
 		{
@@ -405,8 +408,7 @@ public:
 					for ( auto k = 0; k < class_info->m_align; k++ ) {
 						if ( const auto& field = &class_info->m_fields[k]; field ) {
 							if ( field->m_name == var ) {
-								field_map[name] = field->m_single_inheritance_offset;
-								return field->m_single_inheritance_offset;
+								return field_map[ hashed ] = field->m_single_inheritance_offset;
 							}
 						}
 					}

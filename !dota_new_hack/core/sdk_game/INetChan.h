@@ -60,8 +60,8 @@ enum NetworkSerializationMode_t : int
 	NET_SERIALIZATION_MODE_COUNT = 2,
 };
 
-typedef uint32 AppId_t;
-typedef uint64 JobID_t;
+typedef uint32_t AppId_t;
+typedef uint64_t JobID_t;
 
 enum EMsgFormatType
 {
@@ -132,16 +132,6 @@ public:
 	virtual const char* GetName( void ) = 0;
 	virtual int GetSize( void ) = 0;
 	virtual const char* ToString( google::protobuf::Message* msg, void* t ) = 0;
-	virtual const char* GetGroup( void ) = 0;
-	virtual ColorRGBA GetGroupColor( void ) = 0;
-	virtual NetChannelBufType_t GetBufType( void ) = 0;
-	virtual bool ReadFromBuffer( google::protobuf::Message* msg, void* ) = 0; // true if parsing O = 0K
-	virtual bool WriteToBuffer( google::protobuf::Message* msg, void* ) = 0; // true if parsing O = 0K bf_write&
-	virtual void* AllocateMessage( void ) = 0;
-	virtual void DeallocateMessage( void* ) = 0;
-	virtual void* AllocateAndCopyConstructNetMessage( void const* otherProtobufMsg ) = 0;
-	virtual bool OkToRedispatch( void ) = 0;
-	virtual void Copy( void const*, void* ) = 0;
 };
 
 class CNetworkSerializerPB // PB must = protobuf
@@ -198,74 +188,6 @@ public:
 	virtual void* GetTotalPackets( int ) = 0;
 	virtual int GetSequenceNr( int ) = 0;
 	virtual bool  IsValidPacket( int, int ) = 0;
-};
-
-class IPeerToPeerCallbacks;
-class IConnectionlessPacketHandler;
-
-// xref "Leaked channel %s remote %s\n" to Shutdown()
-// or xref "CNetworkSystem::ShutdownGameServer" to ShutdownGameServer()
-class CNetworkSystem : public IAppSystem
-{
-	static auto GetInstanceImpl( )
-	{
-		static CNetworkSystem* inst = nullptr;
-		if ( !inst ) inst = static_cast<CNetworkSystem*>( util::get_interface( "networksystem.dll", "NetworkSystemVersion001" ) );
-
-		return inst;
-	}
-public:
-	static auto& GetInstance( )
-	{
-		return *GetInstanceImpl( );
-	}
-};
-
-#define CASE_STRING( x ) case static_cast<int>( x ) : return #x
-#define CASE_STD_STRING( x ) case static_cast<int>( x ) : return std::string(#x)
-
-struct BaseProtobufMessage {
-	virtual ~BaseProtobufMessage( ) {}
-	virtual std::string GetTypeName( ) { return ""; }
-	virtual void* New( void* ) { return nullptr; }
-	virtual void Clear( ) {}
-	virtual bool IsInitialized( ) { return true; }
-	virtual std::string InitializationErrorString( ) { return ""; }
-	virtual void CheckTypeAndMergeFrom( void* ) {}
-	virtual size_t ByteSizeLong( ) const { return 0; }
-	virtual int GetCachedSize( ) const { return 0; }
-	virtual void* _InternalParse( void*, void* ) { return nullptr; }
-	virtual void OnDemandRegisterArenaDtor( void* ) {}
-	virtual uint8_t* _InternalSerialize( uint8_t* target, ::google::protobuf::io::EpsCopyOutputStream* stream ) const {
-		return target;
-	}
-	virtual size_t ByteSizeLongInternal( ) const { return 0; }
-	FORCEINLINE std::string SerializeAsString( ) const {
-		std::string res;
-		this->SerializeToString( res );
-		return res;
-	}
-	FORCEINLINE void SerializeToString( std::string& out ) const {
-		auto byte_size = this->ByteSizeLong( );
-		out.resize( byte_size );
-		this->SerializeToArrayImpl( (uint8_t*)out.data( ), byte_size );
-	}
-	FORCEINLINE bool SerializeToArray( void* data, int size ) const {
-		auto byte_size = this->ByteSizeLong( );
-		if ( byte_size > size )
-			return false;
-		this->SerializeToArrayImpl( (uint8_t*)data, size );
-		return true;
-	}
-
-private:
-	FORCEINLINE uint8_t* SerializeToArrayImpl( uint8_t* target, int size ) const {
-		::google::protobuf::io::EpsCopyOutputStream out( target, size, false );
-		auto res = this->_InternalSerialize( target, &out );
-		GOOGLE_DCHECK( target + size == res );
-		return res;
-	}
-	void* _internal_metadata_ = nullptr;
 };
 
 struct GCMsgHdr_t
