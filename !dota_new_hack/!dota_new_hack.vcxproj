@@ -344,6 +344,7 @@
     <ClInclude Include="core\sdk_game\CLocalize.h" />
     <ClInclude Include="core\sdk_game\CNetworkMessages.hpp" />
     <ClInclude Include="core\sdk_game\CRenderGameSystem.hh" />
+    <ClInclude Include="core\sdk_game\CVScriptGameSystem.hpp" />
     <ClInclude Include="core\sdk_game\C_DOTA_MapTree.hpp" />
     <ClInclude Include="core\sdk_game\C_DOTA_PlayerResource.h" />
     <ClInclude Include="core\sdk_game\C_DOTA_ProjectileManager.hpp" />

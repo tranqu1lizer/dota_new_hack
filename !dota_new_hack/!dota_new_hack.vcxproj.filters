@@ -464,6 +464,9 @@
     </ClInclude>
     <ClInclude Include="core\features\tree_changer.h" />
     <ClInclude Include="core\features\camera_hack.h" />
+    <ClInclude Include="core\sdk_game\CVScriptGameSystem.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

@@ -96,6 +96,7 @@ public:
 #include "core/sdk_game/CNetworkMessages.hpp"
 #include "core/sdk_game/valve/CBaseFileSystem.hpp"
 #include "core/sdk_game/C_DOTA_ProjectileManager.hpp"
+#include "core/sdk_game/CVScriptGameSystem.hpp"
 #include "core/sdk_game/CLocalize.h"
 #include "core/sdk_game/CRenderGameSystem.hh"
 #include "core/sdk_game/Data.hpp"

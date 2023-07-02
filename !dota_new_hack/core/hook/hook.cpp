@@ -153,7 +153,7 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 		CGameEvent* deserialized = CGameEventManager::GetInstance( )->UnserializeEvent( (CMsgSource1LegacyGameEvent*)r8 );
 		spdlog::info( "{}\n", deserialized->GetName( ) );
 	}
-	else if ( rdx->messageID == svc_PacketEntities ) {
+	/*else if ( rdx->messageID == svc_PacketEntities ) {
 		CSVCMsg_PacketEntities* packet_entities = (CSVCMsg_PacketEntities*)r8;
 		auto _data = proto_string( packet_entities->entity_data( ) );
 		if ( !util::exists( (void*)_data ) ) goto end;
@@ -182,7 +182,7 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 					spdlog::debug( "{}: {}, delta: {}\n", entity->identity( )->entity_name( ), etype );
 			}
 		}
-	}
+	}*/
 
 	if ( rdx->messageID != net_Tick )
 		goto end;
@@ -366,6 +366,8 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 			panorama_gui.show( );
 		}
 		if ( wParam == VK_F4 ) {
+			CVScriptGameSystem* sys = (CVScriptGameSystem*)util::find_game_system( "DOTA_VScriptGameSystem" );
+			sys->RunScript( "draw" ); // steamapps\common\dota 2 beta\game\dota\scripts\vscripts\draw.lua
 		}
 		if ( wParam == VK_INSERT ) {
 			CPanoramaUIEngine::GetInstance( )->engine_source2( )->play_sound_effect( "ui_menu_activate_open" );
