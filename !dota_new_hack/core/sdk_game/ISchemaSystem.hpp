@@ -2,6 +2,8 @@
 
 #include "../global.hpp"
 
+#include "valve/CUtlTSHash.hpp"
+
 #define CSCHEMATYPE_GETSIZES_INDEX 3
 #define SCHEMASYSTEM_TYPE_SCOPES_OFFSET 0x190
 #define SCHEMASYSTEMTYPESCOPE_OFF1 0x450

@@ -1,5 +1,10 @@
 #pragma once
 
+#include "NormalClass.hpp"
+#include "valve/CUtlVector.hpp"
+#include "ISchemaSystem.hpp"
+#include "CHandle.hpp"
+
 class CDOTA_Buff : public VClass {
 public:
 	const char* GetBuffName( ) noexcept {

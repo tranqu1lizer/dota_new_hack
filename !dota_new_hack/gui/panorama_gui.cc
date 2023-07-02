@@ -1,35 +1,17 @@
 #include "panorama_gui.h"
 #include "../core/hook/hook.hpp"
 #include "../core/features/inventory_changer.h"
+#include "../core/features/tree_changer.h"
+#include "../core/features/camera_hack.h"
 
 CPanoramaGUI panorama_gui;
-extern CheatData cheat_data;
+extern CheatData context;
 void* origCPanel2D__OnMouseButtonDown, * origCPanel2D__OnMouseMove;
 
-bool is_number( const std::string& s ) {
-	return !s.empty( ) && std::all_of( s.begin( ), s.end( ), ::isdigit );
-}
+bool is_number( const std::string& s ) { return !s.empty( ) && std::all_of( s.begin( ), s.end( ), ::isdigit ); }
 
 void CameraFogCheckbox_Handler( ) {
-	if ( auto camera = reinterpret_cast<VClass*>( calls::GetCurrentCamera( ) ); camera ) {
-		const auto get_fog_vfunc = camera->GetVF( 18 ); // C_DOTACamera::GetFogEnd
-		const auto instruction_bytes = *reinterpret_cast<std::uintptr_t*>( get_fog_vfunc );
-
-		if ( instruction_bytes == 0x83485708245c8948 ) { // not patched
-
-			// 0x0F, 0x57, 0xC0 | xorps xmm0, xmm0
-			// 0xC3				| ret
-			constexpr const char* bytepatch = "\x0F\x57\xC0\xC3";
-			util::patch( (void*)get_fog_vfunc, bytepatch, 4 );
-		}
-		else if ( instruction_bytes == 0x83485708c3c0570f ) { // already patched
-
-			// 0x48, 0x89, 0x5C, 0x24, 0x08 | mov qword ptr ss:[rsp+8], rbx
-			// 0x57							| push rdi
-			constexpr const char* byterestore = "\x48\x89\x5C\x24\x08\x57";
-			util::patch( (void*)get_fog_vfunc, byterestore, 6 );
-		}
-	}
+	features::camera_hack.toggle_fog( );
 
 	panorama_gui.draw_fog ^= true;
 }
@@ -53,69 +35,24 @@ void VisualsManabarButton_Handler( ) {
 void CameraDistSlider_Handler( ) {
 	const auto fl_value = panorama_gui.camera_dist_slider->children( )[ 1 ]->panel2d_as<CSlider>( )->g_float( );
 
-	const auto value = static_cast<int>( fl_value * ( 3500 - 1100 ) + 1100 ); // fl_value * ( max - min ) + min
-	calls::GetCurrentCamera( )->set_distance( global::camera_distance = value );
+	const auto value = static_cast<int>( fl_value * ( features::camera_hack.get_max_distance() - features::camera_hack.get_min_distance( ) ) + features::camera_hack.get_min_distance( ) ); // fl_value * ( max - min ) + min
+	features::camera_hack.change_distance( value );
 }
 
 void ChangerTreeChanged_Handler( ) {
-	std::unordered_map<std::string, float> tree_models = std::unordered_map<std::string, float>( {
-		{ "models/props_structures/crystal003_refract.vmdl", 1} ,
-		{ "models/props_structures/pumpkin001.vmdl", 1.08 },
-		{ "models/props_structures/pumpkin003.vmdl", 3 },
-		{ "models/props_diretide/pumpkin_head.vmdl", 3 },
-		{ "models/props_gameplay/pumpkin_bucket.vmdl", 1 },
-		{ "maps/jungle_assets/trees/pitcher/jungle_pitcher_tree.vmdl", 2 },
-		{ "models/props_garden/tree_garden001.vmdl", 3 },
-		{ "maps/journey_assets/props/trees/journey_armandpine/journey_armandpine_02_stump.vmdl", 4.5 },
-		{ "models/props_tree/frostivus_tree.vmdl", 0.85 },
-		{ "models/props_tree/ti7/ggbranch.vmdl", 1 },
-		{ "models/props_tree/newbloom_tree.vmdl", 0.9 },
-	} );
 
-	std::unordered_map<std::string, std::string> tree_model_names = std::unordered_map<std::string, std::string>( {
-		{ "Crystal", "models/props_structures/crystal003_refract.vmdl"} ,
-		{ "Pumpkins #1", "models/props_structures/pumpkin001.vmdl"},
-		{ "Pumpkins #2", "models/props_structures/pumpkin003.vmdl"},
-		{ "Pumpkins #3","models/props_diretide/pumpkin_head.vmdl"},
-		{ "Pumpkin Buckets","models/props_gameplay/pumpkin_bucket.vmdl" },
-		{ "Jungle pitcher", "maps/jungle_assets/trees/pitcher/jungle_pitcher_tree.vmdl" },
-		{ "Tree garden", "models/props_garden/tree_garden001.vmdl" },
-		{ "Stumps", "maps/journey_assets/props/trees/journey_armandpine/journey_armandpine_02_stump.vmdl" },
-		{ "Frostivus", "models/props_tree/frostivus_tree.vmdl" },
-		{ "TI7 GG Tree", "models/props_tree/ti7/ggbranch.vmdl" },
-		{ "New Bloom", "models/props_tree/newbloom_tree.vmdl" },
-	} );
-
-
-	CDOTA_BinaryObjectSystem* binary_obj_sys = (CDOTA_BinaryObjectSystem*)util::find_game_system( "CDOTA_BinaryObjectSystem" );
-	CUIPanel* selected = panorama_gui.changer_TreesDropDown->panel2d_as<CDropDown>( )->GetSelected( );
-
-	if ( !selected || !binary_obj_sys )
-		return;
+	CUIPanel* selected;
+	if ( selected = panorama_gui.changer_TreesDropDown->panel2d_as<CDropDown>( )->GetSelected( ); !selected )
+		return spdlog::critical("ChangerTreeChanged_Handler(): selected = nullptr;\n" );
 
 	const char* dropdown_sel = reinterpret_cast<CLabel*>( selected )->label_text( );
+	if ( !dropdown_sel || (std::uintptr_t)dropdown_sel == 0x1 )
+		return spdlog::critical( "ChangerTreeChanged_Handler(): dropdown_sel = nullptr;\n" );;
 
-	if ( !dropdown_sel || (std::uintptr_t)dropdown_sel == 0x1 || !tree_model_names.contains( dropdown_sel ) )
-		return;
+	if ( !util::fast_strcmp( (char*)dropdown_sel, "Default" ) )
+		return features::tree_changer.restore_trees( );
 
-	some_function scale_changed = CNetworkMessages::get( )->find_network_callback( "gameSceneNodeLocalScaleChanged" );
-	for ( C_DOTA_MapTree* ent : binary_obj_sys->m_trees ) {
-
-		if ( !ent )
-			continue;
-
-		SchemaVClass* game_scene = ent->schema_member<SchemaVClass*>( "client.dll/C_BaseEntity/m_pGameSceneNode" );
-
-		ent->set_model( tree_model_names[ dropdown_sel ] );
-
-		if ( game_scene ) {
-			game_scene->schema_member<float>( "client.dll/CGameSceneNode/m_flScale" ) = tree_models[ tree_model_names[ dropdown_sel ] ];
-			game_scene->CallVFunc<10>( 4 );
-		}
-
-		if ( scale_changed )
-			scale_changed( ent );
-	}
+	features::tree_changer.change_trees( dropdown_sel );
 }
 
 void MiscGoldDisplay_Handler( ) {

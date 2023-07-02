@@ -8,7 +8,6 @@
 
 namespace global {
 	inline HMODULE client;
-	inline auto camera_distance = 1200;
 	inline std::unordered_map<std::string, ID3D11ShaderResourceView*> g_mapSpellIcons, g_mapHeroIcons, g_mapItemIcons;
 	inline std::uintptr_t* g_LocalEntity;
 	inline bool in_game;

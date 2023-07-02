@@ -153,8 +153,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="core\features\camera_hack.cc" />
     <ClCompile Include="core\features\hero_bar.cc" />
     <ClCompile Include="core\features\inventory_changer.cc" />
+    <ClCompile Include="core\features\tree_changer.cc" />
     <ClCompile Include="core\hook\hook.cpp" />
     <ClCompile Include="core\lib\imgui\imgui.cpp" />
     <ClCompile Include="core\lib\imgui\imgui_demo.cpp" />
@@ -235,6 +237,7 @@
     <ClCompile Include="core\lib\protobuf\files\valveextensions.pb.cc" />
     <ClCompile Include="core\sdk_game\CEconItem.cpp" />
     <ClCompile Include="core\sdk_game\CDOTA_ParticleManager.cpp" />
+    <ClCompile Include="core\sdk_game\C_BaseModelEntity.hpp" />
     <ClCompile Include="core\sdk_game\panorama\CPanelStyle.hpp" />
     <ClCompile Include="core\sdk_game\panorama\CUIInput.hpp" />
     <ClCompile Include="core\sdk_game\panorama\CUILength.hpp" />
@@ -247,8 +250,10 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="core\features\camera_hack.h" />
     <ClInclude Include="core\features\hero_bar.h" />
     <ClInclude Include="core\features\inventory_changer.h" />
+    <ClInclude Include="core\features\tree_changer.h" />
     <ClInclude Include="core\functions.hpp" />
     <ClInclude Include="core\global.hpp" />
     <ClInclude Include="core\hook\hook.hpp" />
@@ -339,6 +344,7 @@
     <ClInclude Include="core\sdk_game\CLocalize.h" />
     <ClInclude Include="core\sdk_game\CNetworkMessages.hpp" />
     <ClInclude Include="core\sdk_game\CRenderGameSystem.hh" />
+    <ClInclude Include="core\sdk_game\C_DOTA_MapTree.hpp" />
     <ClInclude Include="core\sdk_game\C_DOTA_PlayerResource.h" />
     <ClInclude Include="core\sdk_game\C_DOTA_ProjectileManager.hpp" />
     <ClInclude Include="core\sdk_game\ICVar.hpp" />

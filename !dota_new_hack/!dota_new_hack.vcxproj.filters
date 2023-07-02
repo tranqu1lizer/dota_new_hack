@@ -459,6 +459,11 @@
     <ClInclude Include="core\sdk_game\panorama\CLayoutManager.h" />
     <ClInclude Include="core\sdk_game\CDOTAInput.h" />
     <ClInclude Include="core\sdk_game\CLocalize.h" />
+    <ClInclude Include="core\sdk_game\C_DOTA_MapTree.hpp">
+      <Filter>core\sdk_game</Filter>
+    </ClInclude>
+    <ClInclude Include="core\features\tree_changer.h" />
+    <ClInclude Include="core\features\camera_hack.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -719,6 +724,9 @@
     <ClCompile Include="core\util\drawing.cc">
       <Filter>core\util</Filter>
     </ClCompile>
+    <ClCompile Include="core\sdk_game\C_BaseModelEntity.hpp" />
+    <ClCompile Include="core\features\tree_changer.cc" />
+    <ClCompile Include="core\features\camera_hack.cc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="core\sdk_game\CGameEntitySystem.hpp">

@@ -1,10 +1,12 @@
+#pragma once
+
 #include <cstdint>
 
 class some_function {
 	void* ptr;
 public:
-	some_function( std::uintptr_t ptr ) : ptr( (void*)ptr ) { }
-	some_function( void* ptr ) : ptr( ptr ) { }
+	some_function( std::uintptr_t ptr = 0 ) : ptr( (void*)ptr ) { }
+	some_function( void* ptr = nullptr ) : ptr( ptr ) { }
 
 	operator void* ( ) {
 		return ptr;
