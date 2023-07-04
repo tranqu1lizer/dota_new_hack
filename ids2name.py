@@ -1,9 +1,11 @@
-import json,clipboard ,requests
+import os,json,clipboard ,requests
+
+filename = "heroes.json"
 
 def dw_heroes():
-    url = "https://raw.githubusercontent.com/odota/dotaconstants/master/build/heroes.json"
+    url = f"https://raw.githubusercontent.com/odota/dotaconstants/master/build/{filename}"
     res = requests.get(url)
-    open("heroes.json", 'wb').write(res.content)
+    open(filename, 'wb').write(res.content)
 
 def convert_data(data):
     converted_data = {}
@@ -14,16 +16,17 @@ def convert_data(data):
 
 dw_heroes()
 
-with open("heroes.json", "r") as file:
+with open(filename, "r") as file:
     data = json.load(file)
 
 converted_map = convert_data(data)
 
-result_str = "std::unordered_map<std::byte, std::string> m_heroid = {"
+result_str = "std::unordered_map<int, std::string> m_heroid = {\n"
 for hero_id, hero_name in converted_map.items():
    result_str = result_str + f"    {{ {hero_id}, \"{hero_name}\" }},\n"
 
-result_str = result_str[:-2] + "\n};"
+result_str = result_str[:-2] + "\n}; // generated ids2name.py"
 
 clipboard.copy(result_str)
 print(result_str)
+os.remove(filename)
