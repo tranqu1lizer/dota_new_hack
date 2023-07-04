@@ -4,6 +4,7 @@
 #include "../features/inventory_changer.h"
 #include "../features/hero_bar.h"
 #include "../features/camera_hack.h"
+#include "../features/overwolf.h"
 
 extern CGui* pGui;
 extern CPanoramaGUI panorama_gui;
@@ -103,11 +104,11 @@ EGCResults hook::functions::SGCRetrieveMessage( ISteamGameCoordinator* thisptr, 
 			}
 		}
 	}
-	if ( msg_id == 26 && panorama_gui.auto_accept ) { // k_ESOMsg_UpdateMultiple
+	if ( msg_id == 26 ) { // k_ESOMsg_UpdateMultiple
 		CMsgSOMultipleObjects body;
 		if ( body.ParsePartialFromArray( body_data, body_size ) ) {
-
-			if ( body.objects_modified_size( ) == 5 ) {
+			//body.owner_soid( ).
+			if ( panorama_gui.auto_accept && body.objects_modified_size( ) == 5 ) {
 				const auto inversed_lobby_id = ~( CGCClient::get( ).lobby_manager( )->find_dota_lobby( )->lobby_id( ) );
 				const uint32_t account_id = reinterpret_cast<CDOTAPlayerInventory*>( CGCClient::get( ).so_listeners( )[ 1 ] )->m_soid.m_steamid;
 
@@ -117,6 +118,8 @@ EGCResults hook::functions::SGCRetrieveMessage( ISteamGameCoordinator* thisptr, 
 				ISteamClient::get( ).GetISteamGenericInterface( ISteamClient::GetHSteamPipe( ), ISteamClient::GetHSteamUser( ), "SteamGameCoordinator001" )
 					->send_msg( msg, 7070 ); // k_EMsgGCReadyUp
 			}
+
+
 		}
 	}
 
@@ -329,32 +332,7 @@ void hook::functions::OnMouseWheeled( CDOTA_Camera* rcx, int delta ) {
 LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int uMsg, const uintptr_t wParam, const uintptr_t lParam ) {
 	if ( uMsg == WM_KEYUP ) {
 		if ( wParam == VK_F1 ) {
-			//auto bg = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaDashboard" )->find_child_traverse( "DashboardBackgroundManager" )->children( )[ 0 ];
-			//bg->set_style( "background-image: url(\"file://{resources}/ambg.vtex\");" );
-
-			auto radiant_players = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "TopBarRadiantPlayersContainer" );
-			auto dire_players = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "TopBarDirePlayersContainer" );
-
-			for ( auto img : radiant_players->find_children_traverse( "HeroImage" ) ) {
-
-				const auto src = img->panel2d_as<CDOTA_UI_HeroImage>( )->image_src( );
-				if ( !src ) continue;
-
-				std::string src2 = { std::string_view{src}.substr( 23 ).data( ) };
-				const auto formatted_name = src2.erase( src2.size( ) - 4 );
-
-				spdlog::info( "Radiant player: {}\n", formatted_name );
-			}
-			for ( auto img : dire_players->find_children_traverse( "HeroImage" ) ) {
-
-				const auto src = img->panel2d_as<CDOTA_UI_HeroImage>( )->image_src( );
-				if ( !src ) continue;
-
-				std::string src2 = { std::string_view{src}.substr( 23 ).data( ) };
-				const auto formatted_name = src2.erase( src2.size( ) - 4 );
-
-				spdlog::info( "Dire player: {}\n", formatted_name );
-			}
+			features::overwolf.get_players_info( );
 		}
 		if ( wParam == VK_F2 ) {
 			int idx;
@@ -364,10 +342,6 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 		}
 		if ( wParam == VK_F3 ) {
 			panorama_gui.show( );
-		}
-		if ( wParam == VK_F4 ) {
-			CVScriptGameSystem* sys = (CVScriptGameSystem*)util::find_game_system( "DOTA_VScriptGameSystem" );
-			sys->RunScript( "draw" ); // steamapps\common\dota 2 beta\game\dota\scripts\vscripts\draw.lua
 		}
 		if ( wParam == VK_INSERT ) {
 			CPanoramaUIEngine::GetInstance( )->engine_source2( )->play_sound_effect( "ui_menu_activate_open" );
@@ -383,6 +357,7 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 				global::g_mapItemIcons.clear( );
 				global::g_mapSpellIcons.clear( );
 
+				curl_global_cleanup( );
 				hook::uninstall_all_hooks( );
 				ImGui_ImplDX11_Shutdown( );
 				ImGui_ImplWin32_Shutdown( );

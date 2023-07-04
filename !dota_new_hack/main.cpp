@@ -213,6 +213,7 @@ bool __stdcall DllMain( HINSTANCE hModule, std::uint8_t reason, void* ) {
 #ifdef _DEBUG
 		spdlog::set_level( spdlog::level::debug );
 #endif
+		curl_global_init( CURL_GLOBAL_DEFAULT );
 
 		start_init( );
 	}

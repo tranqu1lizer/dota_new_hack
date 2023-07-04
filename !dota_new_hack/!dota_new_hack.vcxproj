@@ -156,6 +156,7 @@
     <ClCompile Include="core\features\camera_hack.cc" />
     <ClCompile Include="core\features\hero_bar.cc" />
     <ClCompile Include="core\features\inventory_changer.cc" />
+    <ClCompile Include="core\features\overwolf.cc" />
     <ClCompile Include="core\features\tree_changer.cc" />
     <ClCompile Include="core\hook\hook.cpp" />
     <ClCompile Include="core\lib\imgui\imgui.cpp" />
@@ -244,6 +245,7 @@
     <ClCompile Include="core\util\city.cpp" />
     <ClCompile Include="core\util\drawing.cc" />
     <ClCompile Include="core\util\mapbox.hxx" />
+    <ClCompile Include="core\util\request.cc" />
     <ClCompile Include="core\util\util.cpp" />
     <ClCompile Include="gui\gui.cpp" />
     <ClCompile Include="gui\panorama_gui.cc" />
@@ -253,6 +255,7 @@
     <ClInclude Include="core\features\camera_hack.h" />
     <ClInclude Include="core\features\hero_bar.h" />
     <ClInclude Include="core\features\inventory_changer.h" />
+    <ClInclude Include="core\features\overwolf.h" />
     <ClInclude Include="core\features\tree_changer.h" />
     <ClInclude Include="core\functions.hpp" />
     <ClInclude Include="core\global.hpp" />
@@ -395,6 +398,8 @@
     <ClInclude Include="core\util\city.hpp" />
     <ClInclude Include="core\util\cityhash32.hxx" />
     <ClInclude Include="core\util\drawing.h" />
+    <ClInclude Include="core\util\HTTPRequest.hpp" />
+    <ClInclude Include="core\util\request.h" />
     <ClInclude Include="core\util\undocumented.hpp" />
     <ClInclude Include="core\util\util.hpp" />
     <ClInclude Include="gui\gui.hpp" />

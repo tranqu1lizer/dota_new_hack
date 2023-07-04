@@ -26,7 +26,7 @@ struct SOID_t
 
 struct dota_dynamic_lobby_t {
 	void* pad;
-	CSODOTALobby* dynamic_lobby;
+	CSODOTALobby so_dynamic_lobby;
 };
 struct dota_static_lobby_t {
 	void* pad;
@@ -54,20 +54,9 @@ public:
 class CGCClientSharedObjectCache
 {
 public:
-	uint64_t m_pVTable; // 0x0
-	char unk_8[80]; // 0x8
-	// CDOTAGameAccountPlus* m_pAccountPlus; // 0x60
-
 	virtual void unk0( void ) = 0;
 	virtual void unk1( void ) = 0;
 	virtual bool AddObjectToCache( CGCClientSharedObject* object ) = 0;
-	virtual void unk3( void ) = 0;
-	virtual void unk4( void ) = 0;
-	virtual void unk5( void ) = 0;
-	virtual void unk6( void ) = 0;
-	virtual void unk7( void ) = 0;
-
-
 };
 
 class CSharedObjectListener {
@@ -77,7 +66,12 @@ public:
 };
 
 class CDOTALobby : public CSharedObject {
+	char pad[ 0x10 ];
 public:
+	dota_dynamic_lobby_t* get_dynamic_lobby( ) {
+		return Member< dota_dynamic_lobby_t*>( 0x18 );
+	}
+
 	uint64_t lobby_id( ) {
 		return *reinterpret_cast<uint64_t*>( Member<uintptr_t>( 0x18 ) + 0x1D8 );
 	}

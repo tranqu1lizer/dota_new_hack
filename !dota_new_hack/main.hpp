@@ -19,12 +19,11 @@
 #define PPCAT(a,b) PPCAT_NX(a,b)
 #define PAD(sz)\
 private:\
-std::byte PPCAT( _pad, __COUNTER__ )[ sz ];\
+char PPCAT( _pad, __COUNTER__ )[ sz ];\
 public:
 
-#define PPAD(sz) std::byte PPCAT(_pad, __COUNTER__)[sz];
+#define PPAD(sz) char PPCAT(_pad, __COUNTER__)[sz];
 
-#include <windows.h>
 #include <iostream>
 #include <format>
 #include <queue>
@@ -35,9 +34,17 @@ public:
 #include <cstddef>
 #include <d3d11.h>
 #include <regex>
+#include <future>
 #include <spdlog/spdlog.h>
 #include <spdlog/stopwatch.h>
 
+#define CURL_STATICLIB
+#pragma comment(lib, "wldap32.lib" )
+#pragma comment(lib, "crypt32.lib" )
+#pragma comment(lib, "Ws2_32.lib")
+#pragma comment(lib, "Normaliz.lib")
+#include "core/lib/libcurl/curl.h"
+#include "core/lib/json.hpp"
 #include "core/lib/minhook/MinHook.h"
 #pragma comment(lib, "libMinHook.x64.lib")
 
@@ -49,6 +56,7 @@ public:
 #include "core/util/address_wrapper.hxx"
 #include "core/util/mapbox.hxx"
 #include "core/util/drawing.h"
+#include "core/util/request.h"
 
 #include "core/sdk_game/NormalClass.hpp"
 #include "core/sdk_game/SomeFunction.h"
@@ -107,7 +115,9 @@ public:
 #ifdef _DEBUG
 #pragma comment(lib, "core/lib/protobuf/libprotobufd.lib")
 #pragma comment(lib, "core/lib/spdlog/spdlogd.lib")
+#pragma comment(lib, "core/lib/libcurl/libcurl_a_debug.lib")
 #else
 #pragma comment(lib, "core/lib/protobuf/libprotobuf.lib")
 #pragma comment(lib, "core/lib/spdlog/spdlog.lib")
+#pragma comment(lib, "core/lib/libcurl/libcurl_a.lib")
 #endif
