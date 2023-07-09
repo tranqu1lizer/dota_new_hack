@@ -1,8 +1,6 @@
 #pragma once
 
-#include "../functions.hpp"
-#include "../util/util.hpp"
-#include "../sdk_game/CDOTA_Camera.hpp"
+#include "../../main.hpp"
 
 class CCameraHack {
 	float m_current_distance = 1200.f, m_dist_step = 100.f;

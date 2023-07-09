@@ -95,7 +95,7 @@ bool start_init( ) {
 		aNetchanVMT = util::find_pattern( "networksystem.dll", "40 53 56 57 41 56 48 83 EC ?? 45 33 F6 48 8D 71", "NetChannel VMT" );
 		CHECK_VAR_RET( aNetchanVMT )
 
-			aParticleCollectionVMT = (uintptr_t**)GAB( util::find_pattern( "particles.dll", "48 8D 05 ?? ?? ?? ?? 48 89 01 0F 57 C0", "ParticleCollection VMT" ), 3, 7 );
+		aParticleCollectionVMT = (uintptr_t**)GAB( util::find_pattern( "particles.dll", "48 8D 05 ?? ?? ?? ?? 48 89 01 0F 57 C0", "ParticleCollection VMT" ), 3, 7 );
 		CHECK_VAR_RET( aParticleCollectionVMT );
 
 		g_pGameEntitySystem = *reinterpret_cast<CGameEntitySystem**>( GAB( aGameEntitySystem, 3, 7 ) );
@@ -133,8 +133,6 @@ bool start_init( ) {
 		FIND_FUNC_CLIENT_CALL( CPanel2D::aSetDialogVariableInt, "E8 ?? ?? ?? ?? 8B 53 5C", "CPanel2D::SetDialogVariableInt" );
 		FIND_FUNC_CLIENT_CALL( CDropDown::aCDropDown__GetSelected, "E8 ?? ?? ?? ?? 48 85 C0 0F 84 ?? ?? ?? ?? 49 8B 8F", "CDropDown::GetSelected" );
 		
-		// E8 ? ? ? ? EB 4E 83 FB FF
-
 		CDOTAItemSchema::GetItemDefArrIdx = AddressWrapper( CDOTAItemSchema::GetItemDefByIndex ).get_offset( 0x16 ).get_address_from_instruction_ptr( 1 );
 		ISteamClient::GetHSteamPipe = (decltype( ISteamClient::GetHSteamPipe ))util::find_export_address( util::get_module_base_ansi( "steam_api64.dll" ), "GetHSteamPipe" );
 		ISteamClient::GetHSteamUser = (decltype( ISteamClient::GetHSteamUser ))util::find_export_address( util::get_module_base_ansi( "steam_api64.dll" ), "GetHSteamUser" );
@@ -213,8 +211,6 @@ bool __stdcall DllMain( HINSTANCE hModule, std::uint8_t reason, void* ) {
 #ifdef _DEBUG
 		spdlog::set_level( spdlog::level::debug );
 #endif
-		curl_global_init( CURL_GLOBAL_DEFAULT );
-
 		start_init( );
 	}
 	return reason;

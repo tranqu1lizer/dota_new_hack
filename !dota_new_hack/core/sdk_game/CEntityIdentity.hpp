@@ -40,6 +40,10 @@ public:
 		return internalName ? internalName : entityName;
 	}
 
+	bool has_name( ) const {
+		return ( (std::uintptr_t)entity && (std::uintptr_t)this && (internalName || entityName) );
+	}
+
 	bool dormant( ) const {
 		return (this && entity) && ( flags[0] & 0x80 );
 	}

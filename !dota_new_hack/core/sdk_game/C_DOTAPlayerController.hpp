@@ -2,9 +2,17 @@
 
 #include "../global.hpp"
 
-class C_DOTAPlayerController : VClass {
+class CBasePlayerController : public C_BaseEntity {
 public:
+	CHandle pawn( ) {
+		if ( !util::exists( this ) ) return CHandle{};
+		static const auto offset = schema::dynamic_field_offset( "client.dll/CBasePlayerController/m_hPawn" );
+		return Member<CHandle>( offset );
+	}
+};
 
+class C_DOTAPlayerController : public CBasePlayerController {
+public:
 	CHandle assigned_hero( ) {
 		if ( !util::exists( this ) ) return CHandle{};
 		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTAPlayerController/m_hAssignedHero" );

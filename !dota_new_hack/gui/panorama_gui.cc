@@ -5,16 +5,10 @@
 #include "../core/features/camera_hack.h"
 
 CPanoramaGUI panorama_gui;
-extern CheatData context;
+extern CContext context;
 void* origCPanel2D__OnMouseButtonDown, * origCPanel2D__OnMouseMove;
 
 bool is_number( const std::string& s ) { return !s.empty( ) && std::all_of( s.begin( ), s.end( ), ::isdigit ); }
-
-void CameraFogCheckbox_Handler( ) {
-	features::camera_hack.toggle_fog( );
-
-	panorama_gui.draw_fog ^= true;
-}
 
 void ChangerAddItemButton_Handler( ) {
 	auto display_text = panorama_gui.changer_item_def_textentry->panel2d_as<CTextEntry>( )->display_text( );
@@ -69,7 +63,7 @@ bool CPanel2D__OnMouseButtonDown( CPanel2D* rcx, const MouseData_t& code ) {
 	if ( panorama_gui.menu_status ) {
 		if ( code.m_mouse_code == MouseCode::MOUSE_LEFT ) {
 			if ( rcx == panorama_gui.camera_fog_checkbox->panel2d_as( ) ) {
-				CameraFogCheckbox_Handler( );
+				features::camera_hack.toggle_fog( );
 			}
 			else if ( rcx == panorama_gui.changer_add_item_button->panel2d_as( ) ) {
 				ChangerAddItemButton_Handler( );

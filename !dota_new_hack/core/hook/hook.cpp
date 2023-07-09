@@ -20,9 +20,9 @@ void EntityEventListener::OnEntityCreated( C_BaseEntity* rcx ) {
 		}
 
 		if ( class_name.starts_with( "C_DOTA_Unit_Hero" ) || class_name.starts_with( "CDOTA_Unit_Hero" ) )
-			context.heroes.insert( static_cast<C_DOTA_BaseNPC_Hero*>( rcx ) );
+			context.entities.heroes.insert( static_cast<C_DOTA_BaseNPC_Hero*>( rcx ) );
 
-		context.entities[ rcx->index( ) ] = rcx;
+		context.entities.m[ rcx->index( ) ] = rcx;
 	}
 }
 
@@ -30,10 +30,10 @@ void EntityEventListener::OnEntityDeleted( C_BaseEntity* rcx ) {
 	if ( const auto client_class = rcx->client_class( ); ( client_class && client_class->m_pNetworkName ) ) {
 		const auto class_name = std::string_view( client_class->m_pNetworkName );
 
-		if ( class_name.starts_with( "C_DOTA_Unit_Hero" ) || class_name.starts_with( "CDOTA_Unit_Hero" ) && context.heroes.contains( static_cast<C_DOTA_BaseNPC_Hero*>( rcx ) ) )
-			context.heroes.erase( static_cast<C_DOTA_BaseNPC_Hero*>( rcx ) );
+		if ( class_name.starts_with( "C_DOTA_Unit_Hero" ) || class_name.starts_with( "CDOTA_Unit_Hero" ) && context.entities.heroes.contains( static_cast<C_DOTA_BaseNPC_Hero*>( rcx ) ) )
+			context.entities.heroes.erase( static_cast<C_DOTA_BaseNPC_Hero*>( rcx ) );
 
-		context.entities.erase( rcx->index( ) );
+		context.entities.m.erase( rcx->index( ) );
 	}
 }
 
@@ -156,36 +156,6 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 		CGameEvent* deserialized = CGameEventManager::GetInstance( )->UnserializeEvent( (CMsgSource1LegacyGameEvent*)r8 );
 		spdlog::info( "{}\n", deserialized->GetName( ) );
 	}
-	/*else if ( rdx->messageID == svc_PacketEntities ) {
-		CSVCMsg_PacketEntities* packet_entities = (CSVCMsg_PacketEntities*)r8;
-		auto _data = proto_string( packet_entities->entity_data( ) );
-		if ( !util::exists( (void*)_data ) ) goto end;
-		auto updated_entries = packet_entities->updated_entries( );
-
-		while ( updated_entries-- != 0 ) {
-
-			bitstream bs{ _data };
-			while ( bs.good( ) ) {
-				C_BaseEntity* entity = context.entities[ bs.readUBitVar( ) ];
-
-				if ( !entity || !entity->identity( ) || !entity->identity( )->entity_name( ) )
-					break;
-
-				int32_t etype = 0;
-				if ( bs.readBool( ) ) {
-					if ( bs.readBool( ) ) etype = 4;
-					else etype = 3;
-				}
-				else {
-					if ( bs.readBool( ) ) etype = 1;
-					else etype = 2;
-				}
-
-				if ( util::fast_strstr( entity->identity( )->entity_name( ), "hero" ) )
-					spdlog::debug( "{}: {}, delta: {}\n", entity->identity( )->entity_name( ), etype );
-			}
-		}
-	}*/
 
 	if ( rdx->messageID != net_Tick )
 		goto end;
@@ -196,9 +166,9 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 			static C_DOTAPlayerController** players = (decltype( players ))util::get_absolute_address( util::find_pattern( global::client, "\x48\x8B\x05\xCC\xCC\xCC\xCC\x89\xBE", "", false ), 3, 7 );
 
 			if ( const auto local_controller = players[ 0 ]; local_controller ) {
+				global::g_Controller = (std::uintptr_t)local_controller;
 				global::g_LocalEntity = g_pGameEntitySystem->find_entity_by_handle<std::uintptr_t>( local_controller->assigned_hero( ) );
 
-				ICVar::get( )[ "r_farz" ]->m_values.flt = 10000.f;
 #ifdef _DEBUG
 				ICVar::get( )[ "stats_display" ]->m_values.i32 = 5;
 #endif
@@ -242,7 +212,8 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 		features::camera_hack.change_distance( );
 		global::g_LocalEntity = 0;
 		g_pGameRules = nullptr;
-		context.heroes.clear( );
+		context.entities.m.clear( );
+		context.entities.heroes.clear( );
 	}
 
 end:
@@ -271,7 +242,7 @@ long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UI
 		C_DOTA_BaseNPC_Hero* closest_hero = nullptr;
 		double lowest_distance = DBL_MAX;
 
-		for ( C_DOTA_BaseNPC_Hero* hero : context.heroes ) {
+		for ( C_DOTA_BaseNPC_Hero* hero : context.entities.heroes ) {
 
 			if ( hero->health( ) <= 0 && hero->identity( )->dormant( ) && hero->illusion( ) )
 				continue;
@@ -332,12 +303,20 @@ void hook::functions::OnMouseWheeled( CDOTA_Camera* rcx, int delta ) {
 LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int uMsg, const uintptr_t wParam, const uintptr_t lParam ) {
 	if ( uMsg == WM_KEYUP ) {
 		if ( wParam == VK_F1 ) {
-			features::overwolf.get_players_info( );
+			features::overwolf.process_lobby_members( );
 		}
 		if ( wParam == VK_F2 ) {
-			int idx;
-			if ( CVar* ptr = ICVar::get( ).register_convar( "dota2", &idx ); ptr ) {
-				spdlog::debug( "Registered cvar: {}, ptr: {}\n", idx, (void*)ptr->m_name );
+			auto& named_resources = IResourceSystem::get( )->GetNamedResources( );
+			ResourceType_t vmat_type{ "vmat" };
+
+			for ( uint64_t resource : named_resources ) {
+
+				if ( !util::exists( (void*)resource ) || IResourceSystem::get( )->GetResourceType( resource ) != vmat_type )
+					continue;
+
+				IMaterial2* mat = *(IMaterial2**)resource;
+
+				std::cout << mat->GetName( ) << "\n";
 			}
 		}
 		if ( wParam == VK_F3 ) {
@@ -357,7 +336,6 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 				global::g_mapItemIcons.clear( );
 				global::g_mapSpellIcons.clear( );
 
-				curl_global_cleanup( );
 				hook::uninstall_all_hooks( );
 				ImGui_ImplDX11_Shutdown( );
 				ImGui_ImplWin32_Shutdown( );

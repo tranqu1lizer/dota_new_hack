@@ -12,6 +12,12 @@
 #endif
 
 #ifdef _DEBUG
+#define proto_string_np(st) (const char*)&st
+#else
+#define proto_string_np(st) st
+#endif
+
+#ifdef _DEBUG
 #define proto_string_p(st) *(const char**)&st
 #else
 #define proto_string_p(st) st.c_str()

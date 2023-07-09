@@ -27,7 +27,6 @@ public:
 	bool is_menu_dragging = false;
 
 	bool draw_particles = true;
-	bool draw_fog = false;
 	bool draw_mana_bar = false;
 	bool draw_health = false;
 	bool log_searching_players = false;

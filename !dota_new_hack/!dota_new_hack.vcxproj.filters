@@ -470,6 +470,10 @@
     <ClInclude Include="core\util\HTTPRequest.hpp" />
     <ClInclude Include="core\util\request.h" />
     <ClInclude Include="core\features\overwolf.h" />
+    <ClInclude Include="core\sdk_game\C_FogController.h" />
+    <ClInclude Include="core\sdk_game\C_BasePlayerPawn.h" />
+    <ClInclude Include="core\sdk_game\IMaterialSystem2.h" />
+    <ClInclude Include="core\sdk_game\valve\CUtlStringToken.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -741,6 +745,10 @@
       <Filter>core\sdk_game</Filter>
     </None>
     <None Include="cpp.hint" />
+    <None Include="core\overwolf_server.py">
+      <Filter>core</Filter>
+    </None>
+    <None Include="core\ids2name.py" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="core\lib\minhook\libMinHook.x64.lib">

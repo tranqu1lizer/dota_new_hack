@@ -17,23 +17,9 @@ void CCameraHack::on_mouse_wheeled( CDOTA_Camera* cam, int delta ) {
 }
 
 void CCameraHack::toggle_fog( ) {
-	if ( auto camera = reinterpret_cast<std::uintptr_t>( calls::GetCurrentCamera( ) ); camera ) {
-		const auto get_fog_vfunc = util::vmt( camera, 18 ); // C_DOTACamera::GetFogEnd
-		const auto instruction_bytes = *reinterpret_cast<std::uintptr_t*>( get_fog_vfunc );
+	auto fog_controller = (C_FogController*)context.entities[ "env_fog_controller" ];
+	if ( !fog_controller || !fog_controller->fog_params( ) )
+		return;
 
-		if ( instruction_bytes == 0x83485708245c8948 ) { // not patched
-
-			// 0x0F, 0x57, 0xC0 | xorps xmm0, xmm0
-			// 0xC3				| ret
-			constexpr const char* bytepatch = "\x0F\x57\xC0\xC3";
-			util::patch( (void*)get_fog_vfunc, bytepatch );
-		}
-		else if ( instruction_bytes == 0x83485708c3c0570f ) { // already patched
-
-			// 0x48, 0x89, 0x5C, 0x24, 0x08 | mov qword ptr ss:[rsp+8], rbx
-			// 0x57							| push rdi
-			constexpr const char* byterestore = "\x48\x89\x5C\x24\x08\x57";
-			util::patch( (void*)get_fog_vfunc, byterestore );
-		}
-	}
+	fog_controller->fog_params( )->enable ^= true;
 }

@@ -14,7 +14,7 @@ bool CHeroBar::can_draw_for( C_DOTA_BaseNPC_Hero* h ) {
 
 void CHeroBar::draw_health( const bool off ) {
 	static constexpr auto font_size = 17;
-	for ( auto& hero : context.heroes ) {
+	for ( auto& hero : context.entities.heroes ) {
 		if ( !can_draw_for( hero ) )
 			continue;
 
@@ -33,7 +33,7 @@ void CHeroBar::draw_health( const bool off ) {
 
 void CHeroBar::draw_mana( ) {
 	constexpr static ImVec2 manabarSize{ 138, 12 };
-	for ( auto& hero : context.heroes ) {
+	for ( auto& hero : context.entities.heroes ) {
 		if ( !can_draw_for( hero ) )
 			continue;
 
