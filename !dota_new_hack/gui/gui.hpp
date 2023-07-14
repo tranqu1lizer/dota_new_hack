@@ -26,6 +26,8 @@ public:
 	ImFont* hp_mana_font;
 	ImFont* def_font;
 
+	float mat_rgba[4];
+
 	int current_weather = 0;
 	int current_river = 0;
 

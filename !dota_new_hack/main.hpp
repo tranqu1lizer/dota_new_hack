@@ -61,6 +61,7 @@ public:
 #include "core/sdk_game/NormalClass.hpp"
 #include "core/sdk_game/SomeFunction.h"
 
+#include "core/sdk_game/valve/CMemAlloc.hpp"
 #include "core/sdk_game/valve/CUtlSymbol.hpp"
 #include "core/sdk_game/valve/CUtlTSHash.hpp"
 #include "core/sdk_game/valve/CUtlString.hpp"
@@ -103,6 +104,7 @@ public:
 #include "core/sdk_game/CDOTA_ParticleManager.hpp"
 #include "core/sdk_game/C_DOTA_PlayerResource.h"
 #include "core/sdk_game/IResourceSystem.hpp"
+#include "core/sdk_game/ISceneSystem.h"
 #include "core/sdk_game/C_DOTAGamerules.hpp"
 #include "core/sdk_game/INetChan.h"
 #include "core/sdk_game/CNetworkMessages.hpp"

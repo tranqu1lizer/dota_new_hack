@@ -474,6 +474,10 @@
     <ClInclude Include="core\sdk_game\C_BasePlayerPawn.h" />
     <ClInclude Include="core\sdk_game\IMaterialSystem2.h" />
     <ClInclude Include="core\sdk_game\valve\CUtlStringToken.hpp" />
+    <ClInclude Include="core\sdk_game\ISceneSystem.h" />
+    <ClInclude Include="core\sdk_game\valve\CMemAlloc.hpp">
+      <Filter>core\sdk_game\valve</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

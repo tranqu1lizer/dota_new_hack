@@ -200,6 +200,8 @@ void CGui::Render( ) {
 			schema::dump_class_offsets( schema_buf );
 		}
 
+		ImGui::SliderFloat4( "mat color", mat_rgba, 0.f, 1.f, "%.3f", ImGuiSliderFlags_Vertical );
+
 		if ( ImGui::CollapsingHeader( "Panorama" ) ) {
 			static char buf2[128];
 			static char buf3[128];
@@ -213,14 +215,14 @@ void CGui::Render( ) {
 			}
 			ImGui::InputText( "##text3", buf3, IM_ARRAYSIZE( buf3 ) );
 			if ( ImGui::Button( "Convert to symbol" ) ) {
-				auto res = CPanoramaUIEngine::GetInstance( )->engine_source2( )->make_symbol( buf3 );
+				auto res = CPanoramaUIEngine::get( )->engine_source2( )->make_symbol( buf3 );
 				ImGui::SameLine( );
 				ImGui::Text( std::format( "{}", res ).c_str( ) );
 			}
 			ImGui::Separator( );
 			ImGui::InputText( "##textmmr", buf4, IM_ARRAYSIZE( buf4 ) ); ImGui::SameLine( );
 			if ( ImGui::Button( "Set MMR value" ) ) {
-				auto UIEngine = CPanoramaUIEngine::GetInstance( );
+				auto UIEngine = CPanoramaUIEngine::get( );
 				auto childs = UIEngine->engine_source2( )->find_panel( "DotaDashboard" )->find_children_traverse( "MMRNumber" );
 				if ( childs.size( ) ) {
 					CLabel* MMRLabel = childs.front( )->panel2d_as<CLabel>( );

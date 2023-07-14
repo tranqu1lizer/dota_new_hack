@@ -1,6 +1,7 @@
 #pragma once
 
 #include <codecvt>
+#include "../ICVar.hpp"
 
 class CPanel2D : public VClass
 {
@@ -12,6 +13,10 @@ public:
 	void SetDialogVariable( const char* variable, unsigned int value ) {
 		if ( !aSetDialogVariableInt ) return;
 		aSetDialogVariableInt( this, variable, value );
+	}
+
+	void SetDialogVariable( const char* variable, const char* value ) {
+		ui_panel()->CallVFunc< 292, void>( variable, value );
 	}
 
 	vector2d position_within_window( ) {
@@ -69,7 +74,7 @@ public:
 		std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
 		const char32_t const* ptr = reinterpret_cast<const char32_t* ( __fastcall* )( CTextEntry* )>( global::patterns::CTextEntry__GetText )( this );
 
-		return conv.to_bytes(ptr);
+		return conv.to_bytes( ptr );
 	}
 };
 
@@ -127,9 +132,39 @@ public:
 
 class CDropDown : public CPanel2D {
 public:
-	inline static CUIPanel*( *aCDropDown__GetSelected )( CDropDown* rcx ) = nullptr;
+	inline static CUIPanel* ( *aCDropDown__GetSelected )( CDropDown* rcx ) = nullptr;
 
 	CUIPanel* GetSelected( ) {
 		return aCDropDown__GetSelected( this );
+	}
+};
+
+class CDOTA_Hud_Top_Bar : public CPanel2D {
+public:
+	CPanel2D* GetGoldPanel( ) {
+		return Member<CPanel2D*>( 0x110 );
+	}
+
+	void UpdateNetWorthDifference( int RadiantNetWorth, int DireNetWorth ) {
+
+		if ( !GetGoldPanel( ) )
+			return;
+
+		GetGoldPanel( )->ui_panel( )->SwitchClass( "gold_delta_mode", "GoldDeltaDiscrete" );
+		GetGoldPanel( )->ui_panel( )->SwitchClass( "leading_team", RadiantNetWorth <= DireNetWorth ? "DireLeadingGold" : "RadiantLeadingGold" );
+		GetGoldPanel( )->ui_panel( )->SetActive( ( RadiantNetWorth + DireNetWorth ) );
+
+		const int absDiffirence = std::abs( RadiantNetWorth - DireNetWorth );
+
+		if ( absDiffirence >= 1000 )
+		{
+			char Buffer[ 16 ];
+			sprintf_s( Buffer, "%dk", ( absDiffirence / 1000 ) );
+			GetGoldPanel( )->SetDialogVariable( "gold_delta_clamped_string", Buffer );
+		}
+		else
+		{
+			GetGoldPanel( )->SetDialogVariable( "gold_delta_clamped_string", "<1k" );
+		}
 	}
 };

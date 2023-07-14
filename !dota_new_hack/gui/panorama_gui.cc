@@ -29,7 +29,7 @@ void VisualsManabarButton_Handler( ) {
 void CameraDistSlider_Handler( ) {
 	const auto fl_value = panorama_gui.camera_dist_slider->children( )[ 1 ]->panel2d_as<CSlider>( )->g_float( );
 
-	const auto value = static_cast<int>( fl_value * ( features::camera_hack.get_max_distance() - features::camera_hack.get_min_distance( ) ) + features::camera_hack.get_min_distance( ) ); // fl_value * ( max - min ) + min
+	const auto value = static_cast<int>( fl_value * ( features::camera_hack.get_max_distance( ) - features::camera_hack.get_min_distance( ) ) + features::camera_hack.get_min_distance( ) ); // fl_value * ( max - min ) + min
 	features::camera_hack.change_distance( value );
 }
 
@@ -37,7 +37,7 @@ void ChangerTreeChanged_Handler( ) {
 
 	CUIPanel* selected;
 	if ( selected = panorama_gui.changer_TreesDropDown->panel2d_as<CDropDown>( )->GetSelected( ); !selected )
-		return spdlog::critical("ChangerTreeChanged_Handler(): selected = nullptr;\n" );
+		return spdlog::critical( "ChangerTreeChanged_Handler(): selected = nullptr;\n" );
 
 	const char* dropdown_sel = reinterpret_cast<CLabel*>( selected )->label_text( );
 	if ( !dropdown_sel || (std::uintptr_t)dropdown_sel == 0x1 )
@@ -53,10 +53,10 @@ void MiscGoldDisplay_Handler( ) {
 	panorama_gui.draw_networthdelta ^= true;
 	CUIPanel* disp;
 
-	if ( disp = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "SpectatorGoldDisplay" ); !disp )
+	if ( disp = CPanoramaUIEngine::get( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "SpectatorGoldDisplay" ); !disp )
 		return;
 
-	disp->panel_style( )->set_visibility( panorama_gui.draw_networthdelta );
+	disp->SetActive( panorama_gui.draw_networthdelta );
 }
 
 bool CPanel2D__OnMouseButtonDown( CPanel2D* rcx, const MouseData_t& code ) {
@@ -112,7 +112,7 @@ void CPanel2D__OnMouseMove( CPanel2D* rcx, float flMouseX, float flMouseY ) {
 }
 
 void CPanoramaGUI::register_events( ) {
-	auto ui_engine = CPanoramaUIEngine::GetInstance( )->engine_source2( );
+	auto ui_engine = CPanoramaUIEngine::get( )->engine_source2( );
 	FastDelegate0<void> camera_dist_handler( CameraDistSlider_Handler );
 	FastDelegate0<void> changer_tree_handler( ChangerTreeChanged_Handler );
 
@@ -138,7 +138,7 @@ void CPanoramaGUI::register_events( ) {
 }
 
 void CPanoramaGUI::show( ) {
-	auto ui_engine = CPanoramaUIEngine::GetInstance( );
+	auto ui_engine = CPanoramaUIEngine::get( );
 
 	if ( CUIPanel* root = ui_engine->engine_source2( )->find_panel( global::in_game ? "DotaHud" : "DotaDashboard" ); root ) {
 

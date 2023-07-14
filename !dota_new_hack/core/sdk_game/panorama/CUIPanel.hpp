@@ -38,6 +38,10 @@ public:
 		return CallVFunc<22, bool>( );
 	}
 
+	void SetActive( bool state ) {
+		CallVFunc<31, std::uintptr_t>( state );
+	}
+
 	bool set_parent( CUIPanel* p ) {
 		return CallVFunc<28>( p );
 	}
@@ -64,7 +68,7 @@ public:
 	}
 
 	void set_property( const std::string_view& symbol, const std::string_view& value ) {
-		this->set_property( CPanoramaUIEngine::GetInstance( )->engine_source2( )->make_symbol( symbol.data( ) ), value );
+		this->set_property( CPanoramaUIEngine::get( )->engine_source2( )->make_symbol( symbol.data( ) ), value );
 	}
 
 	void set_style( const std::string_view& style ) {
@@ -130,12 +134,16 @@ public:
 	}
 
 	bool has_class( const std::string_view& cl ) {
-		return has_class( CPanoramaUIEngine::GetInstance( )->engine_source2( )->make_symbol( cl.data( ) ) );
+		return has_class( CPanoramaUIEngine::get( )->engine_source2( )->make_symbol( cl.data( ) ) );
 	}
 
 	void add_class( const char* class_ ) {
-		const auto symbol = CPanoramaUIEngine::GetInstance( )->engine_source2( )->make_symbol( class_ );
+		const auto symbol = CPanoramaUIEngine::get( )->engine_source2( )->make_symbol( class_ );
 		CallVFunc<135>( symbol );
+	}
+
+	void SwitchClass( const char* class_, const char* class_2 ) {
+		CallVFunc<152, void>( CPanoramaUIEngine::get( )->engine_source2( )->make_symbol( class_ ), CPanoramaUIEngine::get( )->engine_source2( )->make_symbol( class_2 ) );
 	}
 
 	inline bool layed_out( )

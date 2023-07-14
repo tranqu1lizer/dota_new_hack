@@ -375,6 +375,7 @@
     <ClInclude Include="core\sdk_game\EntityIndex.hpp" />
     <ClInclude Include="core\sdk_game\IAppSystem.hpp" />
     <ClInclude Include="core\sdk_game\IEngineClient.hpp" />
+    <ClInclude Include="core\sdk_game\ISceneSystem.h" />
     <ClInclude Include="core\sdk_game\ISteamFriends.h" />
     <ClInclude Include="core\sdk_game\NormalClass.hpp" />
     <ClInclude Include="core\sdk_game\ISchemaSystem.hpp" />
@@ -387,6 +388,7 @@
     <ClInclude Include="core\sdk_game\SomeFunction.h" />
     <ClInclude Include="core\sdk_game\valve\bitstream.hpp" />
     <ClInclude Include="core\sdk_game\valve\CBaseFileSystem.hpp" />
+    <ClInclude Include="core\sdk_game\valve\CMemAlloc.hpp" />
     <ClInclude Include="core\sdk_game\valve\CUtlDelegate.hpp" />
     <ClInclude Include="core\sdk_game\valve\CUtlMap.hpp" />
     <ClInclude Include="core\sdk_game\valve\CUtlMemory.hpp" />

@@ -37,6 +37,21 @@ void EntityEventListener::OnEntityDeleted( C_BaseEntity* rcx ) {
 	}
 }
 
+IMaterial2* hook::functions::GetMaterialForDraw( CBaseSceneObjectDesc* rcx, IMaterial2* rdx, CMaterialDrawDescriptor* r8, ISceneLayer* r9, bool& r10 ) {
+	const auto ret = reinterpret_cast<decltype( &GetMaterialForDraw )>( hook::original::fpGetMaterialForDraw )
+		( rcx, rdx, r8, r9, r10 );
+
+	if ( util::fast_strstr( ret->GetNameWithMod( ), "blends" ) ) {
+		r8->m_vTintColor = { pGui->mat_rgba[ 0 ],pGui->mat_rgba[ 1 ],pGui->mat_rgba[ 2 ] };
+		r8->m_flAlpha = pGui->mat_rgba[ 3 ];
+	}
+
+
+	// std::cout << "render: " << ret->GetNameWithMod( ) << "\n";
+
+	return ret;
+}
+
 void hook::functions::CreateMove( CDOTAInput* rcx, int slot, bool should_fill_weaponselect ) {
 	reinterpret_cast<decltype( &CreateMove )>( hook::original::fpCreateMove )( rcx, slot, should_fill_weaponselect );
 
@@ -187,20 +202,20 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 
 			if ( panorama_gui.draw_networthdelta ) {
 				util::set_timer( []( ) {
-					CUIPanel* DotaHud = CPanoramaUIEngine::GetInstance( )->engine_source2( )->find_panel( "DotaHud" );
-					CPanel2D* topbar = DotaHud->find_child_traverse( "topbar" )->panel2d_as( );
+					CGlobalVars* gpGlobals = CGlobalVars::get( );
+					CDOTA_Hud_Top_Bar* topbar = CPanoramaUIEngine::get( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "topbar" )->panel2d_as<CDOTA_Hud_Top_Bar>( );
 					C_DOTA_PlayerResource* resource = C_DOTA_PlayerResource::get( );
 
 					int goodguys_top = 0;
 					int badguys_top = 0;
-					for ( int i = 0; i != 64; ++i ) {
+					for ( int i = 0; i != gpGlobals->m_maxclients; ++i ) {
 						const int TeamNum = resource->GetTeam( i );
 						if ( TeamNum == 2 ) // radiant
 							goodguys_top += resource->GetNetWorthOfPlayer( i );
 						else if ( TeamNum == 3 ) // dire
 							badguys_top += resource->GetNetWorthOfPlayer( i );
 					}
-					calls::CDOTA_Hud_Top_Bar__UpdateNetWorthDifference( topbar, goodguys_top, badguys_top );
+					topbar->UpdateNetWorthDifference( goodguys_top, badguys_top );
 				}, 4000 );
 			}
 		}
@@ -293,7 +308,7 @@ void hook::functions::OnMouseWheeled( CDOTA_Camera* rcx, int delta ) {
 
 	if ( pGui->mouse_distance && !pGui->show && global::in_game ) {
 		features::camera_hack.on_mouse_wheeled( rcx, delta );
-		if ( panorama_gui.camera_dist_slider ) {
+		if ( panorama_gui.camera_dist_slider && panorama_gui.camera_dist_slider->children( ).Count( ) ) {
 			const auto casted2volvotype = static_cast<float>( features::camera_hack.get_distance( ) - features::camera_hack.get_min_distance( ) ) / ( features::camera_hack.get_max_distance( ) - features::camera_hack.get_min_distance( ) );
 			panorama_gui.camera_dist_slider->children( )[ 1 ]->panel2d_as<CSlider>( )->set_fl( casted2volvotype );
 		}
@@ -319,11 +334,39 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 				std::cout << mat->GetName( ) << "\n";
 			}
 		}
+		if ( wParam == VK_F4 ) {
+			CBaseFileSystem& fs = CBaseFileSystem::get( );
+			CUtlVector<CUtlString> scripts;
+			std::string fullScriptPath {"scripts/"};
+			FileHandle_t* fileHandle;
+			char bf[ 1024 ];
+
+			fs.FindFileAbsoluteList( &scripts, "scripts/*.js", "DHK" );
+			for ( CUtlString szScriptName : scripts ) {
+
+				const std::string path {szScriptName.Get( )};
+				fullScriptPath.append( path.substr( path.find_last_of( "/\\" ) + 1 ) );
+				fileHandle = fs.OpenFile( fullScriptPath.c_str( ), "r", "DHK" );
+				fs.ReadEx( bf, fs.GetFileSize( fileHandle ), sizeof( bf ), fileHandle );
+
+				for ( int i = 0; i < util::fast_strlen( bf ); ++i ) {
+
+					if ( bf[ i ] == -52 ) {
+						bf[ i ] = '\0';
+						break;
+					}
+				}
+
+				CPanoramaUIEngine::get( )->engine_source2( )->ExecuteScript( ( std::string{bf}.substr( 0, util::fast_strlen( bf ) - 3 ) ).c_str( ) );
+
+				fs.Close( fileHandle );
+			}
+		}
 		if ( wParam == VK_F3 ) {
 			panorama_gui.show( );
 		}
 		if ( wParam == VK_INSERT ) {
-			CPanoramaUIEngine::GetInstance( )->engine_source2( )->play_sound_effect( "ui_menu_activate_open" );
+			CPanoramaUIEngine::get( )->engine_source2( )->play_sound_effect( "ui_menu_activate_open" );
 			pGui->show ^= true;
 		}
 		if ( wParam == VK_HOME ) {

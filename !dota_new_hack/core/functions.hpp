@@ -17,5 +17,4 @@ namespace calls {
 	inline CEconItem* ( *CreateEconItemObject )( ) = nullptr;
 	inline void( *destroy_particle )( void* thisptr, unsigned int, bool ) = nullptr;
 	inline CDOTA_Camera* ( *GetCurrentCamera )( ) = nullptr;
-	inline void( *CDOTA_Hud_Top_Bar__UpdateNetWorthDifference )( CPanel2D*, int RadiantNetWorth, int DireNetWorth ) = nullptr;
 }

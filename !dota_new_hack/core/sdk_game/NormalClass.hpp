@@ -3,6 +3,22 @@
 #include <string>
 #include "SomeFunction.h"
 
+template<typename T = std::uintptr_t>
+inline bool IsValidCodePtr( T p )
+{
+	MEMORY_BASIC_INFORMATION mbi;
+	memset( &mbi, 0, sizeof( mbi ) );
+	if ( !VirtualQuery( (void*)p, &mbi, sizeof( mbi ) ) )
+		return false;
+	if ( !( mbi.State & MEM_COMMIT ) )
+		return false;
+	if ( !( mbi.Protect & ( PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY ) ) )
+		return false;
+	if ( mbi.Protect & ( PAGE_GUARD | PAGE_NOACCESS ) )
+		return false;
+	return true;
+}
+
 class NormalClass
 {
 	virtual void dummy_fn( ) = 0; // so that the classes have a vtable

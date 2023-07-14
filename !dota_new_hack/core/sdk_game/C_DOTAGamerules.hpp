@@ -9,7 +9,7 @@ public:
     float game_time( ) {
         if ( !util::exists( this ) ) return -0.1f;
 
-        auto gpGlobals = (void*)CGlobalVars::GetInstance( );
+        auto gpGlobals = (void*)CGlobalVars::get( );
         int a2 = 0;
 
         __int64 v2; // rdi

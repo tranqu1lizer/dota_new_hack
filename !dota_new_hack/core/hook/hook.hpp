@@ -14,6 +14,7 @@ namespace hook {
 
 	namespace original {
 		inline void* fpCreateMove;
+		inline void* fpGetMaterialForDraw;
 		inline void* fpBAsyncSendProto;
 		inline void* fpOnMouseWheeled;
 		inline void* fpSGCRetrieveMessage;
@@ -24,6 +25,7 @@ namespace hook {
 	}
 
 	namespace functions {
+		IMaterial2* GetMaterialForDraw( CBaseSceneObjectDesc* rcx, IMaterial2* rdx, CMaterialDrawDescriptor* r8, ISceneLayer* r9, bool& r10 );
 		void CreateMove( CDOTAInput* rcx, int unk, bool unk1 );
 		bool BAsyncSendProto( CProtoBufMsgBase* protobufMsg, IProtoBufSendHandler* handler, google::protobuf::Message* responseMsg, unsigned int respMsgID );
 		EGCResults SGCRetrieveMessage( ISteamGameCoordinator* thisptr, uint32* punMsgType, ProtoBufMsgHeader_t* pubDest, uint32 cubDest, uint32* pcubMsgSize );

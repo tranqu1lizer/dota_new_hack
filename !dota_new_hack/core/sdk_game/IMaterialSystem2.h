@@ -42,12 +42,15 @@ public:
 	virtual void vf33( ) = 0; // 0x10
 };
 
-class IMaterialSystem2 {
+class IMaterialSystem2 : VClass {
 public:
 	static auto get( )
 	{
 		static IMaterialSystem2* inst = static_cast<IMaterialSystem2*>( util::get_interface( "materialsystem2.dll", "VMaterialSystem2_001" ) );
-
 		return inst;
+	}
+
+	IMaterial2*** FindOrCreateMaterialFromResource( IMaterial2*** material, const char* material_name ) {
+		return CallVFunc<14, IMaterial2***>( material, material_name );
 	}
 };

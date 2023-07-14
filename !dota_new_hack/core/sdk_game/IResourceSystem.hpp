@@ -27,8 +27,7 @@ class IResourceSystem : VClass {
 public:
 	static auto get( )
 	{
-		static IResourceSystem* inst = nullptr;
-		if ( !inst ) inst = static_cast<IResourceSystem*>( util::get_interface( "resourcesystem.dll", "ResourceSystem013" ) );
+		static IResourceSystem* inst = static_cast<IResourceSystem*>( util::get_interface( "resourcesystem.dll", "ResourceSystem013" ) );
 
 		return inst;
 	}

@@ -40,7 +40,7 @@ struct PanelHandle_t
 class CPanoramaUIEngine : IAppSystem
 {
 public:
-	static auto GetInstance( )
+	static auto get( )
 	{
 		static CPanoramaUIEngine* inst = nullptr;
 		if ( !inst ) inst = static_cast<CPanoramaUIEngine*>( util::get_interface( "panorama.dll", "PanoramaUIEngine001" ) );
@@ -111,8 +111,16 @@ public:
 		return CallVFunc<32, bool>( panel );
 	}
 
-	void RunScript( CUIPanel* panel, char const* script, char const* context, int unk1, int unk2, int unk3 ) {
-		CallVFunc<88>( panel, script, context, unk1, unk2, unk3 );
+	void RunScript( CUIPanel* panel, char const* script, char const* context ) {
+		CallVFunc<88>( panel, script, context, 0, 0, 0 );
+	}
+
+	void RunScript( const char* pname, char const* script, char const* context ) {
+		RunScript( find_panel( pname ), script, context );
+	}
+
+	void ExecuteScript( char const* s ) {
+		RunScript( "Hud", s, global::in_game ? "panorama/layout/base_hud.xml" : "panorama/layout/base.xml" );
 	}
 
 	void play_sound_effect( const std::string_view& ev_name ) {
@@ -120,7 +128,7 @@ public:
 		this->RunScript(
 			this->find_panel( "Hud" ),
 			str.data( ),
-			global::in_game ? "panorama/layout/base_hud.xml" : "panorama/layout/base.xml", 0, 0, 0
+			global::in_game ? "panorama/layout/base_hud.xml" : "panorama/layout/base.xml"
 		);
 	}
 
@@ -135,7 +143,7 @@ public:
 	}
 
 	void register_event_handler_client( const std::string_view& str, CUIPanel* panel, FastDelegate0<void> handler ) {
-		register_event_handler_client( CPanoramaUIEngine::GetInstance( )->engine_source2( )->make_symbol( str.data( ) ), panel, handler.GetAbstractDelegate( ) );
+		register_event_handler_client( CPanoramaUIEngine::get( )->engine_source2( )->make_symbol( str.data( ) ), panel, handler.GetAbstractDelegate( ) );
 	}
 
 	void unregister_event_handler( CPanoramaSymbol event, CUIPanel* panel, CUtlAbstractDelegate handler ) {
@@ -143,7 +151,7 @@ public:
 	}
 
 	void unregister_event_handler( const std::string_view& str, CUIPanel* panel, FastDelegate0<void> handler ) {
-		unregister_event_handler( CPanoramaUIEngine::GetInstance( )->engine_source2( )->make_symbol( str.data( ) ), panel, handler.GetAbstractDelegate( ) );
+		unregister_event_handler( CPanoramaUIEngine::get( )->engine_source2( )->make_symbol( str.data( ) ), panel, handler.GetAbstractDelegate( ) );
 	}
 
 	CUIPanel* find_panel( const char* s_name ) {
@@ -151,7 +159,7 @@ public:
 			auto ret = current.uiPanel;
 			if ( this->is_valid_panel_ptr( ret ) ) {
 				const auto name = *reinterpret_cast<const char**>( reinterpret_cast<std::uintptr_t>( ret ) + 0x10 );
-				if ( name && !strcmp( name, s_name ) )
+				if ( name && !util::fast_strcmp( (char*)name, (char*)s_name ) )
 					return ret;
 			}
 		}
