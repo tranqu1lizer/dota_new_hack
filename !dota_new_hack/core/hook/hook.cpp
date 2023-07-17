@@ -321,18 +321,10 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 			features::overwolf.process_lobby_members( );
 		}
 		if ( wParam == VK_F2 ) {
-			auto& named_resources = IResourceSystem::get( )->GetNamedResources( );
-			ResourceType_t vmat_type{ "vmat" };
+			auto WorldRendererMgr001 = IWorldRendererMgr::get( );
+			CSingleWorldRep* world = WorldRendererMgr001->m_single_worlds[ 0 ];
 
-			for ( uint64_t resource : named_resources ) {
-
-				if ( !util::exists( (void*)resource ) || IResourceSystem::get( )->GetResourceType( resource ) != vmat_type )
-					continue;
-
-				IMaterial2* mat = *(IMaterial2**)resource;
-
-				std::cout << mat->GetName( ) << "\n";
-			}
+			std::cout << world->m_world << "\n";
 		}
 		if ( wParam == VK_F4 ) {
 			CBaseFileSystem& fs = CBaseFileSystem::get( );

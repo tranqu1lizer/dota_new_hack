@@ -377,6 +377,7 @@
     <ClInclude Include="core\sdk_game\IEngineClient.hpp" />
     <ClInclude Include="core\sdk_game\ISceneSystem.h" />
     <ClInclude Include="core\sdk_game\ISteamFriends.h" />
+    <ClInclude Include="core\sdk_game\IWorldRendererMgr.h" />
     <ClInclude Include="core\sdk_game\NormalClass.hpp" />
     <ClInclude Include="core\sdk_game\ISchemaSystem.hpp" />
     <ClInclude Include="core\sdk_game\panorama\CLayoutManager.h" />

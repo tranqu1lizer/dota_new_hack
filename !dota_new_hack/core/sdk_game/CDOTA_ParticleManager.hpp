@@ -7,11 +7,9 @@ struct ParticleFunctionType_t;
 
 class IParticleSnapshot;
 class IParticleSystemQuery;
-class ISceneWorld;
 class CNewParticleEffect;
 class CParticleSystemDefinition;
 class Particle;
-
 
 enum ParticleAttachment_t : int
 {

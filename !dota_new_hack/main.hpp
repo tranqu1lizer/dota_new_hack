@@ -105,6 +105,7 @@ public:
 #include "core/sdk_game/C_DOTA_PlayerResource.h"
 #include "core/sdk_game/IResourceSystem.hpp"
 #include "core/sdk_game/ISceneSystem.h"
+#include "core/sdk_game/IWorldRendererMgr.h"
 #include "core/sdk_game/C_DOTAGamerules.hpp"
 #include "core/sdk_game/INetChan.h"
 #include "core/sdk_game/CNetworkMessages.hpp"

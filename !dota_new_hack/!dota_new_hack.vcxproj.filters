@@ -478,6 +478,7 @@
     <ClInclude Include="core\sdk_game\valve\CMemAlloc.hpp">
       <Filter>core\sdk_game\valve</Filter>
     </ClInclude>
+    <ClInclude Include="core\sdk_game\IWorldRendererMgr.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

@@ -2,6 +2,7 @@
 
 class CBaseSceneObjectDesc;
 class ISceneLayer;
+class CSceneObject;
 using CStrongHandle = void*;
 
 enum class RenderPrimitiveType_t : uint32_t
@@ -83,7 +84,13 @@ public:
 private:
 	[[maybe_unused]] uint8_t __pad00d0[ 0x10 ]; // 0xd0
 public:
-	CStrongHandle m_material; // 0xe0 CStrongHandle< InfoForResourceTypeIMaterial2 >
+	CStrongHandle m_material;
+};
+
+class CWorldSceneObjectRef {
+	char pad[ 0x18 ];
+public:
+	CSceneObject* m_scene_object; // 0x18
 };
 
 class CSceneWorld : VClass {

@@ -2,6 +2,8 @@
 
 #include "../../main.hpp"
 
+using CSplitScreenSlot = unsigned int;
+
 typedef struct player_t
 {
 	int64_t __pad0;
