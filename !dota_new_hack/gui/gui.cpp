@@ -215,7 +215,7 @@ void CGui::Render( ) {
 			}
 			ImGui::InputText( "##text3", buf3, IM_ARRAYSIZE( buf3 ) );
 			if ( ImGui::Button( "Convert to symbol" ) ) {
-				auto res = CPanoramaUIEngine::get( )->engine_source2( )->make_symbol( buf3 );
+				auto res = CPanoramaUIEngine::get( )->AccessUIEngine( )->make_symbol( buf3 );
 				ImGui::SameLine( );
 				ImGui::Text( std::format( "{}", res ).c_str( ) );
 			}
@@ -223,7 +223,7 @@ void CGui::Render( ) {
 			ImGui::InputText( "##textmmr", buf4, IM_ARRAYSIZE( buf4 ) ); ImGui::SameLine( );
 			if ( ImGui::Button( "Set MMR value" ) ) {
 				auto UIEngine = CPanoramaUIEngine::get( );
-				auto childs = UIEngine->engine_source2( )->find_panel( "DotaDashboard" )->find_children_traverse( "MMRNumber" );
+				auto childs = UIEngine->AccessUIEngine( )->FindPanel( "DotaDashboard" )->find_children_traverse( "MMRNumber" );
 				if ( childs.size( ) ) {
 					CLabel* MMRLabel = childs.front( )->panel2d_as<CLabel>( );
 					MMRLabel->set_label_text( buf4 );

@@ -71,7 +71,9 @@ bool start_init( ) {
 	spdlog::info( "PEB: {} | IsDebuggerPresent(): {}\n\n", (void*)peb, IsDebuggerPresent( ) ? "true" : "false" );
 
 	global::client = util::get_module_base_wchar( L"client.dll" );
+	global::tier0 = util::get_module_base_wchar( L"tier0.dll" );
 	CHECK_VAR_RET( global::client );
+	CHECK_VAR_RET( global::tier0 );
 
 	some_memory_patches( );
 	pGui = new CGui( );

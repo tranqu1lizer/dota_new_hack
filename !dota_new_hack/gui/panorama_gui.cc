@@ -53,7 +53,7 @@ void MiscGoldDisplay_Handler( ) {
 	panorama_gui.draw_networthdelta ^= true;
 	CUIPanel* disp;
 
-	if ( disp = CPanoramaUIEngine::get( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "SpectatorGoldDisplay" ); !disp )
+	if ( disp = CPanoramaUIEngine::get( )->AccessUIEngine( )->FindPanel( "DotaHud" )->find_child_traverse( "SpectatorGoldDisplay" ); !disp )
 		return;
 
 	disp->SetActive( panorama_gui.draw_networthdelta );
@@ -112,7 +112,7 @@ void CPanel2D__OnMouseMove( CPanel2D* rcx, float flMouseX, float flMouseY ) {
 }
 
 void CPanoramaGUI::register_events( ) {
-	auto ui_engine = CPanoramaUIEngine::get( )->engine_source2( );
+	auto ui_engine = CPanoramaUIEngine::get( )->AccessUIEngine( );
 	FastDelegate0<void> camera_dist_handler( CameraDistSlider_Handler );
 	FastDelegate0<void> changer_tree_handler( ChangerTreeChanged_Handler );
 
@@ -140,11 +140,11 @@ void CPanoramaGUI::register_events( ) {
 void CPanoramaGUI::show( ) {
 	auto ui_engine = CPanoramaUIEngine::get( );
 
-	if ( CUIPanel* root = ui_engine->engine_source2( )->find_panel( global::in_game ? "DotaHud" : "DotaDashboard" ); root ) {
+	if ( CUIPanel* root = ui_engine->AccessUIEngine( )->FindPanel( global::in_game ? "DotaHud" : "DotaDashboard" ); root ) {
 
 		if ( !main_panel ) {
-			main_panel = ui_engine->engine_source2( )->create_panel( "mainmenu", root )->ui_panel( );
-			if ( ui_engine->engine_source2( )->is_valid_panel_ptr( main_panel ) ) {
+			main_panel = ui_engine->AccessUIEngine( )->create_panel( "mainmenu", root )->UIPanel( );
+			if ( ui_engine->AccessUIEngine( )->is_valid_panel_ptr( main_panel ) ) {
 				main_panel->load_layout_file( "file://{resources}/menu.xml", false );
 			}
 			camera_dist_slider = main_panel->find_child_traverse( "camera_distance_slider" );
@@ -170,6 +170,6 @@ void CPanoramaGUI::show( ) {
 		main_parent_panel = root;
 		main_panel->panel_style( )->set_visibility( menu_status ^= true );
 		register_events( );
-		ui_engine->engine_source2( )->play_sound_effect( "ui_menu_activate_open" );
+		ui_engine->AccessUIEngine( )->play_sound_effect( "ui_menu_activate_open" );
 	}
 }

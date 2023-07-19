@@ -203,7 +203,7 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 			if ( panorama_gui.draw_networthdelta ) {
 				util::set_timer( []( ) {
 					CGlobalVars* gpGlobals = CGlobalVars::get( );
-					CDOTA_Hud_Top_Bar* topbar = CPanoramaUIEngine::get( )->engine_source2( )->find_panel( "DotaHud" )->find_child_traverse( "topbar" )->panel2d_as<CDOTA_Hud_Top_Bar>( );
+					CDOTA_Hud_Top_Bar* topbar = CPanoramaUIEngine::get( )->AccessUIEngine( )->FindPanel( "DotaHud" )->find_child_traverse( "topbar" )->panel2d_as<CDOTA_Hud_Top_Bar>( );
 					C_DOTA_PlayerResource* resource = C_DOTA_PlayerResource::get( );
 
 					int goodguys_top = 0;
@@ -270,7 +270,7 @@ long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UI
 				std::uint16_t cc = 0;
 
 				for ( auto modifier : hero->modifier_manager( )->GetModifiers( ) ) {
-					cc += 25;
+					cc += 20;
 					ImGui::GetForegroundDrawList( )->AddText( ImVec2{ scr.x - 30, scr.y + cc }, 0xFFFFFFFF, modifier->GetBuffName( ) );
 				}
 			}
@@ -321,10 +321,9 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 			features::overwolf.process_lobby_members( );
 		}
 		if ( wParam == VK_F2 ) {
-			auto WorldRendererMgr001 = IWorldRendererMgr::get( );
-			CSingleWorldRep* world = WorldRendererMgr001->m_single_worlds[ 0 ];
+			CDOTA_Hud_ErrorMsg* err_msgs = CPanoramaUIEngine::get( )->AccessUIEngine( )->FindPanel( "DotaHud" )->find_child_traverse( "ErrorMessages" )->panel2d_as< CDOTA_Hud_ErrorMsg>( );
 
-			std::cout << world->m_world << "\n";
+			err_msgs->ShowErrorMessage( "toster" );
 		}
 		if ( wParam == VK_F4 ) {
 			CBaseFileSystem& fs = CBaseFileSystem::get( );
@@ -349,7 +348,7 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 					}
 				}
 
-				CPanoramaUIEngine::get( )->engine_source2( )->ExecuteScript( ( std::string{bf}.substr( 0, util::fast_strlen( bf ) - 3 ) ).c_str( ) );
+				CPanoramaUIEngine::get( )->AccessUIEngine( )->ExecuteScript( ( std::string{bf}.substr( 0, util::fast_strlen( bf ) - 3 ) ).c_str( ) );
 
 				fs.Close( fileHandle );
 			}
@@ -358,7 +357,7 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 			panorama_gui.show( );
 		}
 		if ( wParam == VK_INSERT ) {
-			CPanoramaUIEngine::get( )->engine_source2( )->play_sound_effect( "ui_menu_activate_open" );
+			CPanoramaUIEngine::get( )->AccessUIEngine( )->play_sound_effect( "ui_menu_activate_open" );
 			pGui->show ^= true;
 		}
 		if ( wParam == VK_HOME ) {

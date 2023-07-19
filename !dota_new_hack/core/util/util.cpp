@@ -24,6 +24,13 @@ char* util::fast_strcat( char* dest, const char* src )
 		;
 	return rdest;
 }
+
+double util::Plat_FloatTime( ) {
+	static const auto addr = util::find_export_address( util::get_module_base_wchar( L"tier0.dll" ), "Plat_FloatTime" );
+
+	return some_function( addr ).call<double>( );
+}
+
 void util::allocate_console( ) {
 	AllocConsole( );
 

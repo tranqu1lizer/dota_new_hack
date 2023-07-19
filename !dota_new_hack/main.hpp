@@ -72,6 +72,7 @@ public:
 #include "core/sdk_game/valve/CUtlMap.hpp"
 #include "core/sdk_game/valve/CUtlDelegate.hpp"
 #include "core/sdk_game/valve/VMatrix.hpp"
+#include "core/sdk_game/valve/KV.h"
 
 #include "core/sdk_game/IAppSystem.hpp"
 #include "core/sdk_game/CHandle.hpp"

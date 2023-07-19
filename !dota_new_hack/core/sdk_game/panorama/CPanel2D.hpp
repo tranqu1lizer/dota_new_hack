@@ -6,7 +6,7 @@
 class CPanel2D : public VClass
 {
 public:
-	GETTER( CUIPanel*, ui_panel, 0x8 );
+	GETTER( CUIPanel*, UIPanel, 0x8 );
 
 	inline static void( *aSetDialogVariableInt )( CPanel2D*, const char*, unsigned int ) = nullptr;
 
@@ -16,7 +16,7 @@ public:
 	}
 
 	void SetDialogVariable( const char* variable, const char* value ) {
-		ui_panel()->CallVFunc< 292, void>( variable, value );
+		UIPanel()->CallVFunc< 292, void>( variable, value );
 	}
 
 	vector2d position_within_window( ) {
@@ -150,9 +150,9 @@ public:
 		if ( !GetGoldPanel( ) )
 			return;
 
-		GetGoldPanel( )->ui_panel( )->SwitchClass( "gold_delta_mode", "GoldDeltaDiscrete" );
-		GetGoldPanel( )->ui_panel( )->SwitchClass( "leading_team", RadiantNetWorth <= DireNetWorth ? "DireLeadingGold" : "RadiantLeadingGold" );
-		GetGoldPanel( )->ui_panel( )->SetActive( ( RadiantNetWorth + DireNetWorth ) );
+		GetGoldPanel( )->UIPanel( )->SwitchClass( "gold_delta_mode", "GoldDeltaDiscrete" );
+		GetGoldPanel( )->UIPanel( )->SwitchClass( "leading_team", RadiantNetWorth <= DireNetWorth ? "DireLeadingGold" : "RadiantLeadingGold" );
+		GetGoldPanel( )->UIPanel( )->SetActive( ( RadiantNetWorth + DireNetWorth ) );
 
 		const int absDiffirence = std::abs( RadiantNetWorth - DireNetWorth );
 
@@ -166,5 +166,27 @@ public:
 		{
 			GetGoldPanel( )->SetDialogVariable( "gold_delta_clamped_string", "<1k" );
 		}
+	}
+};
+
+class CDOTA_Hud_ErrorMsg : public CPanel2D {
+	char pad0008[ 0x28 ]; // 0x8
+public:
+	float m_flTotalTime; // 0x30
+	float m_flErrorDurationTime; // 0x34
+
+	void ShowErrorMessage( char* const content ) {
+		float flTime;
+
+		UIPanel( )->RemoveClass( "PopOutEffect" );
+		UIPanel( )->ApplyStyles( 1 );
+		UIPanel( )->AddClass( "ShowErrorMsg" );
+
+		UIPanel( )->RemoveClass( "Hidden" );
+		SetDialogVariable( "error_msg", content );
+		UIPanel( )->AddClass( "PopOutEffect" );
+
+		flTime = util::Plat_FloatTime( );
+		m_flTotalTime = flTime + m_flErrorDurationTime;
 	}
 };

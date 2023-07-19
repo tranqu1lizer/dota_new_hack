@@ -1,5 +1,7 @@
 #pragma once
 
+using CSplitScreenSlot = unsigned int;
+
 class CNetworkServerSpawnGroup;
 struct WorldNodeFlags_t;
 

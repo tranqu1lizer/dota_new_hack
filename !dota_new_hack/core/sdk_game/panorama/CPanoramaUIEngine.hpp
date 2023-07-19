@@ -48,7 +48,7 @@ public:
 		return inst;
 	}
 
-	CUIEngineSource2* engine_source2( ) {
+	CUIEngineSource2* AccessUIEngine( ) {
 		return *(CUIEngineSource2**)( (std::uintptr_t)this + 0x28 );
 	}
 };
@@ -79,7 +79,7 @@ public:
 
 	CPanel2D* create_panel( const char* id, const char* parent_name ) {
 		const auto symbol = this->make_symbol( "Panel" );
-		auto parent = this->find_panel( parent_name );
+		auto parent = this->FindPanel( parent_name );
 		if ( !symbol || !parent ) return nullptr;
 		return CallVFunc<29, CPanel2D*>( symbol, id, parent );
 	}
@@ -116,7 +116,7 @@ public:
 	}
 
 	void RunScript( const char* pname, char const* script, char const* context ) {
-		RunScript( find_panel( pname ), script, context );
+		RunScript( FindPanel( pname ), script, context );
 	}
 
 	void ExecuteScript( char const* s ) {
@@ -126,7 +126,7 @@ public:
 	void play_sound_effect( const std::string_view& ev_name ) {
 		const auto str = std::format( "$.DispatchEvent( 'PlaySoundEffect', '{}' );", ev_name );
 		this->RunScript(
-			this->find_panel( "Hud" ),
+			this->FindPanel( "Hud" ),
 			str.data( ),
 			global::in_game ? "panorama/layout/base_hud.xml" : "panorama/layout/base.xml"
 		);
@@ -143,7 +143,7 @@ public:
 	}
 
 	void register_event_handler_client( const std::string_view& str, CUIPanel* panel, FastDelegate0<void> handler ) {
-		register_event_handler_client( CPanoramaUIEngine::get( )->engine_source2( )->make_symbol( str.data( ) ), panel, handler.GetAbstractDelegate( ) );
+		register_event_handler_client( CPanoramaUIEngine::get( )->AccessUIEngine( )->make_symbol( str.data( ) ), panel, handler.GetAbstractDelegate( ) );
 	}
 
 	void unregister_event_handler( CPanoramaSymbol event, CUIPanel* panel, CUtlAbstractDelegate handler ) {
@@ -151,10 +151,10 @@ public:
 	}
 
 	void unregister_event_handler( const std::string_view& str, CUIPanel* panel, FastDelegate0<void> handler ) {
-		unregister_event_handler( CPanoramaUIEngine::get( )->engine_source2( )->make_symbol( str.data( ) ), panel, handler.GetAbstractDelegate( ) );
+		unregister_event_handler( CPanoramaUIEngine::get( )->AccessUIEngine( )->make_symbol( str.data( ) ), panel, handler.GetAbstractDelegate( ) );
 	}
 
-	CUIPanel* find_panel( const char* s_name ) {
+	CUIPanel* FindPanel( const char* s_name ) {
 		for ( const auto& current : this->panel_list<4096>( ) ) {
 			auto ret = current.uiPanel;
 			if ( this->is_valid_panel_ptr( ret ) ) {
