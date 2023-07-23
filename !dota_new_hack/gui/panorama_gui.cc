@@ -53,7 +53,7 @@ void MiscGoldDisplay_Handler( ) {
 	panorama_gui.draw_networthdelta ^= true;
 	CUIPanel* disp;
 
-	if ( disp = CPanoramaUIEngine::get( )->AccessUIEngine( )->FindPanel( "DotaHud" )->find_child_traverse( "SpectatorGoldDisplay" ); !disp )
+	if ( disp = context.DotaHud->find_child_traverse( "SpectatorGoldDisplay" ); !disp )
 		return;
 
 	disp->SetActive( panorama_gui.draw_networthdelta );

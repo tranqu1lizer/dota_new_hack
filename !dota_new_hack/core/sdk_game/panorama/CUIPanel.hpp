@@ -34,6 +34,18 @@ public:
 		return reinterpret_cast<CPanelStyle*>( reinterpret_cast<std::uintptr_t>( this ) + 0x70 );
 	}
 
+	void SetDialogVariable( const char* variable, int value ) {
+		CallVFunc< 293, void>( variable, value );
+	}
+
+	void SetDialogVariable( const char* variable, double value ) {
+		CallVFunc< 295, void>( variable, value );
+	}
+
+	void SetDialogVariable( const char* variable, const char* value ) {
+		CallVFunc< 292, void>( variable, value );
+	}
+
 	bool loaded( ) {
 		return CallVFunc<22, bool>( );
 	}

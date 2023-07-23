@@ -48,7 +48,7 @@ public:
 
 	INetChannel* m_net_channel;
 	vector3d traced_cursor;
-	CUIPanel* ui_hud;
+	CUIPanel* DotaHud;
 	bool ui_hud_status = false;
 };
 

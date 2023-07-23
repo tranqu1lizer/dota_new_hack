@@ -8,21 +8,14 @@ class CPanel2D : public VClass
 public:
 	GETTER( CUIPanel*, UIPanel, 0x8 );
 
-	inline static void( *aSetDialogVariableInt )( CPanel2D*, const char*, unsigned int ) = nullptr;
-
-	void SetDialogVariable( const char* variable, unsigned int value ) {
-		if ( !aSetDialogVariableInt ) return;
-		aSetDialogVariableInt( this, variable, value );
-	}
-
-	void SetDialogVariable( const char* variable, const char* value ) {
-		UIPanel()->CallVFunc< 292, void>( variable, value );
+	template<class T> void SetDialogVariable( const std::string_view& variable, T value ) {
+		UIPanel( )->SetDialogVariable( variable.data( ), value );
 	}
 
 	vector2d position_within_window( ) {
-		vector2d result{ 0, 0 };
-		CallVFunc<44>( 0, &result.x, &result.y );
-		return result;
+		float ret[ 2 ];
+		CallVFunc<44>( 0, &ret[0], &ret[1] );
+		return ret;
 	}
 
 	bool delete_async( float delay = 0.f ) {
@@ -176,8 +169,6 @@ public:
 	float m_flErrorDurationTime; // 0x34
 
 	void ShowErrorMessage( char* const content ) {
-		float flTime;
-
 		UIPanel( )->RemoveClass( "PopOutEffect" );
 		UIPanel( )->ApplyStyles( 1 );
 		UIPanel( )->AddClass( "ShowErrorMsg" );
@@ -186,7 +177,7 @@ public:
 		SetDialogVariable( "error_msg", content );
 		UIPanel( )->AddClass( "PopOutEffect" );
 
-		flTime = util::Plat_FloatTime( );
+		const float flTime = util::Plat_FloatTime( );
 		m_flTotalTime = flTime + m_flErrorDurationTime;
 	}
 };

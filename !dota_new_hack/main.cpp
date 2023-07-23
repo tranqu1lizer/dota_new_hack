@@ -118,7 +118,6 @@ bool start_init( ) {
 		FIND_FN( "client.dll", C_DOTA_PlayerResource::aGetNetWorthOfPlayer, "E8 ?? ?? ?? ?? F3 0F 5F F7", "C_DOTA_PlayerResource::GetNetWorthOfPlayer", true );
 		FIND_FN( "client.dll", C_DOTA_PlayerResource::aGetLastHits, "E8 ?? ?? ?? ?? 3B F0 7C 5A", "C_DOTA_PlayerResource::GetLastHits", true );
 		FIND_FN( "client.dll", C_DOTA_PlayerResource::aGetDenies, "E8 ?? ?? ?? ?? 45 8B C6 89 44 24 44", "C_DOTA_PlayerResource::GetLastHits", true );
-		FIND_FN( "client.dll", CPanel2D::aSetDialogVariableInt, "E8 ?? ?? ?? ?? 8B 53 5C", "CPanel2D::SetDialogVariableInt", true );
 		FIND_FN( "client.dll", CDropDown::aCDropDown__GetSelected, "E8 ?? ?? ?? ?? 48 85 C0 0F 84 ?? ?? ?? ?? 49 8B 8F", "CDropDown::GetSelected", true );
 
 		CDOTAItemSchema::GetItemDefArrIdx = AddressWrapper( CDOTAItemSchema::GetItemDefByIndex ).get_offset( 0x16 ).get_address_from_instruction_ptr( 1 );
@@ -186,6 +185,9 @@ bool start_init( ) {
 	spdlog::info( "Init functions took {:.2}s\n", duration_funcs.count( ) );
 	spdlog::info( "Init hooks took {:.2}s\n", start_hooks );
 	spdlog::info( "Full cheat initialization took {:.2}s\n\n", start_init );
+	
+	auto test = util::find_game_system( "CDOTAGameChatController" );
+	spdlog::info( "test: {}\n", test );
 
 	return true;
 }

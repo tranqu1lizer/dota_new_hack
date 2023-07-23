@@ -179,6 +179,7 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 
 		if ( !global::g_LocalEntity ) {
 			static C_DOTAPlayerController** players = (decltype( players ))util::get_absolute_address( util::find_pattern( global::client, "\x48\x8B\x05\xCC\xCC\xCC\xCC\x89\xBE", "", false ), 3, 7 );
+			context.DotaHud = CPanoramaUIEngine::get( )->AccessUIEngine( )->FindPanel( "DotaHud" );
 
 			if ( const auto local_controller = players[ 0 ]; local_controller ) {
 				global::g_Controller = (std::uintptr_t)local_controller;
@@ -203,7 +204,7 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 			if ( panorama_gui.draw_networthdelta ) {
 				util::set_timer( []( ) {
 					CGlobalVars* gpGlobals = CGlobalVars::get( );
-					CDOTA_Hud_Top_Bar* topbar = CPanoramaUIEngine::get( )->AccessUIEngine( )->FindPanel( "DotaHud" )->find_child_traverse( "topbar" )->panel2d_as<CDOTA_Hud_Top_Bar>( );
+					CDOTA_Hud_Top_Bar* topbar = context.DotaHud->find_child_traverse( "topbar" )->panel2d_as<CDOTA_Hud_Top_Bar>( );
 					C_DOTA_PlayerResource* resource = C_DOTA_PlayerResource::get( );
 
 					int goodguys_top = 0;
@@ -227,6 +228,7 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 		features::camera_hack.change_distance( );
 		global::g_LocalEntity = 0;
 		g_pGameRules = nullptr;
+		context.DotaHud = nullptr;
 		context.entities.m.clear( );
 		context.entities.heroes.clear( );
 	}
@@ -321,7 +323,12 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 			features::overwolf.process_lobby_members( );
 		}
 		if ( wParam == VK_F2 ) {
-			CDOTA_Hud_ErrorMsg* err_msgs = CPanoramaUIEngine::get( )->AccessUIEngine( )->FindPanel( "DotaHud" )->find_child_traverse( "ErrorMessages" )->panel2d_as< CDOTA_Hud_ErrorMsg>( );
+			auto DOTA_DB_Chat = context.DotaHud->find_child_traverse( "HudChat" )->panel2d_as( );
+			auto CDOTA_DB_Chat__AddCurrentTabMessage = (some_function)util::find_pattern( "client.dll", "40 55 56 41 54 41 56 41 57 48 8D 6C 24" );
+
+			CDOTA_DB_Chat__AddCurrentTabMessage( DOTA_DB_Chat, "test", true );
+
+			CDOTA_Hud_ErrorMsg* err_msgs =  context.DotaHud->find_child_traverse( "ErrorMessages" )->panel2d_as< CDOTA_Hud_ErrorMsg>( );
 
 			err_msgs->ShowErrorMessage( "toster" );
 		}
