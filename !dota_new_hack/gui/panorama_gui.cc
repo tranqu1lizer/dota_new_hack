@@ -37,11 +37,11 @@ void ChangerTreeChanged_Handler( ) {
 
 	CUIPanel* selected;
 	if ( selected = panorama_gui.changer_TreesDropDown->panel2d_as<CDropDown>( )->GetSelected( ); !selected )
-		return spdlog::critical( "ChangerTreeChanged_Handler(): selected = nullptr;\n" );
+		return spdlog::critical( "{}(): selected = nullptr;\n", __FUNCTION__ );
 
 	const char* dropdown_sel = reinterpret_cast<CLabel*>( selected )->label_text( );
 	if ( !dropdown_sel || (std::uintptr_t)dropdown_sel == 0x1 )
-		return spdlog::critical( "ChangerTreeChanged_Handler(): dropdown_sel = nullptr;\n" );;
+		return spdlog::critical( "{}(): dropdown_sel = nullptr;\n",__FUNCTION__  );
 
 	if ( !util::fast_strcmp( (char*)dropdown_sel, "Default" ) )
 		return features::tree_changer.restore_trees( );

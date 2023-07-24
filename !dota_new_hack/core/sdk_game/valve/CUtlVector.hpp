@@ -61,12 +61,12 @@ public:
 
 	// Adds an element, uses default constructor
 	int add_to_head( );
-	int add_to_tail( );
+	int AddToTail( );
 	int InsertBefore( int elem );
 	int InsertAfter( int elem );
 	// Adds an element, uses copy constructor
 	int add_to_head( const T& src );
-	int add_to_tail( const T& src );
+	int AddToTail( const T& src );
 	int InsertBefore( int elem, const T& src );
 	int InsertAfter( int elem, const T& src );
 
@@ -115,7 +115,7 @@ inline int CUtlVector<T>::add_to_head( ) {
 }
 
 template <typename T>
-inline int CUtlVector<T>::add_to_tail( ) {
+inline int CUtlVector<T>::AddToTail( ) {
 	return InsertBefore( m_Size );
 }
 
@@ -142,7 +142,7 @@ inline int CUtlVector<T>::add_to_head( const T& src ) {
 }
 
 template <typename T>
-inline int CUtlVector<T>::add_to_tail( const T& src ) {
+inline int CUtlVector<T>::AddToTail( const T& src ) {
 	return InsertBefore( m_Size, src );
 }
 

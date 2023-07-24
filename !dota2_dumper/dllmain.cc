@@ -1,9 +1,10 @@
 ﻿#include "sdk.hh"
 #include <format>
+#include <optional>
 
 void dump( ) {
-	constexpr const auto mod = "client.dll";
-	constexpr const auto cls = "C_DOTA_BaseNPC_Hero";
+	constexpr const auto mod = "server.dll";
+	constexpr const auto cls = "CDOTAGameRules";
 
 	const auto module_scope = CSchemaSystem::GetInstance( ).FindTypeScopeForModule( mod );
 
@@ -21,6 +22,7 @@ void dump( ) {
 	else
 		sprintf_s( buf, "struct %s // size: 0x%X\n{", class_info->m_name, class_info->m_size );
 	std::cout << buf << "\n";
+
 	for ( auto k = 0; k < class_info->m_align; k++ ) {
 		const auto& field = &class_info->m_fields[k];
 		int sz;

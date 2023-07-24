@@ -14,13 +14,15 @@ public:
 	void( *m_func_ptr )( void* );
 	char* m_class_name;
 private:
-	std::uintptr_t unk2[2];
+	std::uintptr_t unk2[ 2 ];
 };
 
-struct CNetworkMessages
+class CNetworkMessages
 {
-	char pad_0000[1216];
+	char pad_0000[ 1208 ];
 public:
+	std::array<NetworkCallback_t, 32 * 8>* m_net_callbacks; // 0x4C0
+
 	static auto get( )
 	{
 		static CNetworkMessages* inst = nullptr;
@@ -42,19 +44,17 @@ public:
 	virtual void RegisterNetworkArrayFieldSerializer( ) = 0;
 	virtual void* GetNetMessageInfo( NetMessageHandle_t* ) = 0;
 	virtual void vfunc12( void ) = 0;
-	virtual NetMessageHandle_t* FindNetworkMessage( const char* ) = 0; // 13s
-
-	auto network_callbacks( ) {
-		return **( std::array<NetworkCallback_t, 256>** )( (uintptr_t)this + 0x4C0 );
-	}
+	virtual NetMessageHandle_t* FindNetworkMessage( const char* ) = 0; // 13
 
 	some_function find_network_callback( const char* callback_name ) {
-		for ( auto& callback : network_callbacks( ) ) {
-			if ( callback.m_name && callback.m_func_ptr && !util::fast_strcmp(callback.m_name, (char*)callback_name ) ) {
+		if ( !m_net_callbacks ) return nullptr;
+
+		for ( auto& callback : *m_net_callbacks ) {
+			if ( callback.m_name && callback.m_func_ptr && !util::fast_strcmp( callback.m_name, (char*)callback_name ) ) {
 				return callback.m_func_ptr;
 			}
 		}
-		
+
 		return nullptr;
 	}
 };

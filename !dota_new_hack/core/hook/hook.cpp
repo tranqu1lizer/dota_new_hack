@@ -37,19 +37,19 @@ void EntityEventListener::OnEntityDeleted( C_BaseEntity* rcx ) {
 	}
 }
 
-IMaterial2* hook::functions::GetMaterialForDraw( CBaseSceneObjectDesc* rcx, IMaterial2* rdx, CMaterialDrawDescriptor* r8, ISceneLayer* r9, bool& r10 ) {
-	const auto ret = reinterpret_cast<decltype( &GetMaterialForDraw )>( hook::original::fpGetMaterialForDraw )
-		( rcx, rdx, r8, r9, r10 );
+void hook::functions::FrameStageNotify( CSource2Client* rcx, ClientFrameStage_t stage ) {
+	const auto stage2char = []( ClientFrameStage_t s ) -> const char* {
+		switch ( s ) {
+			CASE_STRING( FRAME_NET_UPDATE_START );
+			CASE_STRING( FRAME_NET_UPDATE_END );
+			CASE_STRING( FRAME_NET_UPDATE_POSTDATAUPDATE_START );
+			CASE_STRING( FRAME_NET_UPDATE_POSTDATAUPDATE_END );
+		default:
+			return "";
+		}
+	};
 
-	if ( util::fast_strstr( ret->GetNameWithMod( ), "blends" ) ) {
-		r8->m_vTintColor = { pGui->mat_rgba[ 0 ],pGui->mat_rgba[ 1 ],pGui->mat_rgba[ 2 ] };
-		r8->m_flAlpha = pGui->mat_rgba[ 3 ];
-	}
-
-
-	// std::cout << "render: " << ret->GetNameWithMod( ) << "\n";
-
-	return ret;
+	reinterpret_cast<decltype( &FrameStageNotify )>( hook::original::fpFrameStageNotify )( rcx, stage );
 }
 
 void hook::functions::CreateMove( CDOTAInput* rcx, int slot, bool should_fill_weaponselect ) {
@@ -152,12 +152,12 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 		auto msg_ = (CMsgSosStartSoundEvent*)r8;
 		C_BaseEntity* ent;
 
-		if ( ent = g_pGameEntitySystem->find_entity( msg_->source_entity_index( ) ); !ent || !ent->client_class( ) )
-			goto end;
+		//if ( ent = g_pGameEntitySystem->find_entity( msg_->source_entity_index( ) ); !ent || !ent->client_class( ) )
+		//	goto end;
 
-		if ( util::fast_strstr( ent->client_class( )->m_pNetworkName, "Creep" ) ) {
-			return 0;
-		}
+		//if ( util::fast_strstr( ent->client_class( )->m_pNetworkName, "Creep" ) ) {
+		//	return 0;
+		//}
 	}
 	else if ( rdx->messageID == UM_ParticleManager ) {
 		CUserMsg_ParticleManager* particle_manager = static_cast<CUserMsg_ParticleManager*>( r8 );
@@ -182,8 +182,12 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 			context.DotaHud = CPanoramaUIEngine::get( )->AccessUIEngine( )->FindPanel( "DotaHud" );
 
 			if ( const auto local_controller = players[ 0 ]; local_controller ) {
+				IClientNetworkable ent;
+
 				global::g_Controller = (std::uintptr_t)local_controller;
-				global::g_LocalEntity = g_pGameEntitySystem->find_entity_by_handle<std::uintptr_t>( local_controller->assigned_hero( ) );
+				if ( g_pGameEntitySystem->m_pEnt2NetClasses->GetEntity2Networkable( local_controller->assigned_hero( ).to_index( ).Get( ), &ent ) ) {
+					global::g_LocalEntity = (std::uintptr_t*)ent.m_pEntity;
+				}
 
 #ifdef _DEBUG
 				ICVar::get( )[ "stats_display" ]->m_values.i32 = 5;
@@ -229,6 +233,9 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 		global::g_LocalEntity = 0;
 		g_pGameRules = nullptr;
 		context.DotaHud = nullptr;
+		panorama_gui.main_panel = nullptr;
+		panorama_gui.menu_status = false;
+		panorama_gui.is_menu_dragging = false;
 		context.entities.m.clear( );
 		context.entities.heroes.clear( );
 	}
@@ -302,6 +309,7 @@ long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UI
 
 	pGui->pContext->OMSetRenderTargets( 1, &pGui->pRenderTargetView, nullptr );
 	ImGui_ImplDX11_RenderDrawData( ImGui::GetDrawData( ) );
+
 	return reinterpret_cast<decltype( &Present )>( hook::original::fpPresent )( pSwapchain, SyncInterval, Flags );
 }
 
@@ -317,18 +325,23 @@ void hook::functions::OnMouseWheeled( CDOTA_Camera* rcx, int delta ) {
 	}
 }
 
+#pragma section(".text")
+__declspec( allocate( ".text" ) ) unsigned char JMP_RBX_TEST[] =
+{
+	0xFF, 0xE3
+};
+
 LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int uMsg, const uintptr_t wParam, const uintptr_t lParam ) {
 	if ( uMsg == WM_KEYUP ) {
 		if ( wParam == VK_F1 ) {
-			features::overwolf.process_lobby_members( );
+			auto Result =
+				ReturnSpoofer::DoSpoofCall<DWORD>( MessageBoxA, &JMP_RBX_TEST,
+					NULL, "", "Spoofed call", NULL );
+
+			std::cout << Result << "\n";
 		}
 		if ( wParam == VK_F2 ) {
-			auto DOTA_DB_Chat = context.DotaHud->find_child_traverse( "HudChat" )->panel2d_as( );
-			auto CDOTA_DB_Chat__AddCurrentTabMessage = (some_function)util::find_pattern( "client.dll", "40 55 56 41 54 41 56 41 57 48 8D 6C 24" );
-
-			CDOTA_DB_Chat__AddCurrentTabMessage( DOTA_DB_Chat, "test", true );
-
-			CDOTA_Hud_ErrorMsg* err_msgs =  context.DotaHud->find_child_traverse( "ErrorMessages" )->panel2d_as< CDOTA_Hud_ErrorMsg>( );
+			CDOTA_Hud_ErrorMsg* err_msgs = context.DotaHud->find_child_traverse( "ErrorMessages" )->panel2d_as< CDOTA_Hud_ErrorMsg>( );
 
 			err_msgs->ShowErrorMessage( "toster" );
 		}

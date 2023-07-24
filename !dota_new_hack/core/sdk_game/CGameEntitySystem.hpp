@@ -13,6 +13,8 @@ enum class EntityPVS : uint8_t {
 };
 
 class C_DOTAPlayerController;
+class CEntity2SaveRestore;
+class CEntity2NetworkClasses;
 
 class IEntityListener {
 public:
@@ -50,63 +52,24 @@ public:
 
 class CGameEntitySystem : CEntitySystem
 {
-	//xd
 	template<typename T>
 	T& Field( int offset ) {
 		return *(T*)( (uintptr_t)this + offset );
 	}
 
-	void* m_vtable;
+	char pad_00[ 16 ]; // 0x0
 public:
-	CEntityIdentities* m_entity_list[MAX_ENTITY_LISTS];
-	char pad_0018[ 0x108 ]; // 0x18
-	CEntityIdentity* m_shit_entites;
-
-	CEntityIdentity* find_identity( const int index )
-	{
-		if ( index <= -1 || index >= ( MAX_TOTAL_ENTITIES - 1 ) )
-			return nullptr;
-
-		CEntityIdentities* chunk_to_use = m_entity_list[( index / MAX_ENTITIES_IN_LIST )];
-		if ( !chunk_to_use )
-			return nullptr;
-
-		CEntityIdentity* identity = &chunk_to_use->m_identities[index % MAX_ENTITIES_IN_LIST];
-
-		if ( !identity )
-			return nullptr;
-
-		return identity;
-	}
-	
-	template<typename T = C_BaseEntity>
-	T* find_entity( int index )
-	{
-		if ( auto identity = find_identity( index ); identity )
-			return (T*)identity->entity;
-		return nullptr;
-	}
-	
-	template<typename T = C_BaseEntity>
-	T* find_entity( EntityIndex_t index )
-	{
-		if ( !index.is_valid( ) ) return nullptr;
-		return (T*)this->find_entity( index.Get( ) );
-	}
-
-	template<typename T = C_BaseEntity>
-	T* find_entity_by_handle( CHandle handle )
-	{
-		if ( !handle.is_valid( ) ) return nullptr;
-		return (T*)this->find_entity( handle.to_index() );
-	}
-
-	FIELD( CUtlVector<IEntityListener*>, entity_listeners, 0x1548 );
-
-	int highest_entityindex( )
-	{
-		return *(int*)( (uintptr_t)this + 0x1510 );
-	}
+	CEntityIdentities* m_pEntityLists[ MAX_ENTITY_LISTS ]; // 0x10
+private:
+	char pad_210[ 4854 ]; // 0x210
+public:
+	std::int32_t m_highest_entindex; // 0x1510
+private:
+	char pad_1514[ 0x30 ];
+public:
+	CUtlVector<IEntityListener*> m_vecEntityEvents; // 0x1548
+	CEntity2SaveRestore* m_pEnt2SaveRestore; // 0x1560
+	CEntity2NetworkClasses* m_pEnt2NetClasses; // 0x1568
 };
 
 class C_DOTA_MapTree;

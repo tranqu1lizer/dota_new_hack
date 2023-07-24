@@ -23,6 +23,7 @@ char PPCAT( _pad, __COUNTER__ )[ sz ];\
 public:
 
 #define PPAD(sz) char PPCAT(_pad, __COUNTER__)[sz];
+#define CASE_STRING( x ) case static_cast<int>( x ) : return #x // lwss
 
 #include <iostream>
 #include <format>
@@ -98,6 +99,7 @@ public:
 #include "core/sdk_game/CGameEventManager.h"
 #include "core/sdk_game/CDOTA_Camera.hpp"
 #include "core/sdk_game/ICVar.hpp"
+#include "core/sdk_game/CEntity2NetworkClasses.h"
 #include "core/sdk_game/CGameEntitySystem.hpp"
 #include "core/sdk_game/C_DOTAPlayerController.hpp"
 #include "core/sdk_game/ISteamClient.hpp"

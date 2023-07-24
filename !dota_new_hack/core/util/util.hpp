@@ -74,3 +74,30 @@ namespace util {
 
 	uintptr_t get_absolute_address( uintptr_t instruction_ptr, int offset, int size = -1 );
 }
+
+namespace ReturnSpoofer
+{
+	extern "C"
+		ULONG_PTR SpoofCall(
+			IN ... );
+
+	extern "C"
+		VOID InitSpoofCall(
+			IN LPVOID Function,
+			IN LPVOID FakeRet );
+
+	template< typename _RET_TYPE_,
+		typename... _VA_ARGS_ >
+	__declspec( noinline )
+		_RET_TYPE_ WINAPI DoSpoofCall(
+			IN LPVOID Function,
+			IN LPVOID FakeRet,
+			IN OUT _VA_ARGS_... Args OPTIONAL )
+		noexcept
+	{
+		InitSpoofCall( Function, FakeRet );
+
+		return ( ( _RET_TYPE_( * )( IN OUT ... OPTIONAL ) )SpoofCall )
+			( Args... );
+	}
+}

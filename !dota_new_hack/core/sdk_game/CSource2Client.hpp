@@ -3,11 +3,22 @@
 #include "NormalClass.hpp"
 
 class CGlobalVars;
+class ClientClass;
+
+enum ClientFrameStage_t : int
+{
+	FRAME_PRE_NET_PROCESSED, // by og
+	FRAME_POST_NET_PROCESSED,// by og
+	FRAME_NET_UPDATE_START = 4,
+	FRAME_NET_UPDATE_POSTDATAUPDATE_START,
+	FRAME_NET_UPDATE_POSTDATAUPDATE_END,
+	FRAME_NET_UPDATE_END,
+};
 
 class CSource2Client : public VClass
 {
 public:
-	static CSource2Client* GetInstance( )
+	static CSource2Client* get( )
 	{
 		static CSource2Client* inst = nullptr;
 		if ( !inst ) inst = static_cast<CSource2Client*>( util::get_interface( "client.dll", "Source2Client002" ) );
@@ -16,7 +27,7 @@ public:
 	}
 private:
 	virtual void SetGlobals( CGlobalVars* ) = 0; // 11
-	virtual void FrameStageNotify( short stage ) = 0; // 29
+	virtual void FrameStageNotify( ClientFrameStage_t stage ) = 0; // 29
 };
 
 class INetChannel;
@@ -27,7 +38,7 @@ class CGlobalVars
 {
 public:
 	static auto get( ) {
-		return *reinterpret_cast<CGlobalVars**>( util::get_absolute_address( util::vmt( (uintptr_t)CSource2Client::GetInstance( ), 11 ) /* CSource2Client::SetGlobals() */, 3, 7 ) );
+		return *reinterpret_cast<CGlobalVars**>( util::get_absolute_address( util::vmt( (uintptr_t)CSource2Client::get( ), 11 ) /* CSource2Client::SetGlobals() */, 3, 7 ) );
 	}
 
 	float m_realtime; // 0x0

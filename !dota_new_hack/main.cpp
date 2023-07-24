@@ -29,32 +29,6 @@ return 0;\
 CGui* pGui = nullptr;
 CGameEntitySystem* g_pGameEntitySystem = nullptr;
 
-inline const void some_memory_patches( ) {
-	//CBaseFileSystem::get( ).AddSearchPath( "C:\\ResourcesDHack", "DHK", SearchPathAdd_t::PATH_ADD_TO_TAIL, 1 );
-
-#ifdef _DEBUG
-	void* patch_address;
-
-	{
-		patch_address = (void*)util::vmt( (std::uintptr_t)&CBaseFileSystem::get( ), 118 ); // MarkContentCorrupt
-		// 0x33, 0xC0 | xor eax, eax
-		// 0xC3		  | ret
-		//util::patch( patch_address, "\x33\xC0\xC3" );
-		// const auto patch_address = reinterpret_cast<void*>( util::find_pattern( global::client_module, "BF ? ? ? ? E8 ? ? ? ? 83 F8 01", "MatchmakingStats interval" ) );
-		// 0xBF, 0x08, 0x00, 0x00, 0x00 | mov edi, 8
-		// util::patch( patch_address, "\xBF\x08\x00\x00\x00" );
-
-		patch_address = (void*)util::find_pattern( "panorama.dll", "FF 15 ? ? ? ? 48 8B 7C 24 ? 41 83 FE", "fill-parent-flow console flood" );
-
-		util::patch( patch_address, "\x90\x90\x90\x90\x90\x90" );
-
-		patch_address = (void*)util::find_pattern( "panorama.dll", "FF 15 ? ? ? ? 41 83 FC", "fill-parent-flow console flood2" );
-
-		util::patch( patch_address, "\x90\x90\x90\x90\x90\x90" );
-	}
-#endif
-}
-
 bool start_init( ) {
 	std::uintptr_t aGameEntitySystem,
 		aParticleManager,
@@ -75,7 +49,6 @@ bool start_init( ) {
 	CHECK_VAR_RET( global::client );
 	CHECK_VAR_RET( global::tier0 );
 
-	some_memory_patches( );
 	pGui = new CGui( );
 
 	{
@@ -137,15 +110,15 @@ bool start_init( ) {
 
 		DETOUR_PATTERN( "client.dll", "E8 ?? ?? ?? ?? 48 8B 4D 90 48 89 7C 24", "CGCClient::BAsyncSendProto", BAsyncSendProto, true, true );
 		DETOUR_PATTERN( "client.dll", "44 88 44 24 ?? 89 54 24 ?? 55 53 56 57 41 54", "CDOTAInput::CreateMove", CreateMove, true, false );
-		DETOUR_PATTERN( "scenesystem.dll", "48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC ?? 49 8B 41", "CBaseSceneObjectDesc::GetMaterialForDraw", GetMaterialForDraw, true, false );
 		DETOUR_PATTERN( "GameOverlayRenderer64.dll", "48 89 6C 24 ?? 48 89 74 24 ?? 41 56 48 83 EC ?? 41 8B E8", "SteamOverlayPresent", Present, true, false );
 
 		DETOUR_VF( GAB( aNetchanVMT + 0x15, 3, 7 ), 86, PostReceivedNetMessage, true );
 		DETOUR_VF( GAB( aNetchanVMT + 0x15, 3, 7 ), 69, SendNetMessage, true );
 		DETOUR_VF( aSteamGC, 2, SGCRetrieveMessage, false );
+		DETOUR_VF( CSource2Client::get( ), 29, FrameStageNotify, false );
 
 		g_pEntityListener = CMemAlloc::GetInstance( )->allocate<EntityEventListener>( );
-		g_pGameEntitySystem->entity_listeners( ).add_to_tail( g_pEntityListener );
+		g_pGameEntitySystem->m_vecEntityEvents.AddToTail( g_pEntityListener );
 	}
 
 	for ( auto& ccmd : ICVar::get( ).ccommands( ) ) {
@@ -185,9 +158,6 @@ bool start_init( ) {
 	spdlog::info( "Init functions took {:.2}s\n", duration_funcs.count( ) );
 	spdlog::info( "Init hooks took {:.2}s\n", start_hooks );
 	spdlog::info( "Full cheat initialization took {:.2}s\n\n", start_init );
-	
-	auto test = util::find_game_system( "CDOTAGameChatController" );
-	spdlog::info( "test: {}\n", test );
 
 	return true;
 }

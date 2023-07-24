@@ -37,6 +37,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -342,6 +343,7 @@
     <ClInclude Include="core\lib\protobuf\files\valveextensions.pb.h" />
     <ClInclude Include="core\sdk_game\CDOTAInput.h" />
     <ClInclude Include="core\sdk_game\CDOTAItemDefintion.hpp" />
+    <ClInclude Include="core\sdk_game\CEntity2NetworkClasses.h" />
     <ClInclude Include="core\sdk_game\C_BasePlayerPawn.h" />
     <ClInclude Include="core\sdk_game\CDOTA_InventoryManager.hpp" />
     <ClInclude Include="core\sdk_game\CGCClient.hpp" />
@@ -424,7 +426,11 @@
   <ItemGroup>
     <Library Include="core\lib\minhook\libMinHook.x64.lib" />
   </ItemGroup>
+  <ItemGroup>
+    <MASM Include="core\util\spoof_call.asm" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
   </ImportGroup>
 </Project>

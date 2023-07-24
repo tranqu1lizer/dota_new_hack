@@ -14,7 +14,7 @@ namespace hook {
 
 	namespace original {
 		inline void* fpCreateMove;
-		inline void* fpGetMaterialForDraw;
+		inline void* fpFrameStageNotify;
 		inline void* fpBAsyncSendProto;
 		inline void* fpOnMouseWheeled;
 		inline void* fpSGCRetrieveMessage;
@@ -25,18 +25,15 @@ namespace hook {
 	}
 
 	namespace functions {
-		IMaterial2* GetMaterialForDraw( CBaseSceneObjectDesc* rcx, IMaterial2* rdx, CMaterialDrawDescriptor* r8, ISceneLayer* r9, bool& r10 );
-		void CreateMove( CDOTAInput* rcx, int unk, bool unk1 );
-		bool BAsyncSendProto( CProtoBufMsgBase* protobufMsg, IProtoBufSendHandler* handler, google::protobuf::Message* responseMsg, unsigned int respMsgID );
-		EGCResults SGCRetrieveMessage( ISteamGameCoordinator* thisptr, uint32* punMsgType, ProtoBufMsgHeader_t* pubDest, uint32 cubDest, uint32* pcubMsgSize );
-		bool SendNetMessage( INetChannel* thisptr, NetMessageHandle_t* messageHandle, google::protobuf::Message* msg, NetChannelBufType_t type );
-		PVOID PostReceivedNetMessage( INetChannel* rcx,
-			CNetworkSerializerPB* rdx,
-			google::protobuf::Message* r8,
-			NetChannelBufType_t* r9 );
-		HRESULT Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UINT Flags );
-		LRESULT WndProc( const HWND hWnd, unsigned int uMsg, uintptr_t wParam, uintptr_t lParam );
-		void OnMouseWheeled( CDOTA_Camera* thisptr, int delta );
+		void FrameStageNotify( CSource2Client*, ClientFrameStage_t );
+		void CreateMove( CDOTAInput*, int, bool );
+		bool BAsyncSendProto( CProtoBufMsgBase*, IProtoBufSendHandler*, google::protobuf::Message*, unsigned int );
+		EGCResults SGCRetrieveMessage( ISteamGameCoordinator*, uint32*, ProtoBufMsgHeader_t*, uint32, uint32* );
+		bool SendNetMessage( INetChannel*, NetMessageHandle_t*, google::protobuf::Message*, NetChannelBufType_t );
+		PVOID PostReceivedNetMessage( INetChannel*, CNetworkSerializerPB*, google::protobuf::Message*, NetChannelBufType_t* );
+		HRESULT Present( IDXGISwapChain*, UINT, UINT );
+		LRESULT WndProc( const HWND, unsigned int, uintptr_t, uintptr_t );
+		void OnMouseWheeled( CDOTA_Camera*, int );
 	}
 }
 

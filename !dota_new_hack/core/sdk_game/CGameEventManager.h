@@ -53,7 +53,7 @@ class CGameEventManager
 {
 public:
     static CGameEventManager* GetInstance( ) {
-        if ( auto source2client = CSource2Client::GetInstance( ); ( source2client ) ) {
+        if ( auto source2client = CSource2Client::get( ); ( source2client ) ) {
             return *(CGameEventManager**)util::get_absolute_address( util::vmt( (uintptr_t)source2client, 4 ) + 0x70, 3, 7 );
         }
 

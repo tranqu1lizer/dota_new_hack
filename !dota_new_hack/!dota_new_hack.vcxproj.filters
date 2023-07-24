@@ -479,6 +479,8 @@
       <Filter>core\sdk_game\valve</Filter>
     </ClInclude>
     <ClInclude Include="core\sdk_game\IWorldRendererMgr.h" />
+    <ClInclude Include="core\sdk_game\valve\KV.h" />
+    <ClInclude Include="core\sdk_game\CEntity2NetworkClasses.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -759,5 +761,10 @@
     <Library Include="core\lib\minhook\libMinHook.x64.lib">
       <Filter>core\lib\minhook</Filter>
     </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="core\util\spoof_call.asm">
+      <Filter>core\util</Filter>
+    </MASM>
   </ItemGroup>
 </Project>
