@@ -13,8 +13,8 @@ C_DOTAGamerules* g_pGameRules;
 
 
 void EntityEventListener::OnEntityCreated( C_BaseEntity* rcx ) {
-	if ( const auto client_class = rcx->client_class( ); ( client_class && client_class->m_pNetworkName ) ) {
-		const auto class_name = std::string_view( client_class->m_pNetworkName );
+	if ( const auto GetClientClass = rcx->GetClientClass( ); ( GetClientClass && GetClientClass->m_pNetworkName ) ) {
+		const auto class_name = std::string_view( GetClientClass->m_pNetworkName );
 		if ( class_name == "C_DOTAGamerulesProxy" ) { // class id 1438
 			g_pGameRules = rcx->schema_member<C_DOTAGamerules*>( "client.dll/C_DOTAGamerulesProxy/m_pGameRules" );
 		}
@@ -27,8 +27,8 @@ void EntityEventListener::OnEntityCreated( C_BaseEntity* rcx ) {
 }
 
 void EntityEventListener::OnEntityDeleted( C_BaseEntity* rcx ) {
-	if ( const auto client_class = rcx->client_class( ); ( client_class && client_class->m_pNetworkName ) ) {
-		const auto class_name = std::string_view( client_class->m_pNetworkName );
+	if ( const auto GetClientClass = rcx->GetClientClass( ); ( GetClientClass && GetClientClass->m_pNetworkName ) ) {
+		const auto class_name = std::string_view( GetClientClass->m_pNetworkName );
 
 		if ( class_name.starts_with( "C_DOTA_Unit_Hero" ) || class_name.starts_with( "CDOTA_Unit_Hero" ) && context.entities.heroes.contains( static_cast<C_DOTA_BaseNPC_Hero*>( rcx ) ) )
 			context.entities.heroes.erase( static_cast<C_DOTA_BaseNPC_Hero*>( rcx ) );
@@ -150,14 +150,14 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 	if ( rdx->messageID == DOTA_UM_TE_DotaBloodImpact ) return 0;
 	else if ( rdx->messageID == GE_SosStartSoundEvent ) {
 		auto msg_ = (CMsgSosStartSoundEvent*)r8;
-		C_BaseEntity* ent;
+		
+		C_BaseEntity* ent = context.entities[ msg_->source_entity_index( ) ];
 
-		//if ( ent = g_pGameEntitySystem->find_entity( msg_->source_entity_index( ) ); !ent || !ent->client_class( ) )
-		//	goto end;
+		if ( !ent )
+			goto end;
 
-		//if ( util::fast_strstr( ent->client_class( )->m_pNetworkName, "Creep" ) ) {
-		//	return 0;
-		//}
+		if ( util::fast_strstr( ent->GetClientClass( )->m_pNetworkName, "Creep" ) )
+			return 0;
 	}
 	else if ( rdx->messageID == UM_ParticleManager ) {
 		CUserMsg_ParticleManager* particle_manager = static_cast<CUserMsg_ParticleManager*>( r8 );
