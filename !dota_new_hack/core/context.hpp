@@ -12,10 +12,10 @@ public:
 
 		for ( auto& [idx, ent] : m ) {
 
-			if ( !ent || !ent->identity( )->has_name( ) || !ent->schema_dynamic_binding( ) )
+			if ( !ent || !ent->GetIdentity( )->HasName( ) || !ent->Schema_DynamicBinding( ) )
 				continue;
 
-			if ( name == ent->identity( )->entity_name_view( ) || name == ent->schema_dynamic_binding( )->m_binary_name )
+			if ( name == ent->GetIdentity( )->GetEntityNameView( ) || name == ent->Schema_DynamicBinding( )->m_binary_name )
 			{
 				ret.push_back( ent );
 			}
@@ -66,10 +66,12 @@ class CContext {
 public:
 	entity_list entities;
 
+	C_DOTAPlayerController* local_controller;
+	C_BaseEntity* local_entity;
+
 	INetChannel* m_net_channel;
 	vector3d traced_cursor;
 	CUIPanel* DotaHud;
-	bool ui_hud_status = false;
 };
 
 inline CContext context;

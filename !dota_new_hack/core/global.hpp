@@ -9,8 +9,6 @@
 namespace global {
 	inline HMODULE client, tier0;
 	inline std::unordered_map<std::string, ID3D11ShaderResourceView*> g_mapSpellIcons, g_mapHeroIcons, g_mapItemIcons;
-	inline std::uintptr_t* g_LocalEntity, g_Controller;
-	inline bool bIsInGame;
 	inline HINSTANCE hModule;
 
 	namespace patterns {

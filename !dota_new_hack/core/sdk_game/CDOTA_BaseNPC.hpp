@@ -49,30 +49,23 @@ public:
 		return MemberNotPtr<CDOTA_ModifierManager>( offset );
 	}
 
-	int health_bar_offset( ) noexcept {
+	int GetHBOffset( ) noexcept {
 		if ( !util::exists( this ) ) return -1;
 
 		return schema_member<int>( "client.dll/C_DOTA_BaseNPC/m_iHealthBarOffset" );
 	}
 
-	float physical_armor( ) {
+	float GetPhysicalArmor( ) {
 		if ( !util::exists( this ) ) return -1;
 		return CallVFunc<271, float>( );
 	}
 
-	float magical_armor( ) {
+	float GetMagicalArmor( ) {
 		if ( !util::exists( this ) ) return -1;
 		return CallVFunc<272, float>( );
 	}
 
-	CUtlVector<CHandle> old_wearables( ) {
-		if ( !util::exists( this ) ) return CUtlVector<CHandle>{};
-
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_hOldWearables" );
-		return *( CUtlVector<CHandle>* )( (uintptr_t)this + offset );
-	}
-
-	EntityIndex_t ability_at( const int idx )
+	EntityIndex_t GetAbility( const int idx )
 	{
 		if ( !util::exists( this ) ) return -1;
 		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_hAbilities" );
@@ -80,7 +73,7 @@ public:
 		return ability.ToIndex( );
 	}
 
-	EntityIndex_t item_in_slot( const int idx )
+	EntityIndex_t GetItemSlot( const int idx )
 	{
 		if ( !util::exists( this ) ) return -1;
 		if ( Member<bool>( schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_bHasInventory" ) ) ) {
@@ -100,14 +93,14 @@ public:
 		return CallVFunc<127, int>( );
 	}
 
-	bool illusion( ) {
+	bool IsIllusion( ) {
 		if ( !util::exists( this ) ) return false;
 		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC_Hero/m_hReplicatingOtherHeroModel" );
 		const auto state = Member<uintptr_t>( offset ) != 0xFFFFFFFF;
 		return state;
 	}
 
-	int32_t hero_id( ) {
+	int32_t GetHeroId( ) {
 		if ( !util::exists( this ) ) return -1;
 
 		return schema_member<int32_t>( "client.dll/C_DOTA_BaseNPC_Hero/m_iHeroID" );

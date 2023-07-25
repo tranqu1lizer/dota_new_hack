@@ -13,8 +13,8 @@ C_DOTAGamerules* g_pGameRules;
 
 
 void EntityEventListener::OnEntityCreated( C_BaseEntity* rcx ) {
-	if ( const auto GetClientClass = rcx->GetClientClass( ); ( GetClientClass && GetClientClass->m_pNetworkName ) ) {
-		const auto class_name = std::string_view( GetClientClass->m_pNetworkName );
+	if ( const auto clientclass = rcx->GetClientClass( ); ( clientclass && clientclass->m_pNetworkName ) ) {
+		const auto class_name = std::string_view( clientclass->m_pNetworkName );
 		if ( class_name == "C_DOTAGamerulesProxy" ) { // class id 1438
 			g_pGameRules = rcx->schema_member<C_DOTAGamerules*>( "client.dll/C_DOTAGamerulesProxy/m_pGameRules" );
 		}
@@ -22,24 +22,26 @@ void EntityEventListener::OnEntityCreated( C_BaseEntity* rcx ) {
 		if ( class_name.starts_with( "C_DOTA_Unit_Hero" ) || class_name.starts_with( "CDOTA_Unit_Hero" ) )
 			context.entities.heroes.insert( static_cast<C_DOTA_BaseNPC_Hero*>( rcx ) );
 
-		context.entities.m[ rcx->index( ) ] = rcx;
+		context.entities.m[ rcx->GetIndex( ) ] = rcx;
 	}
 }
 
 void EntityEventListener::OnEntityDeleted( C_BaseEntity* rcx ) {
-	if ( const auto GetClientClass = rcx->GetClientClass( ); ( GetClientClass && GetClientClass->m_pNetworkName ) ) {
-		const auto class_name = std::string_view( GetClientClass->m_pNetworkName );
+	if ( const auto clientclass = rcx->GetClientClass( ); ( clientclass && clientclass->m_pNetworkName ) ) {
+		const auto class_name = std::string_view( clientclass->m_pNetworkName );
 
 		if ( class_name.starts_with( "C_DOTA_Unit_Hero" ) || class_name.starts_with( "CDOTA_Unit_Hero" ) && context.entities.heroes.contains( static_cast<C_DOTA_BaseNPC_Hero*>( rcx ) ) )
 			context.entities.heroes.erase( static_cast<C_DOTA_BaseNPC_Hero*>( rcx ) );
 
-		context.entities.m.erase( rcx->index( ) );
+		context.entities.m.erase( rcx->GetIndex( ) );
 	}
 }
 
 void hook::functions::FrameStageNotify( CSource2Client* rcx, ClientFrameStage_t stage ) {
 	const auto stage2char = []( ClientFrameStage_t s ) -> const char* {
 		switch ( s ) {
+			CASE_STRING( FRAME_PRE_NET_PROCESSED );
+			CASE_STRING( FRAME_POST_NET_PROCESSED );
 			CASE_STRING( FRAME_NET_UPDATE_START );
 			CASE_STRING( FRAME_NET_UPDATE_END );
 			CASE_STRING( FRAME_NET_UPDATE_POSTDATAUPDATE_START );
@@ -147,7 +149,7 @@ bool hook::functions::SendNetMessage( INetChannel* thisptr, NetMessageHandle_t* 
 }
 
 void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSerializerPB* rdx, google::protobuf::Message* r8, NetChannelBufType_t* r9 ) {
-	if ( rdx->messageID == DOTA_UM_TE_DotaBloodImpact ) return 0;
+	if ( rdx->messageID == DOTA_UM_TE_DotaBloodImpact ) return nullptr;
 	else if ( rdx->messageID == GE_SosStartSoundEvent ) {
 		auto msg_ = (CMsgSosStartSoundEvent*)r8;
 
@@ -175,16 +177,16 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 	if ( rdx->messageID != net_Tick )
 		goto end;
 
-	if ( global::bIsInGame = IEngineClient::get( ).IsInGame( ); global::bIsInGame ) {
+	if ( IEngineClient::get( ).IsInGame( ) ) {
 
-		if ( !global::g_LocalEntity ) {
+		if ( !context.local_entity ) {
 			context.DotaHud = CPanoramaUIEngine::get( )->AccessUIEngine( )->FindPanel( "DotaHud" );
 
-			global::g_Controller = (std::uintptr_t)context.entities.GetLocalPlayer( );
+			context.local_controller = context.entities.GetLocalPlayer( );
 
 			IClientNetworkable ent;
-			if ( global::g_Controller && CSource2Client::get( )->GetEntity2NetworkableByHandle( context.entities.GetLocalPlayer( )->GetAssignedHero( ), &ent ) )
-				global::g_LocalEntity = (std::uintptr_t*)ent.m_pEntity;
+			if ( context.local_controller && CSource2Client::get( )->GetEntity2NetworkableByHandle( context.local_controller->GetAssignedHero( ), &ent ) )
+				context.local_entity = ent.m_pEntity;
 		}
 
 		static bool camera_hooked = false;
@@ -200,7 +202,7 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 			if ( panorama_gui.draw_networthdelta ) {
 				util::set_timer( []( ) {
 					CGlobalVars* gpGlobals = CGlobalVars::get( );
-					CDOTA_Hud_Top_Bar* topbar = context.DotaHud->find_child_traverse( "topbar" )->panel2d_as<CDOTA_Hud_Top_Bar>( );
+					CDOTA_Hud_Top_Bar* topbar = context.DotaHud->FindChildTraverse( "topbar" )->panel2d_as<CDOTA_Hud_Top_Bar>( );
 					C_DOTA_PlayerResource* resource = C_DOTA_PlayerResource::get( );
 
 					int goodguys_top = 0;
@@ -213,16 +215,16 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 							badguys_top += resource->GetNetWorthOfPlayer( i );
 					}
 					topbar->UpdateNetWorthDifference( goodguys_top, badguys_top );
-				}, 4000 );
+				}, 4000 ); // раз в 4 секунды апдейт
 			}
 		}
 	}
 	else {
-		if ( !global::g_LocalEntity )
+		if ( !context.local_entity )
 			goto end;
 
 		features::camera_hack.change_distance( );
-		global::g_LocalEntity = 0;
+		context.local_entity = nullptr;
 		g_pGameRules = nullptr;
 		context.DotaHud = nullptr;
 		panorama_gui.main_panel = nullptr;
@@ -249,7 +251,7 @@ long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UI
 	// OLD IMGUI MENU
 	pGui->Render( );
 
-	if ( global::bIsInGame && g_pGameRules && ( g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS || g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_PRE_GAME ) ) {
+	if ( IEngineClient::get( ).IsInGame( ) && g_pGameRules && ( g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS || g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_PRE_GAME ) ) {
 
 		if ( panorama_gui.draw_health )
 			features::hero_bar.draw_health( panorama_gui.draw_mana_bar );
@@ -260,12 +262,12 @@ long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UI
 
 		for ( C_DOTA_BaseNPC_Hero* hero : context.entities.heroes ) {
 
-			if ( hero->health( ) <= 0 && hero->identity( )->dormant( ) && hero->illusion( ) )
+			if ( hero->GetHealth( ) <= 0 && hero->GetIdentity( )->IsDormant( ) && hero->IsIllusion( ) )
 				continue;
 
 			vector2d scr;
-			vector3d pos = hero->abs_origin( );
-			pos.z += hero->health_bar_offset( );
+			vector3d pos = hero->GetAbsoluteOrigin( );
+			pos.z += hero->GetHBOffset( );
 
 			if ( CRenderGameSystem::GetInstance( )->GetVectorInScreenSpace( pos, scr ) ) {
 				std::uint16_t cc = 0;
@@ -276,7 +278,7 @@ long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UI
 				}
 			}
 
-			if ( const double distance = hero->abs_origin( ).dist_to( context.traced_cursor ); distance < lowest_distance ) {
+			if ( const double distance = hero->GetAbsoluteOrigin( ).dist_to( context.traced_cursor ); distance < lowest_distance ) {
 				lowest_distance = distance;
 				closest_hero = hero;
 			}
@@ -284,13 +286,13 @@ long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UI
 
 		if ( closest_hero && lowest_distance < 1000.f ) {
 			vector2d scr;
-			vector3d pos = closest_hero->abs_origin( );
-			pos.z += closest_hero->health_bar_offset( );
+			vector3d pos = closest_hero->GetAbsoluteOrigin( );
+			pos.z += closest_hero->GetHBOffset( );
 
 			if ( CRenderGameSystem::GetInstance( )->GetVectorInScreenSpace( pos, scr ) ) {
 				std::uint16_t cc = 0;
 				char buf[ 256 ];
-				sprintf_s( buf, "closest: %s, dist: %2.f", closest_hero->identity( )->entity_name( ), lowest_distance );
+				sprintf_s( buf, "closest: %s, dist: %2.f", closest_hero->GetIdentity( )->GetEntityName( ), lowest_distance );
 				ImGui::GetForegroundDrawList( )->AddText( ImVec2{ scr.x, scr.y }, 0xFFFFFFFF, buf );
 			}
 
@@ -308,11 +310,11 @@ long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UI
 void hook::functions::OnMouseWheeled( CDOTA_Camera* rcx, int delta ) {
 	reinterpret_cast<decltype( &OnMouseWheeled )>( hook::original::fpOnMouseWheeled )( rcx, delta );
 
-	if ( pGui->mouse_distance && !pGui->show && global::bIsInGame ) {
+	if ( pGui->mouse_distance && !pGui->show && IEngineClient::get( ).IsInGame( ) ) {
 		features::camera_hack.on_mouse_wheeled( rcx, delta );
-		if ( panorama_gui.camera_dist_slider && panorama_gui.camera_dist_slider->children( ).Count( ) ) {
+		if ( panorama_gui.camera_dist_slider && panorama_gui.camera_dist_slider->GetChildren( ).Count( ) ) {
 			const auto casted2volvotype = static_cast<float>( features::camera_hack.get_distance( ) - features::camera_hack.get_min_distance( ) ) / ( features::camera_hack.get_max_distance( ) - features::camera_hack.get_min_distance( ) );
-			panorama_gui.camera_dist_slider->children( )[ 1 ]->panel2d_as<CSlider>( )->set_fl( casted2volvotype );
+			panorama_gui.camera_dist_slider->GetChildren( )[ 1 ]->panel2d_as<CSlider>( )->SetFloat( casted2volvotype );
 		}
 	}
 }
@@ -330,47 +332,26 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 				ReturnSpoofer::DoSpoofCall<DWORD>( MessageBoxA, &JMP_RBX_TEST,
 					NULL, "", "Spoofed call", NULL );
 
-			auto mod = (C_BaseModelEntity*)global::g_LocalEntity;
+			auto mod = (C_BaseModelEntity*)context.local_entity;
 
 			mod->SetColor( 0, 0, 0 );
 		}
 		if ( wParam == VK_F2 ) {
-			context.DotaHud->find_child_traverse( "ErrorMessages" )->panel2d_as< CDOTA_Hud_ErrorMsg>( )->ShowErrorMessage( "toster" );
+			context.DotaHud->FindChildTraverse( "ErrorMessages" )->panel2d_as< CDOTA_Hud_ErrorMsg>( )->ShowErrorMessage( "toster" );
 
 		}
 		if ( wParam == VK_F4 ) {
-			CBaseFileSystem& fs = CBaseFileSystem::get( );
-			CUtlVector<CUtlString> scripts;
-			std::string fullScriptPath {"scripts/"};
-			FileHandle_t* fileHandle;
-			char bf[ 1024 ];
 
-			fs.FindFileAbsoluteList( &scripts, "scripts/*.js", "DHK" );
-			for ( CUtlString szScriptName : scripts ) {
-
-				const std::string path {szScriptName.Get( )};
-				fullScriptPath.append( path.substr( path.find_last_of( "/\\" ) + 1 ) );
-				fileHandle = fs.OpenFile( fullScriptPath.c_str( ), "r", "DHK" );
-				fs.ReadEx( bf, fs.GetFileSize( fileHandle ), sizeof( bf ), fileHandle );
-
-				for ( int i = 0; i < util::fast_strlen( bf ); ++i ) {
-
-					if ( bf[ i ] == -52 ) {
-						bf[ i ] = '\0';
-						break;
-					}
-				}
-
-				CPanoramaUIEngine::get( )->AccessUIEngine( )->ExecuteScript( ( std::string{bf}.substr( 0, util::fast_strlen( bf ) - 3 ) ).c_str( ) );
-
-				fs.Close( fileHandle );
-			}
 		}
 		if ( wParam == VK_F3 ) {
 			panorama_gui.show( );
 		}
 		if ( wParam == VK_INSERT ) {
-			CPanoramaUIEngine::get( )->AccessUIEngine( )->play_sound_effect( "ui_menu_activate_open" );
+			CPanoramaUIEngine::get( )->AccessUIEngine( )->RunScript(
+				"Hud",
+				"$.DispatchEvent( 'PlaySoundEffect', 'ui_menu_activate_open' );",
+				IEngineClient::get( ).IsInGame( ) ? "panorama/layout/base_hud.xml" : "panorama/layout/base.xml"
+			);
 			pGui->show ^= true;
 		}
 		if ( wParam == VK_HOME ) {
@@ -379,7 +360,7 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 
 			constexpr auto unhook = []( void* ) -> unsigned long {
 				features::camera_hack.change_distance( );
-				global::g_LocalEntity = 0;
+				context.local_entity = nullptr;
 				global::g_mapItemIcons.clear( );
 				global::g_mapSpellIcons.clear( );
 

@@ -11,7 +11,7 @@ void* origCPanel2D__OnMouseButtonDown, * origCPanel2D__OnMouseMove;
 bool is_number( const std::string& s ) { return !s.empty( ) && std::all_of( s.begin( ), s.end( ), ::isdigit ); }
 
 void ChangerAddItemButton_Handler( ) {
-	auto display_text = panorama_gui.changer_item_def_textentry->panel2d_as<CTextEntry>( )->display_text( );
+	auto display_text = panorama_gui.changer_item_def_textentry->panel2d_as<CTextEntry>( )->GetDisplayText( );
 	if ( !display_text.empty( ) && is_number( display_text ) ) {
 		if ( const auto def_index = std::stoi( display_text ); def_index ) {
 			features::inventory_changer.create_fake_item( def_index );
@@ -27,7 +27,7 @@ void VisualsManabarButton_Handler( ) {
 }
 
 void CameraDistSlider_Handler( ) {
-	const auto fl_value = panorama_gui.camera_dist_slider->children( )[ 1 ]->panel2d_as<CSlider>( )->g_float( );
+	const auto fl_value = panorama_gui.camera_dist_slider->GetChildren( )[ 1 ]->panel2d_as<CSlider>( )->GetFloat( );
 
 	const auto value = static_cast<int>( fl_value * ( features::camera_hack.get_max_distance( ) - features::camera_hack.get_min_distance( ) ) + features::camera_hack.get_min_distance( ) ); // fl_value * ( max - min ) + min
 	features::camera_hack.change_distance( value );
@@ -39,7 +39,7 @@ void ChangerTreeChanged_Handler( ) {
 	if ( selected = panorama_gui.changer_TreesDropDown->panel2d_as<CDropDown>( )->GetSelected( ); !selected )
 		return spdlog::critical( "{}(): selected = nullptr;\n", __FUNCTION__ );
 
-	const char* dropdown_sel = reinterpret_cast<CLabel*>( selected )->label_text( );
+	const char* dropdown_sel = reinterpret_cast<CLabel*>( selected )->GetLabelText( );
 	if ( !dropdown_sel || (std::uintptr_t)dropdown_sel == 0x1 )
 		return spdlog::critical( "{}(): dropdown_sel = nullptr;\n",__FUNCTION__  );
 
@@ -53,7 +53,7 @@ void MiscGoldDisplay_Handler( ) {
 	panorama_gui.draw_networthdelta ^= true;
 	CUIPanel* disp;
 
-	if ( disp = context.DotaHud->find_child_traverse( "SpectatorGoldDisplay" ); !disp )
+	if ( disp = context.DotaHud->FindChildTraverse( "SpectatorGoldDisplay" ); !disp )
 		return;
 
 	disp->SetActive( panorama_gui.draw_networthdelta );
@@ -106,7 +106,7 @@ void CPanel2D__OnMouseMove( CPanel2D* rcx, float flMouseX, float flMouseY ) {
 			const auto uixp = p.x / uiw * 100;
 			const auto uiyp = p.y / uih * 100;
 
-			panorama_gui.main_panel->set_style( std::format( "position: {}% {}% 0;", uixp, uiyp ) );
+			panorama_gui.main_panel->SetStyle( std::format( "position: {}% {}% 0;", uixp, uiyp ) );
 		}
 	}
 }
@@ -140,36 +140,40 @@ void CPanoramaGUI::register_events( ) {
 void CPanoramaGUI::show( ) {
 	auto ui_engine = CPanoramaUIEngine::get( );
 
-	if ( CUIPanel* root = ui_engine->AccessUIEngine( )->FindPanel( global::bIsInGame ? "DotaHud" : "DotaDashboard" ); root ) {
+	if ( CUIPanel* root = ui_engine->AccessUIEngine( )->FindPanel( IEngineClient::get( ).IsInGame( ) ? "DotaHud" : "DotaDashboard" ); root ) {
 
 		if ( !main_panel ) {
 			main_panel = ui_engine->AccessUIEngine( )->create_panel( "mainmenu", root )->UIPanel( );
 			if ( ui_engine->AccessUIEngine( )->is_valid_panel_ptr( main_panel ) ) {
-				main_panel->load_layout_file( "file://{resources}/menu.xml", false );
+				main_panel->LoadLayoutFile( "file://{resources}/menu.xml", false );
 			}
-			camera_dist_slider = main_panel->find_child_traverse( "camera_distance_slider" );
-			camera_fog_checkbox = main_panel->find_child_traverse( "camera_draw_fog" );
-			camera_draw_button = main_panel->find_child_traverse( "camera_draw_particles" );
-			changer_item_def_textentry = main_panel->find_child_traverse( "item_def_to_add" );
-			changer_add_item_button = main_panel->find_child_traverse( "add_item" );
-			visuals_hpnumb = main_panel->find_child_traverse( "visual_health_number" );
-			visuals_manabar = main_panel->find_child_traverse( "visual_mana_bar" );
-			misc_log_searching_players = main_panel->find_child_traverse( "misc_log_searching_players" );
-			misc_autoaccept = main_panel->find_child_traverse( "misc_autoaccept" );
-			misc_networth_delta = main_panel->find_child_traverse( "misc_networth_delta" );
-			misc_unlock_emoticons = main_panel->find_child_traverse( "misc_unlock_emoticons" );
-			changer_TreesDropDown = main_panel->find_child_traverse( "TreesDropDown" );
+			camera_dist_slider = main_panel->FindChildTraverse( "camera_distance_slider" );
+			camera_fog_checkbox = main_panel->FindChildTraverse( "camera_draw_fog" );
+			camera_draw_button = main_panel->FindChildTraverse( "camera_draw_particles" );
+			changer_item_def_textentry = main_panel->FindChildTraverse( "item_def_to_add" );
+			changer_add_item_button = main_panel->FindChildTraverse( "add_item" );
+			visuals_hpnumb = main_panel->FindChildTraverse( "visual_health_number" );
+			visuals_manabar = main_panel->FindChildTraverse( "visual_mana_bar" );
+			misc_log_searching_players = main_panel->FindChildTraverse( "misc_log_searching_players" );
+			misc_autoaccept = main_panel->FindChildTraverse( "misc_autoaccept" );
+			misc_networth_delta = main_panel->FindChildTraverse( "misc_networth_delta" );
+			misc_unlock_emoticons = main_panel->FindChildTraverse( "misc_unlock_emoticons" );
+			changer_TreesDropDown = main_panel->FindChildTraverse( "TreesDropDown" );
 
-			main_panel->find_child_traverse( "GeneralTab" )->panel_style( )->set_visibility( true );
-			main_panel->find_child_traverse( "ChangerTab" )->panel_style( )->set_visibility( false );
-			main_panel->find_child_traverse( "MiscTab" )->panel_style( )->set_visibility( false );
-			camera_draw_button->panel2d_as<CDOTA_DB_SettingsCheckbox>( )->set_selected( draw_particles );
+			main_panel->FindChildTraverse( "GeneralTab" )->GetStyle( )->SetVisibility( true );
+			main_panel->FindChildTraverse( "ChangerTab" )->GetStyle( )->SetVisibility( false );
+			main_panel->FindChildTraverse( "MiscTab" )->GetStyle( )->SetVisibility( false );
+			camera_draw_button->panel2d_as<CDOTA_DB_SettingsCheckbox>( )->SetSelected( draw_particles );
 		}
 
-		main_panel->set_parent( root );
+		main_panel->SetParent( root );
 		main_parent_panel = root;
-		main_panel->panel_style( )->set_visibility( menu_status ^= true );
+		main_panel->GetStyle( )->SetVisibility( menu_status ^= true );
 		register_events( );
-		ui_engine->AccessUIEngine( )->play_sound_effect( "ui_menu_activate_open" );
+		ui_engine->AccessUIEngine( )->RunScript(
+			"Hud",
+			"$.DispatchEvent( 'PlaySoundEffect', 'ui_menu_activate_open' );",
+			IEngineClient::get( ).IsInGame( ) ? "panorama/layout/base_hud.xml" : "panorama/layout/base.xml"
+		);
 	}
 }

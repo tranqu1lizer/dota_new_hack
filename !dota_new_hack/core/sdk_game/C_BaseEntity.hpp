@@ -58,7 +58,7 @@ enum class DOTATeam_t : int {
 
 class C_BaseEntity : public SchemaVClass {
 public:
-	CSchemaClassBinding* schema_dynamic_binding( ) {
+	CSchemaClassBinding* Schema_DynamicBinding( ) {
 		return CallVFunc<0, CSchemaClassBinding*>( );
 	}
 
@@ -68,24 +68,24 @@ public:
 
 	////////////////////
 
-	int index( ) {
+	int GetIndex( ) {
 		if ( !util::exists( this ) ) return -1;
-		return this->identity( )->entHandle & 0x7FFF;
+		return this->GetIdentity( )->entHandle & 0x7FFF;
 	}
 
-	CHandle owner( ) {
+	CHandle GetOwner( ) {
 		if ( !util::exists( this ) ) return CHandle{};
 		static const auto offset = schema::dynamic_field_offset( "client.dll/C_BaseEntity/m_hOwnerEntity" );
 		return Member<CHandle>( offset );
 	}
 
-	DOTATeam_t team_number( ) {
+	DOTATeam_t GetTeamNumber( ) {
 		if ( !util::exists( this ) ) return DOTATeam_t::DOTA_TEAM_INVALID;
 		static const auto offset = schema::dynamic_field_offset( "client.dll/C_BaseEntity/m_iTeamNum" );
 		return Member<DOTATeam_t>( offset );
 	}
 
-	vector3d abs_origin( )
+	vector3d GetAbsoluteOrigin( )
 	{
 		if ( !util::exists( this ) ) return vector3d{ -1,-1,-1 };
 
@@ -94,22 +94,21 @@ public:
 		return *(vector3d*)( scene + schema::dynamic_field_offset( "client.dll/CGameSceneNode/m_vecAbsOrigin" ) );
 	}
 
-	float rotation( ) {
+	float GetRotation( ) {
 		return schema_member<SchemaVClass*>( "client.dll/C_BaseEntity/m_pGameSceneNode" )
 			->schema_member<QAngle>( "client.dll/CGameSceneNode/m_angRotation" ).roll_deg;
 	}
 
 	// Gets the point in front of the entity at the specified distance
-	vector3d forward_vector( float dist ) {
-		const auto rot = rotation( );
-		const float casted_rot = rotation( ) * M_PI / 180;
+	vector3d GetForwardVector( float dist ) {
+		const auto rot = GetRotation( );
+		const float casted_rot = GetRotation( ) * M_PI / 180;
 
 		const float sine = sinf( casted_rot ), cosine = cosf( casted_rot );
-		return abs_origin( ) + vector3d( cosine * dist, sine * dist, 0 );
+		return GetAbsoluteOrigin( ) + vector3d( cosine * dist, sine * dist, 0 );
 	}
 
-	void set_abs_origin( vector3d abs_origin )
-	{
+	void SetAbsOrigin( vector3d abs_origin ) {
 		if ( !util::exists( this ) ) return;
 		static const auto scene_offset = schema::dynamic_field_offset( "client.dll/C_BaseEntity/m_pGameSceneNode" );
 		static const auto offset = schema::dynamic_field_offset( "client.dll/CGameSceneNode/m_vecAbsOrigin" );
@@ -117,31 +116,31 @@ public:
 		Member<VClass*>( scene_offset )->Member<vector3d>( offset ) = abs_origin;
 	}
 
-	int max_health( ) {
+	int GetMaxHealth( ) {
 		if ( !util::exists( this ) ) return -1;
 		static const auto offset = schema::dynamic_field_offset( "client.dll/C_BaseEntity/m_iMaxHealth" );
 		return Member<int>( offset );
 	}
 
-	int health( ) {
+	int GetHealth( ) {
 		if ( !util::exists( this ) ) return -1;
 		static const auto offset = schema::dynamic_field_offset( "client.dll/C_BaseEntity/m_iHealth" );
 		return Member<int>( offset );
 	}
 
-	std::int8_t life_state( ) {
+	std::int8_t GetLifeState( ) {
 		if ( !util::exists( this ) ) return -1;
 		return schema_member<std::int8_t>( "client.dll/C_BaseEntity/m_lifeState" );
 	}
 
 	////////////////////
 
-	bool ally( ) {
-		if ( !util::exists( this ) || !util::exists( global::g_LocalEntity ) ) return false;
-		return reinterpret_cast<C_BaseEntity*>( global::g_LocalEntity )->team_number( ) == this->team_number( );
+	bool IsAllyWith( C_BaseEntity* w ) {
+		if ( !util::exists( this ) || !util::exists( w ) ) return false;
+		return w->GetTeamNumber( ) == this->GetTeamNumber( );
 	}
 
-	CEntityIdentity* identity( ) noexcept {
+	CEntityIdentity* GetIdentity( ) noexcept {
 		if ( !util::exists( this ) ) return nullptr;
 
 		return Member<CEntityIdentity*>( 0x10 );

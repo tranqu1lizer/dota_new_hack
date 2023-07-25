@@ -2,10 +2,10 @@
 
 bool CHeroBar::can_draw_for( C_DOTA_BaseNPC_Hero* h ) {
 	if ( !h ||
-		 h->ally( ) ||
-		 h->identity( )->dormant( ) ||
-		 h->life_state( ) != 0 ||
-		 h->illusion( )
+		 h->IsAllyWith( context.local_entity ) ||
+		 h->GetIdentity( )->IsDormant( ) ||
+		 h->GetLifeState( ) != 0 ||
+		 h->IsIllusion( )
 		 )
 		return false;
 
@@ -19,15 +19,15 @@ void CHeroBar::draw_health( const bool off ) {
 			continue;
 
 		vector2d scr;
-		vector3d pos = hero->abs_origin( );
-		pos.z += hero->health_bar_offset( );
+		vector3d pos = hero->GetAbsoluteOrigin( );
+		pos.z += hero->GetHBOffset( );
 
 		if ( !CRenderGameSystem::GetInstance( )->GetVectorInScreenSpace( pos, scr ) )
 			continue;
 
 		off ? scr.y -= 43 : scr.y -= 39;
 
-		drawing::DrawTextForeground( DrawData.GetFont( "Monofonto", font_size ), std::to_string( hero->health( ) ), ImVec2{ scr.x, scr.y }, font_size, ImColor{ 255,255,255 }, true );
+		drawing::DrawTextForeground( DrawData.GetFont( "Monofonto", font_size ), std::to_string( hero->GetHealth( ) ), ImVec2{ scr.x, scr.y }, font_size, ImColor{ 255,255,255 }, true );
 	}
 }
 
@@ -38,8 +38,8 @@ void CHeroBar::draw_mana( ) {
 			continue;
 
 		vector2d scr;
-		vector3d pos = hero->abs_origin( );
-		pos.z += hero->health_bar_offset( );
+		vector3d pos = hero->GetAbsoluteOrigin( );
+		pos.z += hero->GetHBOffset( );
 
 		if ( !CRenderGameSystem::GetInstance( )->GetVectorInScreenSpace( pos, scr ) )
 			continue;

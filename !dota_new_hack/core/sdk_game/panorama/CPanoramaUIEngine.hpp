@@ -2,6 +2,7 @@
 
 #include "../definitions.h"
 #include <fstream>
+#include "../IEngineClient.hpp"
 
 class CUIPanel;
 class CPanel2D;
@@ -71,11 +72,11 @@ public:
 		return std::span{ Member<PanelListNode*>( 0xf8 ), size };
 	}
 
-	CPanel2D* create_panel( const char* id, const char* parent_name ) {
+	FORCEINLINE CPanel2D* create_panel( const char* id, const char* parent_name ) {
 		const auto symbol = this->make_symbol( "Panel" );
 		auto parent = this->FindPanel( parent_name );
 		if ( !symbol || !parent ) return nullptr;
-		return CallVFunc<29, CPanel2D*>( symbol, id, parent );
+		return create_panel( id, parent );
 	}
 
 	CPanel2D* create_panel( const char* id, CUIPanel* parent ) {
@@ -88,8 +89,7 @@ public:
 		return CallVFunc<29, CPanel2D*>( symbol, id, parent );
 	}
 
-	CUIPanel* GetPanelPtr( PanelHandle_t& handle )
-	{
+	CUIPanel* GetPanelPtr( PanelHandle_t& handle ) {
 		return CallVFunc<34, CUIPanel*>( handle );
 	}
 
@@ -109,21 +109,8 @@ public:
 		CallVFunc<88>( panel, script, context, 0, 0, 0 );
 	}
 
-	void RunScript( const char* pname, char const* script, char const* context ) {
+	FORCEINLINE void RunScript( const char* pname, char const* script, char const* context ) {
 		RunScript( FindPanel( pname ), script, context );
-	}
-
-	void ExecuteScript( char const* s ) {
-		RunScript( "Hud", s, global::bIsInGame ? "panorama/layout/base_hud.xml" : "panorama/layout/base.xml" );
-	}
-
-	void play_sound_effect( const std::string_view& ev_name ) {
-		const auto str = std::format( "$.DispatchEvent( 'PlaySoundEffect', '{}' );", ev_name );
-		this->RunScript(
-			this->FindPanel( "Hud" ),
-			str.data( ),
-			global::bIsInGame ? "panorama/layout/base_hud.xml" : "panorama/layout/base.xml"
-		);
 	}
 
 	CPanoramaSymbol make_symbol( const char* string ) {
@@ -136,7 +123,7 @@ public:
 		CallVFunc<40, void>( event, panel, handler );
 	}
 
-	void register_event_handler_client( const std::string_view& str, CUIPanel* panel, FastDelegate0<void> handler ) {
+	FORCEINLINE void register_event_handler_client( const std::string_view& str, CUIPanel* panel, FastDelegate0<void> handler ) {
 		register_event_handler_client( CPanoramaUIEngine::get( )->AccessUIEngine( )->make_symbol( str.data( ) ), panel, handler.GetAbstractDelegate( ) );
 	}
 
@@ -144,7 +131,7 @@ public:
 		CallVFunc<42, void>( event, panel, handler );
 	}
 
-	void unregister_event_handler( const std::string_view& str, CUIPanel* panel, FastDelegate0<void> handler ) {
+	FORCEINLINE void unregister_event_handler( const std::string_view& str, CUIPanel* panel, FastDelegate0<void> handler ) {
 		unregister_event_handler( CPanoramaUIEngine::get( )->AccessUIEngine( )->make_symbol( str.data( ) ), panel, handler.GetAbstractDelegate( ) );
 	}
 

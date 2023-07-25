@@ -32,19 +32,19 @@ public:
 	CEntityIdentity* m_pPrevByClass;
 	CEntityIdentity* m_pNextByClass;
 public:
-	const char* entity_name( ) const {
+	const char* GetEntityName( ) const {
 		return internalName ? internalName : entityName;
 	}
 	
-	const std::string_view& entity_name_view( ) const {
+	const std::string_view& GetEntityNameView( ) const {
 		return internalName ? internalName : entityName;
 	}
 
-	bool has_name( ) const {
+	bool HasName( ) const {
 		return ( (std::uintptr_t)entity && (std::uintptr_t)this && (internalName || entityName) );
 	}
 
-	bool dormant( ) const {
+	bool IsDormant( ) const {
 		return (this && entity) && ( flags[0] & 0x80 );
 	}
 };

@@ -14,9 +14,9 @@ public:
 __forceinline static T* get( ){ static auto inst = (T*)util::get_interface( dll, inter );return inst;};
 
 #define DEFINE_INTERFACE(T, dll, inter) private:\
-static auto GetInstanceImpl( ) {static auto inst = (T*)util::get_interface( dll, inter ); return inst;}\
+__forceinline static auto GetInstanceImpl( ) {static auto inst = (T*)util::get_interface( dll, inter ); return inst;}\
 public: \
-static auto& get( ) {return *GetInstanceImpl( );}
+__forceinline static auto& get( ) {return *GetInstanceImpl( );}
 
 #define FIND_FN( dll_name, fn, sig, fn_name, relative_call )\
 fn = (decltype(fn))util::find_pattern( (util::fast_strcmp(dll_name, "client.dll")==0) ? global::client : (HMODULE)util::get_module_base_ansi( dll_name ), sig, fn_name ); \
@@ -37,3 +37,10 @@ if(!var) {\
 spdlog::critical( "{} is nullptr", #var );\
 return 0;\
 }
+
+#define GETTER(type, name, offset) __forceinline type name() {\
+if ( util::exists( reinterpret_cast<std::uintptr_t*>( this ) ) )\
+    return Member<type>( offset );\
+throw std::runtime_error{ "getter err" }; }
+
+#define FIELD(type, name, offset) __forceinline type& name() { return Field<type>(offset); }

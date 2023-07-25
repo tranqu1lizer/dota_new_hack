@@ -82,10 +82,3 @@ public:
 		return *(T*)( (std::uintptr_t)this + offset );
 	}
 };
-
-#define GETTER(type, name, offset) type name() {\
-if ( util::exists( reinterpret_cast<std::uintptr_t*>( this ) ) )\
-    return Member<type>( offset );\
-throw std::runtime_error{ "getter err" }; }
-
-#define FIELD(type, name, offset) type& name() { return Field<type>(offset); }
