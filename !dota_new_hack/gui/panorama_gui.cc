@@ -43,7 +43,7 @@ void ChangerTreeChanged_Handler( ) {
 	if ( !dropdown_sel || (std::uintptr_t)dropdown_sel == 0x1 )
 		return spdlog::critical( "{}(): dropdown_sel = nullptr;\n",__FUNCTION__  );
 
-	if ( !util::fast_strcmp( (char*)dropdown_sel, "Default" ) )
+	if ( !util::fast_strcmp( dropdown_sel, "Default" ) )
 		return features::tree_changer.restore_trees( );
 
 	features::tree_changer.change_trees( dropdown_sel );
@@ -140,7 +140,7 @@ void CPanoramaGUI::register_events( ) {
 void CPanoramaGUI::show( ) {
 	auto ui_engine = CPanoramaUIEngine::get( );
 
-	if ( CUIPanel* root = ui_engine->AccessUIEngine( )->FindPanel( global::in_game ? "DotaHud" : "DotaDashboard" ); root ) {
+	if ( CUIPanel* root = ui_engine->AccessUIEngine( )->FindPanel( global::bIsInGame ? "DotaHud" : "DotaDashboard" ); root ) {
 
 		if ( !main_panel ) {
 			main_panel = ui_engine->AccessUIEngine( )->create_panel( "mainmenu", root )->UIPanel( );

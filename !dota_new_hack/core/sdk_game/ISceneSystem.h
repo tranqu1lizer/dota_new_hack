@@ -111,13 +111,7 @@ public:
 };
 
 class ISceneSystem : VClass {
-public:
-	static auto get( )
-	{
-		static auto inst = static_cast<ISceneSystem*>( util::get_interface( "scenesystem.dll", "SceneSystem_002" ) );
-
-		return inst;
-	}
+	PDEFINE_INTERFACE( ISceneSystem, "scenesystem.dll", "SceneSystem_002" );
 
 	auto GetAllActiveSceneWorld( ) {
 		CUtlVector<CSceneWorld*> scenes;

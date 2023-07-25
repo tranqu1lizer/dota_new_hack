@@ -6,17 +6,20 @@ class CBasePlayerController : public C_BaseEntity {
 public:
 	CHandle pawn( ) {
 		if ( !util::exists( this ) ) return CHandle{};
-		static const auto offset = schema::dynamic_field_offset( "client.dll/CBasePlayerController/m_hPawn" );
-		return Member<CHandle>( offset );
+		return schema_member<CHandle>( "client.dll/CBasePlayerController/m_hPawn" );
+	}
+
+	bool IsLocalPlayer( ) {
+		if ( !util::exists( this ) ) return false;
+		return schema_member<bool>( "client.dll/CBasePlayerController/m_bIsLocalPlayerController" );
 	}
 };
 
 class C_DOTAPlayerController : public CBasePlayerController {
 public:
-	CHandle assigned_hero( ) {
+	CHandle GetAssignedHero( ) {
 		if ( !util::exists( this ) ) return CHandle{};
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTAPlayerController/m_hAssignedHero" );
-		return Member<CHandle>( offset );
+		return schema_member<CHandle>( "client.dll/C_DOTAPlayerController/m_hAssignedHero" );
 	}
 };
 

@@ -1,4 +1,5 @@
 // Файлы указаний помогают среде IDE Visual Studio интерпретировать идентификаторы Visual C++
 // (например, имена функций и макросов).
 // Дополнительные сведения: https://go.microsoft.com/fwlink/?linkid=865984
-#define PAD(sz) private:std::byte PPCAT( _pad, __COUNTER__ )[ sz ];public:
+#define DEFINE_INTERFACE(T, dll, inter) public:__forceinline static T* get( ){ static auto inst = (T*)util::get_interface( dll, inter ); return inst;}
+#define PAD(sz) private:char PPCAT( _pad, __COUNTER__ )[ sz ];public:

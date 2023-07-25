@@ -17,7 +17,7 @@ void CCameraHack::on_mouse_wheeled( CDOTA_Camera* cam, int delta ) {
 }
 
 void CCameraHack::toggle_fog( ) {
-	auto fog_controller = (C_FogController*)context.entities[ "env_fog_controller" ];
+	auto fog_controller = (C_FogController*)context.entities[ "env_fog_controller" ].front( );
 	if ( !fog_controller || !fog_controller->fog_params( ) )
 		return;
 

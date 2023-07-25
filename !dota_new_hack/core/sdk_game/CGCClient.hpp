@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../definitions.h"
 #include "NormalClass.hpp"
 #include "../lib/protobuf/files/dota_gcmessages_common_lobby.pb.h"
 
@@ -123,20 +124,7 @@ public:
 };
 
 class CGCClient : public VClass {
-public:
-	static auto GetInstanceImpl( )
-	{
-		static CGCClient* inst = nullptr;
-		if ( !inst ) inst = static_cast<CGCClient*>( util::get_interface( "client.dll", "DOTA_CLIENT_GCCLIENT" ) );
-
-		return inst;
-	}
-public:
-	static auto& get( )
-	{
-		return *GetInstanceImpl( );
-	}
-
+	DEFINE_INTERFACE( CGCClient, "client.dll", "DOTA_CLIENT_GCCLIENT" );
 	GETTER( CUtlVector<CSharedObjectListener*>, so_listeners, 0x270 );
 
 	auto lobby_manager( ) {

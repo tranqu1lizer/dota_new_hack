@@ -15,16 +15,6 @@
 #define SPDLOG_WCHAR_TO_UTF8_SUPPORT
 #define SPDLOG_EOL ""
 
-#define PPCAT_NX(a,b) a##b
-#define PPCAT(a,b) PPCAT_NX(a,b)
-#define PAD(sz)\
-private:\
-char PPCAT( _pad, __COUNTER__ )[ sz ];\
-public:
-
-#define PPAD(sz) char PPCAT(_pad, __COUNTER__)[sz];
-#define CASE_STRING( x ) case static_cast<int>( x ) : return #x // lwss
-
 #include <iostream>
 #include <format>
 #include <queue>
@@ -38,6 +28,8 @@ public:
 #include <future>
 #include <spdlog/spdlog.h>
 #include <spdlog/stopwatch.h>
+
+#include "core/definitions.h"
 
 #define CURL_STATICLIB
 #pragma comment(lib, "wldap32.lib" )
@@ -86,6 +78,7 @@ public:
 #include "core/sdk_game/panorama/CUILength.hpp"
 #include "core/sdk_game/panorama/CUIRenderDeviceSource2.hpp"
 #include "core/sdk_game/ISchemaSystem.hpp"
+#include "core/sdk_game/INetworkClientService.h"
 #include "core/sdk_game/IEngineClient.hpp"
 #include "core/sdk_game/CSource2Client.hpp"
 #include "core/sdk_game/IMaterialSystem2.h"
@@ -117,7 +110,7 @@ public:
 #include "core/sdk_game/CVScriptGameSystem.hpp"
 #include "core/sdk_game/CLocalize.h"
 #include "core/sdk_game/CRenderGameSystem.hh"
-#include "core/sdk_game/Data.hpp"
+#include "core/context.hpp"
 #include "core/sdk_game/CDOTAItemDefintion.hpp"
 #include "core/sdk_game/CDOTAInput.h"
 #include "core/functions.hpp"

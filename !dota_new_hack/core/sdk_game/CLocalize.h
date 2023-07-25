@@ -1,18 +1,9 @@
 #pragma once
 
-class CLocalize : public VClass {
-	static auto GetInstanceImpl( )
-	{
-		static CLocalize* inst = nullptr;
-		if ( !inst ) inst = static_cast<CLocalize*>( util::get_interface( "localize.dll", "Localize_001" ) );
+#include "../definitions.h"
 
-		return inst;
-	}
-public:
-	static auto& GetInstance( )
-	{
-		return *GetInstanceImpl( );
-	}
+class CLocalize : public VClass {
+	DEFINE_INTERFACE( CLocalize, "localize.dll", "Localize_001" );
 
 	auto FindString( const std::string_view& str ) {
 		return CallVFunc<16, const char*>( str.data( ) );

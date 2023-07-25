@@ -18,7 +18,7 @@ class CHandle
 public:
     CHandle( std::uint32_t data = -1 ) : _data( data ) {}
 
-    EntityIndex_t to_index() const noexcept {
+    EntityIndex_t ToIndex() const noexcept {
         return { _data & ENTITYHANDLE_MASK };
     }
     bool is_valid() const noexcept {

@@ -13,8 +13,7 @@
 #include "../lib/protobuf/files/dota_usercmd.pb.h"
 #include "../lib/protobuf/files/gameevents.pb.h"
 
-struct NetMessageInfo_t
-{
+struct NetMessageInfo_t {
 	void* pad;
 	void* pProtobufBinding;
 };

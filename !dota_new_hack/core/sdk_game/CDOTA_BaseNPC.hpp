@@ -77,7 +77,7 @@ public:
 		if ( !util::exists( this ) ) return -1;
 		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_hAbilities" );
 		const auto& ability = Member<CHandle>( offset + ( 4 * idx ) );
-		return ability.to_index( );
+		return ability.ToIndex( );
 	}
 
 	EntityIndex_t item_in_slot( const int idx )
@@ -87,7 +87,7 @@ public:
 			static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_Inventory" );
 
 			const auto item = Member<CHandle>( offset + ( 4 * idx ) );
-			if ( item.is_valid( ) ) return item.to_index( );
+			if ( item.is_valid( ) ) return item.ToIndex( );
 		}
 		return -1;
 	}

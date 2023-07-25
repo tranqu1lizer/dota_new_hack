@@ -61,7 +61,7 @@ class C_DOTA_PlayerResource : VClass {
 	char pad[ 0x590 ];
 public:
 	static C_DOTA_PlayerResource* get( ) {
-		static const auto ptr = AddressWrapper( CSource2Client::get( )->GetVF( 102 ) ).get_offset( 4 ).get_address_from_instruction_ptr( 3 );
+		static const auto ptr = AddressWrapper( util::vmt( (uintptr_t)CSource2Client::get( ), 102 ) ).get_offset( 4 ).get_address_from_instruction_ptr( 3 );
 		if ( !ptr ) return nullptr;
 		return *(C_DOTA_PlayerResource**)ptr;
 	}

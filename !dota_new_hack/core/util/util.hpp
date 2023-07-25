@@ -31,7 +31,8 @@ namespace util {
 	void allocate_console( );
 	void clear_console( );
 	char* fast_strstr( const char* haystack, const char* needle );
-	int fast_strcmp( char* s1, char* s2 );
+	int fast_strcmp( const char* s1, const char* s2 );
+	int fast_stricmp( const char* s1,const char* s2);
 	FARPROC find_export_address( HMODULE hModule, const char* lpProcName );
 	void* memset( void* src, int val, unsigned __int64 count );
 	int memcmp( const void* buf1,const void* buf2,size_t count );

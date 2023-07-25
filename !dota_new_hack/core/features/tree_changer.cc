@@ -22,7 +22,7 @@ void CTreeChanger::change_trees( const std::string_view& new_tree ) {
 
 		ent->set_model( m_tree_model_names[ new_tree.data( ) ] );
 
-		m_tree_model_names[ new_tree.data( ) ] == "models/props_tree/ti7/ggbranch.vmdl" ? ent->set_color( 200, 165, 0, 255 ) : ent->set_color( 255, 255, 255, 255 );
+		m_tree_model_names[ new_tree.data( ) ] == "models/props_tree/ti7/ggbranch.vmdl" ? ent->SetColor( 200, 165, 0, 255 ) : ent->SetColor( 255, 255, 255, 255 );
 
 		if ( game_scene ) {
 			game_scene->schema_member<float>( "client.dll/CGameSceneNode/m_flScale" ) = m_tree_models[ m_tree_model_names[ new_tree.data( ) ] ];
@@ -37,7 +37,7 @@ void CTreeChanger::restore_trees( ) {
 			tree.first->set_model( tree.second.m_model_name );
 
 			tree.first->set_mesh_group_mask( tree.second.m_mesh_group );
-			tree.first->set_color( 255, 255, 255, 255 );
+			tree.first->SetColor( 255, 255, 255, 255 );
 			tree.first->schema_member<SchemaVClass*>( "client.dll/C_BaseEntity/m_pGameSceneNode" )->schema_member<float>( "client.dll/CGameSceneNode/m_flScale" ) = tree.second.m_scale;
 			tree.first->schema_member<SchemaVClass*>( "client.dll/C_BaseEntity/m_pGameSceneNode" )->CallVFunc<10>( 4 );
 		}

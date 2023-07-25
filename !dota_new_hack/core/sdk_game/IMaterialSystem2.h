@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../definitions.h"
 #include "NormalClass.hpp"
 #include "../util/util.hpp"
 #include "valve/CUtlStringToken.hpp"
@@ -43,12 +44,7 @@ public:
 };
 
 class IMaterialSystem2 : VClass {
-public:
-	static auto get( )
-	{
-		static IMaterialSystem2* inst = static_cast<IMaterialSystem2*>( util::get_interface( "materialsystem2.dll", "VMaterialSystem2_001" ) );
-		return inst;
-	}
+	PDEFINE_INTERFACE( IMaterialSystem2, "materialsystem2.dll", "vmaterialsystem2_001" );
 
 	IMaterial2*** FindOrCreateMaterialFromResource( IMaterial2*** material, const char* material_name ) {
 		return CallVFunc<14, IMaterial2***>( material, material_name );

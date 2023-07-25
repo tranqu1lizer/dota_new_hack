@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../definitions.h"
 #include "../global.hpp"
 
 #include "valve/CUtlTSHash.hpp"
@@ -315,18 +316,7 @@ public:
 };
 
 class CSchemaSystem : VClass {
-	static auto GetInstanceImpl( )
-	{
-		static CSchemaSystem* inst = nullptr;
-		if ( !inst ) inst = static_cast<CSchemaSystem*>( util::get_interface( "schemasystem.dll", "SchemaSystem_001" ) );
-
-		return inst;
-	}
-public:
-	static auto& GetInstance( )
-	{
-		return *GetInstanceImpl( );
-	}
+	DEFINE_INTERFACE( CSchemaSystem, "schemasystem.dll", "SchemaSystem_001" );
 
 	inline CSchemaSystemTypeScope* GlobalTypeScope( void ) {
 		return CallVFunc<11, CSchemaSystemTypeScope*>( );
@@ -376,7 +366,7 @@ public:
 			const auto& mod = paths.at( 0 );
 			const auto& cls = paths.at( 1 );
 
-			if ( const auto module_scope = CSchemaSystem::GetInstance( ).FindTypeScopeForModule( mod.c_str( ) ); module_scope ) {
+			if ( const auto module_scope = CSchemaSystem::get( ).FindTypeScopeForModule( mod.c_str( ) ); module_scope ) {
 				if ( const auto class_info = module_scope->FindDeclaredClass( cls.c_str( ) ); class_info ) {
 					std::cout << "		class " << class_info->m_name << " (size: 0x" << std::hex << class_info->m_size << ")" << std::endl;
 					for ( auto k = 0; k < class_info->m_align; k++ ) {
@@ -403,7 +393,7 @@ public:
 			const auto& cls = paths.at( 1 );
 			const auto& var = paths.at( 2 );
 
-			if ( const auto module_scope = CSchemaSystem::GetInstance( ).FindTypeScopeForModule( mod.c_str( ) ); module_scope ) {
+			if ( const auto module_scope = CSchemaSystem::get( ).FindTypeScopeForModule( mod.c_str( ) ); module_scope ) {
 				if ( const auto class_info = module_scope->FindDeclaredClass( cls.c_str( ) ); class_info ) {
 					for ( auto k = 0; k < class_info->m_align; k++ ) {
 						if ( const auto& field = &class_info->m_fields[k]; field ) {

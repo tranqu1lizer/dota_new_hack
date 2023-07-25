@@ -23,7 +23,7 @@ public:
 class CEntity2NetworkClasses {
 public:
 	virtual ~CEntity2NetworkClasses( ) = 0; // 0
-	virtual bool GetEntity2Networkable( int iIndex, IClientNetworkable* ) = 0; // 1
+	virtual bool GetEntity2Networkable( EntityIndex_t, IClientNetworkable* ) = 0; // 1
 	virtual int GetSomeNumber( ) = 0; // 2
 	virtual void* CreateEntity2Networkable( void*, void* ) = 0; // 3
 	virtual void GetEntity2ClassName( IClientNetworkable*, bool ) = 0; // 4

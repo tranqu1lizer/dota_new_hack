@@ -55,7 +55,7 @@ void hook::functions::FrameStageNotify( CSource2Client* rcx, ClientFrameStage_t 
 void hook::functions::CreateMove( CDOTAInput* rcx, int slot, bool should_fill_weaponselect ) {
 	reinterpret_cast<decltype( &CreateMove )>( hook::original::fpCreateMove )( rcx, slot, should_fill_weaponselect );
 
-	auto user_cmd = (CDota2UserCmdPB*)( (char*)rcx + 0x68 * ( rcx->m_sequence_number % 150 ) + slot + 0x10 );
+	auto user_cmd = (CDota2UserCmdPB*)( (char*)rcx + 0x68 * ( rcx->m_sequence_number /* CSource2Client::get( )->GetUsercmdSequenceNumber( ); */ % 150 ) + slot + 0x10 );
 
 	if ( user_cmd->has_crosshairtrace( ) && user_cmd->has_cameraposition_x( ) && user_cmd->has_cameraposition_y( ) )
 		context.traced_cursor = vector3d{ user_cmd->crosshairtrace( ).x( ), user_cmd->crosshairtrace( ).y( ), user_cmd->crosshairtrace( ).z( ) };
@@ -113,7 +113,7 @@ EGCResults hook::functions::SGCRetrieveMessage( ISteamGameCoordinator* thisptr, 
 				const auto& group = body.match_groups( iterator );
 
 				if ( const auto searching = group.players_searching( ); searching > 0 ) {
-					const auto res = CLocalize::GetInstance( ).FindStringSafely( matchgroups.at( iterator ).data( ) );
+					const auto res = CLocalize::get( ).FindStringSafely( matchgroups.at( iterator ).data( ) );
 					std::wcout << util::utf8_decode( res ) << L": " << searching << "\n";
 				}
 			}
@@ -150,14 +150,14 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 	if ( rdx->messageID == DOTA_UM_TE_DotaBloodImpact ) return 0;
 	else if ( rdx->messageID == GE_SosStartSoundEvent ) {
 		auto msg_ = (CMsgSosStartSoundEvent*)r8;
-		
+
 		C_BaseEntity* ent = context.entities[ msg_->source_entity_index( ) ];
 
 		if ( !ent )
 			goto end;
 
 		if ( util::fast_strstr( ent->GetClientClass( )->m_pNetworkName, "Creep" ) )
-			return 0;
+			return nullptr;
 	}
 	else if ( rdx->messageID == UM_ParticleManager ) {
 		CUserMsg_ParticleManager* particle_manager = static_cast<CUserMsg_ParticleManager*>( r8 );
@@ -175,24 +175,16 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 	if ( rdx->messageID != net_Tick )
 		goto end;
 
-	if ( global::in_game = IEngineClient::GetInstance( ).in_game( ); global::in_game ) {
+	if ( global::bIsInGame = IEngineClient::get( ).IsInGame( ); global::bIsInGame ) {
 
 		if ( !global::g_LocalEntity ) {
-			static C_DOTAPlayerController** players = (decltype( players ))util::get_absolute_address( util::find_pattern( global::client, "\x48\x8B\x05\xCC\xCC\xCC\xCC\x89\xBE", "", false ), 3, 7 );
 			context.DotaHud = CPanoramaUIEngine::get( )->AccessUIEngine( )->FindPanel( "DotaHud" );
 
-			if ( const auto local_controller = players[ 0 ]; local_controller ) {
-				IClientNetworkable ent;
+			global::g_Controller = (std::uintptr_t)context.entities.GetLocalPlayer( );
 
-				global::g_Controller = (std::uintptr_t)local_controller;
-				if ( g_pGameEntitySystem->m_pEnt2NetClasses->GetEntity2Networkable( local_controller->assigned_hero( ).to_index( ).Get( ), &ent ) ) {
-					global::g_LocalEntity = (std::uintptr_t*)ent.m_pEntity;
-				}
-
-#ifdef _DEBUG
-				ICVar::get( )[ "stats_display" ]->m_values.i32 = 5;
-#endif
-			}
+			IClientNetworkable ent;
+			if ( global::g_Controller && CSource2Client::get( )->GetEntity2NetworkableByHandle( context.entities.GetLocalPlayer( )->GetAssignedHero( ), &ent ) )
+				global::g_LocalEntity = (std::uintptr_t*)ent.m_pEntity;
 		}
 
 		static bool camera_hooked = false;
@@ -257,7 +249,7 @@ long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UI
 	// OLD IMGUI MENU
 	pGui->Render( );
 
-	if ( global::in_game && g_pGameRules && ( g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS || g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_PRE_GAME ) ) {
+	if ( global::bIsInGame && g_pGameRules && ( g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS || g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_PRE_GAME ) ) {
 
 		if ( panorama_gui.draw_health )
 			features::hero_bar.draw_health( panorama_gui.draw_mana_bar );
@@ -316,7 +308,7 @@ long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UI
 void hook::functions::OnMouseWheeled( CDOTA_Camera* rcx, int delta ) {
 	reinterpret_cast<decltype( &OnMouseWheeled )>( hook::original::fpOnMouseWheeled )( rcx, delta );
 
-	if ( pGui->mouse_distance && !pGui->show && global::in_game ) {
+	if ( pGui->mouse_distance && !pGui->show && global::bIsInGame ) {
 		features::camera_hack.on_mouse_wheeled( rcx, delta );
 		if ( panorama_gui.camera_dist_slider && panorama_gui.camera_dist_slider->children( ).Count( ) ) {
 			const auto casted2volvotype = static_cast<float>( features::camera_hack.get_distance( ) - features::camera_hack.get_min_distance( ) ) / ( features::camera_hack.get_max_distance( ) - features::camera_hack.get_min_distance( ) );
@@ -338,12 +330,13 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 				ReturnSpoofer::DoSpoofCall<DWORD>( MessageBoxA, &JMP_RBX_TEST,
 					NULL, "", "Spoofed call", NULL );
 
-			std::cout << Result << "\n";
+			auto mod = (C_BaseModelEntity*)global::g_LocalEntity;
+
+			mod->SetColor( 0, 0, 0 );
 		}
 		if ( wParam == VK_F2 ) {
-			CDOTA_Hud_ErrorMsg* err_msgs = context.DotaHud->find_child_traverse( "ErrorMessages" )->panel2d_as< CDOTA_Hud_ErrorMsg>( );
+			context.DotaHud->find_child_traverse( "ErrorMessages" )->panel2d_as< CDOTA_Hud_ErrorMsg>( )->ShowErrorMessage( "toster" );
 
-			err_msgs->ShowErrorMessage( "toster" );
 		}
 		if ( wParam == VK_F4 ) {
 			CBaseFileSystem& fs = CBaseFileSystem::get( );

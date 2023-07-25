@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../definitions.h"
 #include "INetChan.h"
 
 struct NetworkCallback_t
@@ -19,17 +20,10 @@ private:
 
 class CNetworkMessages
 {
-	char pad_0000[ 1208 ];
-public:
+	PDEFINE_INTERFACE( CNetworkMessages, "networksystem.dll", "NetworkMessagesVersion001" );
+
+	PAD( 0x4B8 );
 	std::array<NetworkCallback_t, 32 * 8>* m_net_callbacks; // 0x4C0
-
-	static auto get( )
-	{
-		static CNetworkMessages* inst = nullptr;
-		if ( !inst ) inst = static_cast<CNetworkMessages*>( util::get_interface( "networksystem.dll", "NetworkMessagesVersion001" ) );
-
-		return inst;
-	}
 
 	virtual void RegisterNetworkCategory( unsigned int, const char* ) = 0;
 	virtual void AssociateNetMessageWithChannelCategoryAbstract( NetMessageHandle_t*, unsigned int, bool ) = 0;
@@ -50,7 +44,7 @@ public:
 		if ( !m_net_callbacks ) return nullptr;
 
 		for ( auto& callback : *m_net_callbacks ) {
-			if ( callback.m_name && callback.m_func_ptr && !util::fast_strcmp( callback.m_name, (char*)callback_name ) ) {
+			if ( callback.m_name && callback.m_func_ptr && !util::fast_strcmp( callback.m_name, callback_name ) ) {
 				return callback.m_func_ptr;
 			}
 		}

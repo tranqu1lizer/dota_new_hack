@@ -132,16 +132,7 @@ struct ConVarID
 using t_CvarCallback = void( * )( const ConVarID& id, int unk1, const CVarValue_t* val, const CVarValue_t* old_val );
 
 class ICVar : VClass {
-	static auto GetInstanceImpl( )
-	{
-		static ICVar* inst = static_cast<ICVar*>( util::get_interface( "tier0.dll", "VEngineCvar007" ) );
-		return inst;
-	}
-public:
-	static auto& get( )
-	{
-		return *GetInstanceImpl( );
-	}
+	DEFINE_INTERFACE( ICVar, "tier0.dll", "VEngineCvar007" );
 
 	CVar* register_convar( const char* name, std::int32_t* index = nullptr ) {
 		static some_function RegisterConVar = util::get_absolute_address( util::find_pattern( global::client, "\xE8\xCC\xCC\xCC\xCC\x48\x63\x6E\x40", "", false ), 1, 5 );

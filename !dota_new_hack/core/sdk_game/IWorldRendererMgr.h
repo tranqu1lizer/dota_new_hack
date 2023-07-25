@@ -65,14 +65,8 @@ public:
 };
 
 class IWorldRendererMgr : VClass {
-	char pad[ 0x88 ]; // 0x0
-public:
-	static auto get( )
-	{
-		static auto inst = static_cast<IWorldRendererMgr*>( util::get_interface( "worldrenderer.dll", "WorldRendererMgr001" ) );
+	PDEFINE_INTERFACE( IWorldRendererMgr, "worldrenderer.dll", "WorldRendererMgr001" );
 
-		return inst;
-	}
-
+	PAD( 0x88 ); // 0x0
 	CUtlVector<CSingleWorldRep*> m_single_worlds; // 0x90
 };

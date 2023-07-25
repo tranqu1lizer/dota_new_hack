@@ -34,7 +34,7 @@ public:
 	C_CollisionProperty* collision( ) {
 		return Member< C_CollisionProperty* >( 0x310 );
 	}
-	void set_color( const unsigned short r, const unsigned short g, const unsigned short b, const unsigned short a = 255 ) {
+	void SetColor( const unsigned short r, const unsigned short g, const unsigned short b, const unsigned short a = 255 ) {
 		if ( !util::exists( this ) ) return;
 		static const auto offset = schema::dynamic_field_offset( "client.dll/C_BaseModelEntity/m_clrRender" );
 		const auto base = ( (std::uintptr_t)this + offset );

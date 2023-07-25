@@ -29,18 +29,7 @@ class NetChannelInfo;
 
 class IEngineClient : VClass
 {
-	static auto GetInstanceImpl( )
-	{
-		static IEngineClient* inst = nullptr;
-		if ( !inst ) inst = static_cast<IEngineClient*>( util::get_interface( "engine2.dll", "Source2EngineToClient001" ) );
-
-		return inst;
-	}
-public:
-	static auto& GetInstance( )
-	{
-		return *GetInstanceImpl( );
-	}
+	DEFINE_INTERFACE( IEngineClient, "engine2.dll", "Source2EngineToClient001" );
 
 	int localplayer_index( )
 	{
@@ -49,7 +38,7 @@ public:
 		return idx == -1 ? -1 : idx + 1;
 	}
 
-	bool in_game( ) {
+	bool IsInGame( ) {
 		return static_cast<bool>(CallVFunc<30, unsigned char>( ));
 	}
 

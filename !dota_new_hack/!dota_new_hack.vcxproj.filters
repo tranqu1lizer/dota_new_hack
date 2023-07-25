@@ -103,7 +103,7 @@
     <ClInclude Include="core\sdk_game\CEconItem.hpp">
       <Filter>core\sdk_game</Filter>
     </ClInclude>
-    <ClInclude Include="core\sdk_game\Data.hpp">
+    <ClInclude Include="core\context.hpp">
       <Filter>core\sdk_game</Filter>
     </ClInclude>
     <ClInclude Include="core\sdk_game\ICVar.hpp">
@@ -481,6 +481,8 @@
     <ClInclude Include="core\sdk_game\IWorldRendererMgr.h" />
     <ClInclude Include="core\sdk_game\valve\KV.h" />
     <ClInclude Include="core\sdk_game\CEntity2NetworkClasses.h" />
+    <ClInclude Include="core\sdk_game\INetworkClientService.h" />
+    <ClInclude Include="core\definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -751,11 +753,11 @@
     <None Include="core\sdk_game\CGameEntitySystem.hpp">
       <Filter>core\sdk_game</Filter>
     </None>
-    <None Include="cpp.hint" />
     <None Include="core\overwolf_server.py">
       <Filter>core</Filter>
     </None>
     <None Include="core\ids2name.py" />
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="core\lib\minhook\libMinHook.x64.lib">

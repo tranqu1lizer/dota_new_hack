@@ -253,6 +253,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="core\definitions.h" />
     <ClInclude Include="core\features\camera_hack.h" />
     <ClInclude Include="core\features\hero_bar.h" />
     <ClInclude Include="core\features\inventory_changer.h" />
@@ -365,12 +366,13 @@
     <ClInclude Include="core\sdk_game\C_DOTAPlayerController.hpp" />
     <ClInclude Include="core\sdk_game\CGameEventManager.h" />
     <ClInclude Include="core\sdk_game\C_DOTAGamerules.hpp" />
-    <ClInclude Include="core\sdk_game\Data.hpp" />
+    <ClInclude Include="core\context.hpp" />
     <ClInclude Include="core\sdk_game\CHandle.hpp" />
     <ClInclude Include="core\sdk_game\IMaterialSystem2.h" />
     <ClInclude Include="core\sdk_game\INetChan.h" />
     <ClInclude Include="core\sdk_game\color.hpp" />
     <ClInclude Include="core\sdk_game\CDOTA_ParticleManager.hpp" />
+    <ClInclude Include="core\sdk_game\INetworkClientService.h" />
     <ClInclude Include="core\sdk_game\IResourceSystem.hpp" />
     <ClInclude Include="core\sdk_game\C_BaseCombatCharacter.hpp" />
     <ClInclude Include="core\sdk_game\C_Properties.hpp" />

@@ -80,18 +80,7 @@ class ISteamGameCoordinator;
 
 class ISteamClient
 {
-	static auto GetInstanceImpl( )
-	{
-		static ISteamClient* inst = nullptr;
-		if ( !inst ) inst = static_cast<ISteamClient*>( util::get_interface( "steamclient64.dll", "SteamClient017" ) );
-
-		return inst;
-	}
-public:
-	static auto& get( )
-	{
-		return *GetInstanceImpl( );
-	}
+	DEFINE_INTERFACE( ISteamClient, "steamclient64.dll", "SteamClient017" );
 
 	inline static HSteamPipe( *GetHSteamPipe )( ) = nullptr;
 	inline static HSteamUser( *GetHSteamUser )( ) = nullptr;

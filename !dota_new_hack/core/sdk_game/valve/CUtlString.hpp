@@ -1,9 +1,5 @@
 #pragma once
 
-//-----------------------------------------------------------------------------
-// Simple string class. 
-// NOTE: This is *not* optimal! Use in tools, but not runtime code
-//-----------------------------------------------------------------------------
 class CUtlString
 {
 public:
@@ -31,7 +27,7 @@ public:
 	size_t		Length() const
 	{
 		if (m_pString)
-			return strlen(m_pString);
+			return util::fast_strlen(m_pString);
 
 		return 0;
 	}
@@ -44,7 +40,7 @@ public:
 		if (!src)
 			return (Length() == 0);
 
-		return (strcmp(Get(), src) == 0);
+		return (util::fast_strcmp(Get(), src) == 0);
 	}
 
 	bool		IsEqual_CaseInsensitive(const char* src) const
@@ -52,7 +48,7 @@ public:
 		if (!src)
 			return (Length() == 0);
 
-		return (_stricmp(Get(), src) == 0);
+		return (util::fast_stricmp(Get(), src) == 0);
 	}
 
 
@@ -71,7 +67,7 @@ public:
 			if (src.IsEmpty())
 				return false;
 
-			return (strcmp(m_pString, src.m_pString) == 0);
+			return (util::fast_strcmp(m_pString, src.m_pString) == 0);
 		}
 	}
 	bool operator!=(const CUtlString& src) const { return !operator==(src); }
@@ -92,8 +88,8 @@ public:
 	typedef const char* AltArgumentType_t;
 
 	// These can be used for utlvector sorts.
-	static int __cdecl SortCaseInsensitive(const CUtlString* pString1, const CUtlString* pString2) { return _stricmp(pString1->String(), pString2->String()); }
-	static int __cdecl SortCaseSensitive(const CUtlString* pString1, const CUtlString* pString2) { return strcmp(pString1->String(), pString2->String()); }
+	static int __cdecl SortCaseInsensitive(const CUtlString* pString1, const CUtlString* pString2) { return util::fast_stricmp(pString1->String(), pString2->String()); }
+	static int __cdecl SortCaseSensitive(const CUtlString* pString1, const CUtlString* pString2) { return util::fast_strcmp(pString1->String(), pString2->String()); }
 
 	// Empty string for those times when you need to return an empty string and
 	// either don't want to pay the construction cost, or are returning a
@@ -105,6 +101,5 @@ public:
 	}
 
 private:
-	// If m_pString is not NULL, it points to the start of the string, and the memory allocation.
 	char* m_pString;
 };

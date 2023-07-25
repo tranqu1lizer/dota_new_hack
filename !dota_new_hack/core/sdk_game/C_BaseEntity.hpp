@@ -62,7 +62,7 @@ public:
 		return CallVFunc<0, CSchemaClassBinding*>( );
 	}
 
-	ClientClass* client_class( ) {
+	ClientClass* GetClientClass( ) {
 		return CallVFunc<33, ClientClass*>( );
 	}
 

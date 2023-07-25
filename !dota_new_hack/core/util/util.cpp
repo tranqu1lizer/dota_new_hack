@@ -75,7 +75,7 @@ void* util::find_game_system( const char* name ) {
 	auto factory_it = factory_first;
 
 	while ( factory_it && util::exists((void*)factory_it->m_name) ) {
-		if ( !util::fast_strcmp( (char*)factory_it->m_name, (char*)name ) ) {
+		if ( !util::fast_strcmp( factory_it->m_name, name ) ) {
 			const auto res = factory_it->game_system( );
 			return res ? res : factory_it->get_game_system();
 		}
@@ -256,12 +256,24 @@ char* util::fast_strstr( const char* haystack, const char* needle )
 	return NULL;
 }
 
-int util::fast_strcmp( char* s1, char* s2 )
+int util::fast_strcmp( const char* s1, const char* s2 )
 {
 	while ( *s1 == *s2++ )
 		if ( *s1++ == 0 )
 			return ( 0 );
 	return ( *(const unsigned char*)s1 - *(const unsigned char*)( s2 - 1 ) );
+}
+
+int util::fast_stricmp( const char* s1,const char* s2)
+{
+	while ( toupper( *s1 ) == toupper( *s2 ) )
+	{
+		if ( *s1 == 0 )
+			return 0;
+		s1++;
+		s2++;
+	}
+	return toupper( *(unsigned const char*)s1 ) - toupper( *(unsigned const char*)( s2 ) );
 }
 
 FARPROC __stdcall util::find_export_address( HMODULE hModule, const char* ImportName )

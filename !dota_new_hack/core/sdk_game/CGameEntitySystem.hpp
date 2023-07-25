@@ -3,15 +3,6 @@
 #include "CEntityIdentity.hpp"
 #include "EntityIndex.hpp"
 
-#undef DELETE
-
-enum class EntityPVS : uint8_t {
-	UPDATE,
-	LEAVE,
-	CREATE,
-	DELETE,
-};
-
 class C_DOTAPlayerController;
 class CEntity2SaveRestore;
 class CEntity2NetworkClasses;

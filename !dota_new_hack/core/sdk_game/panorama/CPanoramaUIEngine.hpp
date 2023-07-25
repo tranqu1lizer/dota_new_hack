@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../definitions.h"
 #include <fstream>
 
 class CUIPanel;
@@ -39,14 +40,7 @@ struct PanelHandle_t
 
 class CPanoramaUIEngine : IAppSystem
 {
-public:
-	static auto get( )
-	{
-		static CPanoramaUIEngine* inst = nullptr;
-		if ( !inst ) inst = static_cast<CPanoramaUIEngine*>( util::get_interface( "panorama.dll", "PanoramaUIEngine001" ) );
-
-		return inst;
-	}
+	PDEFINE_INTERFACE( CPanoramaUIEngine, "panorama.dll", "PanoramaUIEngine001" );
 
 	CUIEngineSource2* AccessUIEngine( ) {
 		return *(CUIEngineSource2**)( (std::uintptr_t)this + 0x28 );
@@ -120,7 +114,7 @@ public:
 	}
 
 	void ExecuteScript( char const* s ) {
-		RunScript( "Hud", s, global::in_game ? "panorama/layout/base_hud.xml" : "panorama/layout/base.xml" );
+		RunScript( "Hud", s, global::bIsInGame ? "panorama/layout/base_hud.xml" : "panorama/layout/base.xml" );
 	}
 
 	void play_sound_effect( const std::string_view& ev_name ) {
@@ -128,7 +122,7 @@ public:
 		this->RunScript(
 			this->FindPanel( "Hud" ),
 			str.data( ),
-			global::in_game ? "panorama/layout/base_hud.xml" : "panorama/layout/base.xml"
+			global::bIsInGame ? "panorama/layout/base_hud.xml" : "panorama/layout/base.xml"
 		);
 	}
 
@@ -159,7 +153,7 @@ public:
 			auto ret = current.uiPanel;
 			if ( this->is_valid_panel_ptr( ret ) ) {
 				const auto name = *reinterpret_cast<const char**>( reinterpret_cast<std::uintptr_t>( ret ) + 0x10 );
-				if ( name && !util::fast_strcmp( (char*)name, (char*)s_name ) )
+				if ( name && !util::fast_strcmp( name, s_name ) )
 					return ret;
 			}
 		}

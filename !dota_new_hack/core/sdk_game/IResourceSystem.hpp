@@ -24,13 +24,7 @@ public:
 };
 
 class IResourceSystem : VClass {
-public:
-	static auto get( )
-	{
-		static IResourceSystem* inst = static_cast<IResourceSystem*>( util::get_interface( "resourcesystem.dll", "ResourceSystem013" ) );
-
-		return inst;
-	}
+	PDEFINE_INTERFACE( IResourceSystem, "resourcesystem.dll", "ResourceSystem013" );
 
 	template<ResourceType_t resource_type>
 	auto GetResourceByHash( const ResourceId_t id ) const

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../definitions.h"
+
 enum SearchPathAdd_t
 {
 	PATH_ADD_TO_HEAD,		// First path searched
@@ -8,28 +10,13 @@ enum SearchPathAdd_t
 
 enum FileWarningLevel_t
 {
-	// A problem!
 	FILESYSTEM_WARNING = -1,
-
-	// Don't print anything
 	FILESYSTEM_WARNING_QUIET = 0,
-
-	// On shutdown, report names of files left unclosed
 	FILESYSTEM_WARNING_REPORTUNCLOSED,
-
-	// Report number of times a file was opened, closed
 	FILESYSTEM_WARNING_REPORTUSAGE,
-
-	// Report all open/close events to console ( !slow! )
 	FILESYSTEM_WARNING_REPORTALLACCESSES,
-
-	// Report all open/close/read events to the console ( !slower! )
 	FILESYSTEM_WARNING_REPORTALLACCESSES_READ,
-
-	// Report all open/close/read/write events to the console ( !slower! )
 	FILESYSTEM_WARNING_REPORTALLACCESSES_READWRITE,
-
-	// Report all open/close/read/write events and all async I/O file events to the console ( !slower(est)! )
 	FILESYSTEM_WARNING_REPORTALLACCESSES_ASYNC,
 };
 
@@ -52,7 +39,6 @@ enum FilesystemOpenExFlags_t
 {
 	FSOPEN_UNBUFFERED = ( 1 << 0 ),
 	FSOPEN_FORCE_TRACK_CRC = ( 1 << 1 ),		// This makes it calculate a CRC for the file (if the file came from disk) regardless
-	// of the IFileList passed to RegisterFileWhitelist.
 	FSOPEN_NEVERINPACK = ( 1 << 2 ),		// 360 only, hint to FS that file is not allowed to be in pack file
 };
 
@@ -76,39 +62,12 @@ enum FileSystemSeek_t
 	FILESYSTEM_SEEK_TAIL = 2,
 };
 
-typedef unsigned long CRC32_t;
-
-class CUnverifiedCRCFile
-{
-public:
-	char m_PathID[ MAX_PATH ];
-	char m_Filename[ MAX_PATH ];
-	CRC32_t m_CRC;
-};
-
 typedef int FileFindHandle_t;
-typedef void* FileNameHandle_t;
-
-class IFileList;
-class CSysModule;
-class KeyValues;
-class CUtlBuffer;
 class FileHandle_t;
 
 class CBaseFileSystem : VClass
 {
-	static auto GetInstanceImpl( )
-	{
-		static CBaseFileSystem* inst = nullptr;
-		if ( !inst ) inst = static_cast<CBaseFileSystem*>( util::get_interface( "filesystem_stdio.dll", "VFileSystem017" ) );
-
-		return inst;
-	}
-public:
-	static auto& get( )
-	{
-		return *GetInstanceImpl( );
-	}
+	DEFINE_INTERFACE( CBaseFileSystem, "filesystem_stdio.dll", "VFileSystem017" );
 
 	FileHandle_t* OpenFile( const char* file_path, const char* options, const char* path_id = nullptr ) {
 		return CallVFunc<78, FileHandle_t*>( file_path, options, 0, path_id );
