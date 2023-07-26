@@ -138,8 +138,8 @@ public:
 			return Member<CNewParticleEffect*>( 0x10 );
 		}
 	};
-	GETTER( CUtlVector<ParticleContainer*>, GetParticles, 0x80 );
-	FIELD( uint32_t, handle, 0xb8 );
+	OFFSET( CUtlVector<ParticleContainer*>, GetParticles, 0x80 );
+	OFFSET_REF( uint32_t, handle, 0xb8 );
 
 	ParticleWrapper create_particle( const char* name, ParticleAttachment_t attachType, C_BaseEntity* ent );
 	void destroy_particle( const char* name, C_BaseEntity* entity );

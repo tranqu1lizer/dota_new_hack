@@ -14,8 +14,6 @@
 
 #include "../sdk_game/valve/bitstream.hpp"
 #include "undocumented.hpp"
-#include "city.hpp"
-#include "cityhash32.hxx"
 
 enum entity_state : byte {
 	state_updated = 0,

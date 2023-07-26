@@ -45,11 +45,7 @@ public:
 	virtual void vfunc21( void ) = 0;
 };
 
-class CDOTAInventoryManager
-{
+class CDOTAInventoryManager {
 public:
-	CDOTAPlayerInventory* GetCDOTAPlayerInventory( ) {
-		if ( !this ) return nullptr;
-		return (CDOTAPlayerInventory*)(this + 0x118);
-	}
+	OFFSET( CDOTAPlayerInventory*, GetCDOTAPlayerInventory, 0x118 );
 };

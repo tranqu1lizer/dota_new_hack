@@ -41,7 +41,7 @@ void ChangerTreeChanged_Handler( ) {
 
 	const char* dropdown_sel = reinterpret_cast<CLabel*>( selected )->GetLabelText( );
 	if ( !dropdown_sel || (std::uintptr_t)dropdown_sel == 0x1 )
-		return spdlog::critical( "{}(): dropdown_sel = nullptr;\n",__FUNCTION__  );
+		return spdlog::critical( "{}(): dropdown_sel = nullptr;\n", __FUNCTION__ );
 
 	if ( !util::fast_strcmp( dropdown_sel, "Default" ) )
 		return features::tree_changer.restore_trees( );
@@ -64,6 +64,7 @@ bool CPanel2D__OnMouseButtonDown( CPanel2D* rcx, const MouseData_t& code ) {
 		if ( code.m_mouse_code == MouseCode::MOUSE_LEFT ) {
 			if ( rcx == panorama_gui.camera_fog_checkbox->panel2d_as( ) ) {
 				features::camera_hack.toggle_fog( );
+				panorama_gui.fog_enabled ^= true;
 			}
 			else if ( rcx == panorama_gui.changer_add_item_button->panel2d_as( ) ) {
 				ChangerAddItemButton_Handler( );
@@ -86,7 +87,7 @@ bool CPanel2D__OnMouseButtonDown( CPanel2D* rcx, const MouseData_t& code ) {
 			}
 		}
 	}
-end:
+
 	return reinterpret_cast<decltype( &CPanel2D__OnMouseButtonDown )>( origCPanel2D__OnMouseButtonDown )( rcx, code );
 }
 
@@ -127,13 +128,13 @@ void CPanoramaGUI::register_events( ) {
 			hook::install_hook( aOnMouseButtonDown, &CPanel2D__OnMouseButtonDown, &origCPanel2D__OnMouseButtonDown, "CPanel2D::OnMouseButtonDown" );
 			hook::install_hook( aOnMouseMove, &CPanel2D__OnMouseMove, &origCPanel2D__OnMouseMove, "CPanel2D::OnMouseMove" );
 		}
-		ui_engine->register_event_handler_client( "SliderValueChanged", camera_dist_slider, camera_dist_handler );
-		ui_engine->register_event_handler_client( "DropDownSelectionChanged", changer_TreesDropDown, changer_tree_handler );
+		ui_engine->RegisterEventHandlerClient( "SliderValueChanged", camera_dist_slider, camera_dist_handler );
+		ui_engine->RegisterEventHandlerClient( "DropDownSelectionChanged", changer_TreesDropDown, changer_tree_handler );
 	}
 	else {
 		// hook::uninstall_hook( aOnMouseButtonDown );
-		ui_engine->unregister_event_handler( "SliderValueChanged", camera_dist_slider, camera_dist_handler );
-		ui_engine->unregister_event_handler( "DropDownSelectionChanged", changer_TreesDropDown, changer_tree_handler );
+		ui_engine->UnregisterEventHandler( "SliderValueChanged", camera_dist_slider, camera_dist_handler );
+		ui_engine->UnregisterEventHandler( "DropDownSelectionChanged", changer_TreesDropDown, changer_tree_handler );
 	}
 }
 
@@ -143,8 +144,8 @@ void CPanoramaGUI::show( ) {
 	if ( CUIPanel* root = ui_engine->AccessUIEngine( )->FindPanel( IEngineClient::get( ).IsInGame( ) ? "DotaHud" : "DotaDashboard" ); root ) {
 
 		if ( !main_panel ) {
-			main_panel = ui_engine->AccessUIEngine( )->create_panel( "mainmenu", root )->UIPanel( );
-			if ( ui_engine->AccessUIEngine( )->is_valid_panel_ptr( main_panel ) ) {
+			main_panel = ui_engine->AccessUIEngine( )->CreatePanel( "mainmenu", root )->UIPanel( );
+			if ( ui_engine->AccessUIEngine( )->IsValidPanelPtr( main_panel ) ) {
 				main_panel->LoadLayoutFile( "file://{resources}/menu.xml", false );
 			}
 			camera_dist_slider = main_panel->FindChildTraverse( "camera_distance_slider" );

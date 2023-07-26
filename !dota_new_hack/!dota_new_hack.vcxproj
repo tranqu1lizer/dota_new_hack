@@ -243,8 +243,8 @@
     <ClCompile Include="core\sdk_game\panorama\CPanelStyle.hpp" />
     <ClCompile Include="core\sdk_game\panorama\CUIInput.hpp" />
     <ClCompile Include="core\sdk_game\panorama\CUILength.hpp" />
-    <ClCompile Include="core\util\city.cpp" />
     <ClCompile Include="core\util\drawing.cc" />
+    <ClCompile Include="core\util\fnv1a.cc" />
     <ClCompile Include="core\util\mapbox.hxx" />
     <ClCompile Include="core\util\request.cc" />
     <ClCompile Include="core\util\util.cpp" />
@@ -342,6 +342,7 @@
     <ClInclude Include="core\lib\protobuf\files\usercmd.pb.h" />
     <ClInclude Include="core\lib\protobuf\files\usermessages.pb.h" />
     <ClInclude Include="core\lib\protobuf\files\valveextensions.pb.h" />
+    <ClInclude Include="core\schema.h" />
     <ClInclude Include="core\sdk_game\CDOTAInput.h" />
     <ClInclude Include="core\sdk_game\CDOTAItemDefintion.hpp" />
     <ClInclude Include="core\sdk_game\CEntity2NetworkClasses.h" />
@@ -407,9 +408,8 @@
     <ClInclude Include="core\sdk_game\valve\VMatrix.hpp" />
     <ClInclude Include="core\sdk_game\vector.hpp" />
     <ClInclude Include="core\util\address_wrapper.hxx" />
-    <ClInclude Include="core\util\city.hpp" />
-    <ClInclude Include="core\util\cityhash32.hxx" />
     <ClInclude Include="core\util\drawing.h" />
+    <ClInclude Include="core\util\fnv1a.h" />
     <ClInclude Include="core\util\HTTPRequest.hpp" />
     <ClInclude Include="core\util\request.h" />
     <ClInclude Include="core\util\undocumented.hpp" />

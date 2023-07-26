@@ -26,10 +26,10 @@ public:
 		if ( !util::exists( this ) ) return nullptr;
 		return Member<T*>( 0x8 );
 	}
-	GETTER( CUIPanel*, GetParent, 0x18 );
-	GETTER( CUtlVector<CUIPanel*>, GetChildren, 0x28 );
-	GETTER( CPanelStyle*, GetStyle, 0x70 );
-	GETTER( CUtlVector<CPanoramaSymbol>, GetClasses, 0x160 );
+	OFFSET( CUIPanel*, GetParent, 0x18 );
+	OFFSET( CUtlVector<CUIPanel*>, GetChildren, 0x28 );
+	OFFSET_INLINE( CPanelStyle, GetStyle, 0x70 );
+	OFFSET( CUtlVector<CPanoramaSymbol>, GetClasses, 0x160 );
 
 	void SetDialogVariable( const char* variable, int value ) {
 		CallVFunc< 293, void>( variable, value );

@@ -6,7 +6,7 @@
 
 class C_DOTAGamerules : VClass {
 public:
-    float game_time( ) {
+    float GetGameTime( ) {
         if ( !util::exists( this ) ) return -0.1f;
 
         auto gpGlobals = (void*)CGlobalVars::get( );
@@ -70,29 +70,6 @@ public:
         return result;
     }
 
-	/*float game_time( ) {
-		const auto g_vars = CGlobalVars::GetInstance( );
-		if ( !this ) return g_vars->m_current_time;
-
-		if ( auto magic_time_func = g_vars->Member<some_function>( 0x20 ); magic_time_func ) {
-			magic_time_func( true, g_vars );
-		}
-				
-		const auto total_paused_ticks = Member<uint32_t>( schema::dynamic_field_offset( "client.dll/C_DOTAGamerules/m_nTotalPausedTicks" ) );
-		return g_vars->m_current_time - total_paused_ticks * g_vars->m_tick_to_seconds;
-	}*/
-
-	DOTA_GameState game_state( ) {
-        if ( !util::exists( this ) ) return DOTA_GAMERULES_STATE_INIT;
-
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTAGamerules/m_nGameState" );
-		return Member<DOTA_GameState>( offset );
-	}
-
-	DOTA_GameMode game_mode( ) {
-        if ( !util::exists( this ) ) return DOTA_GAMEMODE_NONE;
-
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTAGamerules/m_iGameMode" );
-		return Member<DOTA_GameMode>( offset );
-	}
+    OFFSET( DOTA_GameState, GetGameState, schema::C_DOTAGamerules::m_nGameState );
+    OFFSET( DOTA_GameMode, GetGameMode, schema::C_DOTAGamerules::m_iGameMode );
 };

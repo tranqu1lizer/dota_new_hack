@@ -137,7 +137,7 @@ class ICVar : VClass {
 	CVar* register_convar( const char* name, std::int32_t* index = nullptr ) {
 		static some_function RegisterConVar = util::get_absolute_address( util::find_pattern( global::client, "\xE8\xCC\xCC\xCC\xCC\x48\x63\x6E\x40", "", false ), 1, 5 );
 		if ( !RegisterConVar.valid() ) return nullptr;
-		uint64 cvar_[ 2 ];
+		uint64_t cvar_[ 2 ];
 		RegisterConVar( cvar_, name, 0 );
 
 		if ( index ) *index = cvar_[ 0 ];

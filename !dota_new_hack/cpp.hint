@@ -3,3 +3,4 @@
 // Дополнительные сведения: https://go.microsoft.com/fwlink/?linkid=865984
 #define DEFINE_INTERFACE(T, dll, inter) public:__forceinline static T* get( ){ static auto inst = (T*)util::get_interface( dll, inter ); return inst;}
 #define PAD(sz) private:char PPCAT( _pad, __COUNTER__ )[ sz ];public:
+#define OFFSET(type, name, offset) __forceinline type name() {return *reinterpret_cast<type*>( reinterpret_cast<std::uintptr_t>( this ) + offset ); }

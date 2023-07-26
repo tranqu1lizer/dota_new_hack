@@ -37,10 +37,7 @@ public:
 	bool m_bPadding; // 0x67	
 };
 
-class C_FogController : public C_BaseEntity
-{
+class C_FogController : public C_BaseEntity {
 public:
-	auto fog_params( ) {
-		return MemberNotPtr<fogparams_t>( 0x528 );
-	}
+	OFFSET_INLINE( fogparams_t, GetFogParams, 0x528 );
 };

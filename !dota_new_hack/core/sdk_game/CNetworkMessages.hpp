@@ -18,8 +18,7 @@ private:
 	std::uintptr_t unk2[ 2 ];
 };
 
-class CNetworkMessages
-{
+class CNetworkMessages {
 	PDEFINE_INTERFACE( CNetworkMessages, "networksystem.dll", "NetworkMessagesVersion001" );
 
 	PAD( 0x4B8 );

@@ -9,14 +9,13 @@ public:
 	CUtlVector<CHandle> wearables( ) {
 		if ( !util::exists( this ) ) return CUtlVector<CHandle>{};
 
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_BaseCombatCharacter/m_hMyWearables" );
-		return *( CUtlVector<CHandle>* )( (uintptr_t)this + offset );
+		return *( CUtlVector<CHandle>* )( (uintptr_t)this + schema::C_BaseCombatCharacter::m_hMyWearables );
 	}
 
 	int blood_color(){
 		if ( !util::exists( this ) ) return -1;
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_BaseCombatCharacter/m_bloodColor" );
-		return Member<int>( offset );
+
+		return Member<int>( schema::C_BaseCombatCharacter::m_bloodColor );
 	}
 
 	inline void wearables_changed( ) {
@@ -29,8 +28,7 @@ class CAttributeContainer : VClass
 {
 public:
 	C_EconItemView* econ_item( ) {
-		static const auto offset = schema::dynamic_field_offset( "client.dll/CAttributeContainer/m_Item" );
-		return (C_EconItemView* )( (uintptr_t)this + offset );
+		return (C_EconItemView* )( (uintptr_t)this + schema::CAttributeContainer::m_Item );
 	}
 };
 
@@ -38,7 +36,6 @@ class C_EconEntity : VClass
 {
 public:
 	CAttributeContainer* attribute_container( ) {
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_EconEntity/m_AttributeManager" );
-		return (CAttributeContainer*)( (uintptr_t)this + offset );
+		return (CAttributeContainer*)( (uintptr_t)this + schema::C_EconEntity::m_AttributeManager );
 	}
 };

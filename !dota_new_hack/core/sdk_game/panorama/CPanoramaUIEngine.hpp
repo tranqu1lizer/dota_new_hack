@@ -72,20 +72,20 @@ public:
 		return std::span{ Member<PanelListNode*>( 0xf8 ), size };
 	}
 
-	FORCEINLINE CPanel2D* create_panel( const char* id, const char* parent_name ) {
+	FORCEINLINE CPanel2D* CreatePanel( const char* id, const char* parent_name ) {
 		const auto symbol = this->make_symbol( "Panel" );
 		auto parent = this->FindPanel( parent_name );
 		if ( !symbol || !parent ) return nullptr;
-		return create_panel( id, parent );
+		return CreatePanel( id, parent );
 	}
 
-	CPanel2D* create_panel( const char* id, CUIPanel* parent ) {
+	CPanel2D* CreatePanel( const char* id, CUIPanel* parent ) {
 		const auto symbol = this->make_symbol( "Panel" );
 		if ( !symbol || !parent ) return nullptr;
 		return CallVFunc<29, CPanel2D*>( symbol, id, parent );
 	}
 
-	CPanel2D* create_panel( CPanoramaSymbol symbol, const char* id, CUIPanel* parent ) {
+	CPanel2D* CreatePanel( CPanoramaSymbol symbol, const char* id, CUIPanel* parent ) {
 		return CallVFunc<29, CPanel2D*>( symbol, id, parent );
 	}
 
@@ -101,7 +101,7 @@ public:
 		CallVFunc<117>( );
 	}
 
-	bool is_valid_panel_ptr( CUIPanel* panel ) {
+	bool IsValidPanelPtr( CUIPanel* panel ) {
 		return CallVFunc<32, bool>( panel );
 	}
 
@@ -119,26 +119,26 @@ public:
 		return result;
 	}
 
-	void register_event_handler_client( CPanoramaSymbol event, CUIPanel* panel, CUtlAbstractDelegate handler ) {
+	void RegisterEventHandlerClient( CPanoramaSymbol event, CUIPanel* panel, CUtlAbstractDelegate handler ) {
 		CallVFunc<40, void>( event, panel, handler );
 	}
 
-	FORCEINLINE void register_event_handler_client( const std::string_view& str, CUIPanel* panel, FastDelegate0<void> handler ) {
-		register_event_handler_client( CPanoramaUIEngine::get( )->AccessUIEngine( )->make_symbol( str.data( ) ), panel, handler.GetAbstractDelegate( ) );
+	FORCEINLINE void RegisterEventHandlerClient( const std::string_view& str, CUIPanel* panel, FastDelegate0<void> handler ) {
+		RegisterEventHandlerClient( CPanoramaUIEngine::get( )->AccessUIEngine( )->make_symbol( str.data( ) ), panel, handler.GetAbstractDelegate( ) );
 	}
 
-	void unregister_event_handler( CPanoramaSymbol event, CUIPanel* panel, CUtlAbstractDelegate handler ) {
+	void UnregisterEventHandler( CPanoramaSymbol event, CUIPanel* panel, CUtlAbstractDelegate handler ) {
 		CallVFunc<42, void>( event, panel, handler );
 	}
 
-	FORCEINLINE void unregister_event_handler( const std::string_view& str, CUIPanel* panel, FastDelegate0<void> handler ) {
-		unregister_event_handler( CPanoramaUIEngine::get( )->AccessUIEngine( )->make_symbol( str.data( ) ), panel, handler.GetAbstractDelegate( ) );
+	FORCEINLINE void UnregisterEventHandler( const std::string_view& str, CUIPanel* panel, FastDelegate0<void> handler ) {
+		UnregisterEventHandler( CPanoramaUIEngine::get( )->AccessUIEngine( )->make_symbol( str.data( ) ), panel, handler.GetAbstractDelegate( ) );
 	}
 
 	CUIPanel* FindPanel( const char* s_name ) {
 		for ( const auto& current : this->panel_list<4096>( ) ) {
 			auto ret = current.uiPanel;
-			if ( this->is_valid_panel_ptr( ret ) ) {
+			if ( this->IsValidPanelPtr( ret ) ) {
 				const auto name = *reinterpret_cast<const char**>( reinterpret_cast<std::uintptr_t>( ret ) + 0x10 );
 				if ( name && !util::fast_strcmp( name, s_name ) )
 					return ret;

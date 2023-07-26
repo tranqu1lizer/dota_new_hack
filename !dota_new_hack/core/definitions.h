@@ -38,9 +38,7 @@ spdlog::critical( "{} is nullptr", #var );\
 return 0;\
 }
 
-#define GETTER(type, name, offset) __forceinline type name() {\
-if ( util::exists( reinterpret_cast<std::uintptr_t*>( this ) ) )\
-    return Member<type>( offset );\
-throw std::runtime_error{ "getter err" }; }
+#define OFFSET(type, name, offset) __forceinline type name() { return *reinterpret_cast<type*>( reinterpret_cast<std::uintptr_t>( this ) + offset ); }
 
-#define FIELD(type, name, offset) __forceinline type& name() { return Field<type>(offset); }
+#define OFFSET_REF(type, name, offset) __forceinline type& name() { return *(type*)( (std::uintptr_t)this + offset ); }
+#define OFFSET_INLINE(type, name, offset) __forceinline type* name() { return reinterpret_cast<type*>( reinterpret_cast<std::uintptr_t>( this ) + offset ); }

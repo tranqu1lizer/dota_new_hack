@@ -6,7 +6,7 @@
 class CPanel2D : public VClass
 {
 public:
-	GETTER( CUIPanel*, UIPanel, 0x8 );
+	OFFSET( CUIPanel*, UIPanel, 0x8 );
 
 	template<class T> void SetDialogVariable( const std::string_view& variable, T value ) {
 		UIPanel( )->SetDialogVariable( variable.data( ), value );

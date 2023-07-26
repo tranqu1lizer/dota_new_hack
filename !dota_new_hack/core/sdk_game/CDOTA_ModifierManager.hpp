@@ -4,46 +4,20 @@
 #include "valve/CUtlVector.hpp"
 #include "ISchemaSystem.hpp"
 #include "CHandle.hpp"
+#include "../schema.h"
 
-class CDOTA_Buff : public VClass {
+class CDOTA_Buff {
 public:
-	const char* GetBuffName( ) noexcept {
-		if ( !util::exists( this ) ) return nullptr;
-		static const auto offset = schema::dynamic_field_offset( "server.dll/CDOTA_Buff/m_name" );
-		return Member<const char*>( offset );
-	}
-
-	float GetDuration( ) noexcept {
-		if ( !util::exists( this ) ) return -1;
-		static const auto offset = schema::dynamic_field_offset( "server.dll/CDOTA_Buff/m_flDuration" );
-		return Member<float>( offset );
-	}
-
-	CHandle GetCaster( ) {
-		if ( !util::exists( this ) ) return CHandle{};
-		static const auto offset = schema::dynamic_field_offset( "server.dll/CDOTA_Buff/m_hCaster" );
-		return Member<CHandle>( offset );
-	}
-	
-	CHandle GetAbility( ) {
-		if ( !util::exists( this ) ) return CHandle{};
-		static const auto offset = schema::dynamic_field_offset( "server.dll/CDOTA_Buff/m_hAbility" );
-		return Member<CHandle>( offset );
-	}
-
-	CHandle GetParent( ) {
-		if ( !util::exists( this ) ) return CHandle{};
-		static const auto offset = schema::dynamic_field_offset( "server.dll/CDOTA_Buff/m_hParent" );
-		return Member<CHandle>( offset );
-	};
+	OFFSET( const char*, GetBuffName, schema::CDOTA_Buff::m_name );
+	OFFSET( float, GetDuration, schema::CDOTA_Buff::m_flDuration );
+	OFFSET( CHandle, GetCaster, schema::CDOTA_Buff::m_hCaster );
+	OFFSET( CHandle, GetAbility, schema::CDOTA_Buff::m_hAbility );
+	OFFSET( CHandle, GetParent, schema::CDOTA_Buff::m_hParent );
 };
 
 class CDOTA_ModifierManager : VClass {
 public:
-	CUtlVector<CDOTA_Buff*> GetModifiers( ) {
-		if ( !util::exists( this ) ) return CUtlVector<CDOTA_Buff*>{};
-		return Member<CUtlVector<CDOTA_Buff*>>( 0x10 );
-	}
+	OFFSET( CUtlVector<CDOTA_Buff*>, GetModifiers, 0x10 );
 
 	bool HasModifier( const char* modifier_name ) {
 		if ( !util::exists( this ) ) return false;

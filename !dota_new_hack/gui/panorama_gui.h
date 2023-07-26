@@ -30,6 +30,7 @@ public:
 	bool draw_mana_bar = false;
 	bool draw_health = false;
 	bool log_searching_players = false;
+	bool fog_enabled = false;
 	bool auto_accept = false;
 	bool draw_networthdelta = false;
 

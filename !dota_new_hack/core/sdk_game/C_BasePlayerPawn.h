@@ -25,20 +25,12 @@ public:
 	float m_flNewFarZ; // 0x3c	
 };
 
-class CPlayer_CameraServices : NormalClass
-{
+class CPlayer_CameraServices : NormalClass {
 public:
-	auto player_fog( ) {
-		const auto offset = schema::dynamic_field_offset( "client.dll/CPlayer_CameraServices/m_PlayerFog" );
-
-		return MemberNotPtr<C_fogplayerparams_t>( offset );
-	}
+	OFFSET_INLINE( C_fogplayerparams_t, GetPlayerFog, schema::CPlayer_CameraServices::m_PlayerFog );
 };
 
-class C_BasePlayerPawn : public C_BaseCombatCharacter
-{
+class C_BasePlayerPawn : public C_BaseCombatCharacter {
 public:
-	CPlayer_CameraServices* camera_services( ) {
-		return schema_member<CPlayer_CameraServices*>( "client.dll/C_BasePlayerPawn/m_pCameraServices" );
-	}
+	OFFSET( CPlayer_CameraServices*, GetCameraServices, schema::C_BasePlayerPawn::m_pCameraServices );
 };

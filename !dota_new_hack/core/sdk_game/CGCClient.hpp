@@ -116,18 +116,11 @@ class CDOTAGCClientSystem : public CSharedObjectListener {
 public:
 	char pad_0000[192]; // 0x0
 	uint64_t m_pSteamUser; // 0xC0
-
-	/*bool SendReadyUp( bool state = true ) {
-		typedef bool( __fastcall* fn_t )( CDOTAGCClientSystem*, bool );
-		return reinterpret_cast<fn_t>( global::patterns::CDOTAGCClientSystem__SendReadyUp )( this, state );
-	}*/
 };
 
 class CGCClient : public VClass {
 	DEFINE_INTERFACE( CGCClient, "client.dll", "DOTA_CLIENT_GCCLIENT" );
-	GETTER( CUtlVector<CSharedObjectListener*>, so_listeners, 0x270 );
 
-	auto lobby_manager( ) {
-		return MemberNotPtr<CDOTAGCClientLobbyManager>( 0x6d0 );
-	}
+	OFFSET( CUtlVector<CSharedObjectListener*>, GetListeners, 0x270 );
+	OFFSET_INLINE( CDOTAGCClientLobbyManager, GetLobbyManager, 0x6d0 );
 };

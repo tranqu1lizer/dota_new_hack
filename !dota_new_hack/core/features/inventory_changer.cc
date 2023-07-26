@@ -3,7 +3,7 @@
 CEconItem* CInventoryChanger::create_fake_item( std::uint16_t def_index ) {
 	auto& gcc = CGCClient::get( );
 	if ( !( &gcc ) ) return nullptr;
-	const auto dota_inventory = reinterpret_cast<CDOTAPlayerInventory*>( gcc.so_listeners( )[1] );
+	const auto dota_inventory = reinterpret_cast<CDOTAPlayerInventory*>( gcc.GetListeners( )[1] );
 	if ( !( &dota_inventory ) ) return nullptr;
 
 	CEconItem* item = dota_inventory->CreateItemObject( );
@@ -26,7 +26,7 @@ CEconItem* CInventoryChanger::create_fake_item( std::uint16_t def_index ) {
 void CInventoryChanger::process_equips( CMsgClientToGCEquipItems* msg ) {
 	auto& gcc = CGCClient::get( );
 	if ( !( &gcc ) || !msg ) return;
-	const auto dota_inventory = reinterpret_cast<CDOTAPlayerInventory*>( gcc.so_listeners( )[1] );
+	const auto dota_inventory = reinterpret_cast<CDOTAPlayerInventory*>( gcc.GetListeners( )[1] );
 	if ( !( &dota_inventory ) ) return;
 
 	for ( auto& equip : msg->equips( ) ) {

@@ -9,6 +9,7 @@
 #include "ISchemaSystem.hpp"
 #include "CSource2Client.hpp"
 #include "../util/util.hpp"
+#include "../schema.h"
 
 enum DataUpdateType_t {
 	DATA_UPDATE_CREATED = 0,  // indicates it was created +and+ entered the pvs
@@ -56,8 +57,15 @@ enum class DOTATeam_t : int {
 	DOTA_TEAM_COUNT = 14
 };
 
-class C_BaseEntity : public SchemaVClass {
+class C_BaseEntity : public VClass {
 public:
+	OFFSET( CEntityIdentity*, GetIdentity, 0x10 );
+	OFFSET( int, GetMaxHealth, schema::C_BaseEntity::m_iMaxHealth );
+	OFFSET( int, GetHealth, schema::C_BaseEntity::m_iHealth );
+	OFFSET( std::int8_t, GetLifeState, schema::C_BaseEntity::m_lifeState );
+	OFFSET( CHandle, GetOwner, schema::C_BaseEntity::m_hOwnerEntity );
+	OFFSET( DOTATeam_t, GetTeamNumber, schema::C_BaseEntity::m_iTeamNum );
+
 	CSchemaClassBinding* Schema_DynamicBinding( ) {
 		return CallVFunc<0, CSchemaClassBinding*>( );
 	}
@@ -66,83 +74,28 @@ public:
 		return CallVFunc<33, ClientClass*>( );
 	}
 
-	////////////////////
-
 	int GetIndex( ) {
 		if ( !util::exists( this ) ) return -1;
-		return this->GetIdentity( )->entHandle & 0x7FFF;
-	}
-
-	CHandle GetOwner( ) {
-		if ( !util::exists( this ) ) return CHandle{};
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_BaseEntity/m_hOwnerEntity" );
-		return Member<CHandle>( offset );
-	}
-
-	DOTATeam_t GetTeamNumber( ) {
-		if ( !util::exists( this ) ) return DOTATeam_t::DOTA_TEAM_INVALID;
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_BaseEntity/m_iTeamNum" );
-		return Member<DOTATeam_t>( offset );
+		return GetIdentity( )->entHandle & 0x7FFF;
 	}
 
 	vector3d GetAbsoluteOrigin( )
 	{
 		if ( !util::exists( this ) ) return vector3d{ -1,-1,-1 };
 
-		const auto scene = *(uintptr_t*)( (uintptr_t)this + schema::dynamic_field_offset( "client.dll/C_BaseEntity/m_pGameSceneNode" ) );
+		const auto scene = *(uintptr_t*)( (uintptr_t)this + schema::C_BaseEntity::m_pGameSceneNode );
 
-		return *(vector3d*)( scene + schema::dynamic_field_offset( "client.dll/CGameSceneNode/m_vecAbsOrigin" ) );
-	}
-
-	float GetRotation( ) {
-		return schema_member<SchemaVClass*>( "client.dll/C_BaseEntity/m_pGameSceneNode" )
-			->schema_member<QAngle>( "client.dll/CGameSceneNode/m_angRotation" ).roll_deg;
-	}
-
-	// Gets the point in front of the entity at the specified distance
-	vector3d GetForwardVector( float dist ) {
-		const auto rot = GetRotation( );
-		const float casted_rot = GetRotation( ) * M_PI / 180;
-
-		const float sine = sinf( casted_rot ), cosine = cosf( casted_rot );
-		return GetAbsoluteOrigin( ) + vector3d( cosine * dist, sine * dist, 0 );
+		return *(vector3d*)( scene + schema::CGameSceneNode::m_vecAbsOrigin );
 	}
 
 	void SetAbsOrigin( vector3d abs_origin ) {
 		if ( !util::exists( this ) ) return;
-		static const auto scene_offset = schema::dynamic_field_offset( "client.dll/C_BaseEntity/m_pGameSceneNode" );
-		static const auto offset = schema::dynamic_field_offset( "client.dll/CGameSceneNode/m_vecAbsOrigin" );
 
-		Member<VClass*>( scene_offset )->Member<vector3d>( offset ) = abs_origin;
+		Member<VClass*>( schema::C_BaseEntity::m_pGameSceneNode )->Member<vector3d>( schema::CGameSceneNode::m_vecAbsOrigin ) = abs_origin;
 	}
-
-	int GetMaxHealth( ) {
-		if ( !util::exists( this ) ) return -1;
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_BaseEntity/m_iMaxHealth" );
-		return Member<int>( offset );
-	}
-
-	int GetHealth( ) {
-		if ( !util::exists( this ) ) return -1;
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_BaseEntity/m_iHealth" );
-		return Member<int>( offset );
-	}
-
-	std::int8_t GetLifeState( ) {
-		if ( !util::exists( this ) ) return -1;
-		return schema_member<std::int8_t>( "client.dll/C_BaseEntity/m_lifeState" );
-	}
-
-	////////////////////
 
 	bool IsAllyWith( C_BaseEntity* w ) {
 		if ( !util::exists( this ) || !util::exists( w ) ) return false;
 		return w->GetTeamNumber( ) == this->GetTeamNumber( );
-	}
-
-	CEntityIdentity* GetIdentity( ) noexcept {
-		if ( !util::exists( this ) ) return nullptr;
-
-		return Member<CEntityIdentity*>( 0x10 );
 	}
 };

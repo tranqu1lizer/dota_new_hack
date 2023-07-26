@@ -7,53 +7,14 @@
 class C_DOTA_BaseNPC : public C_BaseCombatCharacter
 {
 public:
-	float max_mana( ) {
-		if ( !util::exists( this ) ) return -1;
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_flMaxMana" );
-		return Member<float>( offset );
-	}
-
-	float mana( ) {
-		if ( !util::exists( this ) ) return -1;
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_flMana" );
-		return Member<float>( offset );
-	}
-
-	bool moving( ) {
-		if ( !util::exists( this ) ) return -1;
-		
-		return schema_member<bool>( "client.dll/C_DOTA_BaseNPC/m_bIsMoving" );
-	}
-
-	int movespeed( ) {
-		if ( !util::exists( this ) ) return -1;
-
-		return schema_member<int>( "client.dll/C_BaseEntity/m_iMoveSpeed" );
-	}
-
-	uint64_t GetUnitState( ) {
-		if ( !util::exists( this ) ) return -1;
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_nUnitState64" );
-		return Member<uint64_t>( offset );
-	}
-
-	int32_t GetUnitType( ) {
-		if ( !util::exists( this ) ) return -1;
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_iUnitType" );
-		return Member<int32_t>( offset );
-	}
-
-	CDOTA_ModifierManager* modifier_manager( ) {
-		if ( !util::exists( this ) ) return nullptr;
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_ModifierManager" );
-		return MemberNotPtr<CDOTA_ModifierManager>( offset );
-	}
-
-	int GetHBOffset( ) noexcept {
-		if ( !util::exists( this ) ) return -1;
-
-		return schema_member<int>( "client.dll/C_DOTA_BaseNPC/m_iHealthBarOffset" );
-	}
+	OFFSET( float, GetMaxMana, schema::C_DOTA_BaseNPC::m_flMaxMana );
+	OFFSET( float, GetMana, schema::C_DOTA_BaseNPC::m_flMana );
+	OFFSET( bool, IsMoving, schema::C_DOTA_BaseNPC::m_bIsMoving );
+	OFFSET( int, GetMoveSpeed, schema::C_DOTA_BaseNPC::m_iMoveSpeed );
+	OFFSET( uint64_t, GetUnitState, schema::C_DOTA_BaseNPC::m_nUnitState64 );
+	OFFSET( int32_t, GetUnitType, schema::C_DOTA_BaseNPC::m_iUnitType );
+	OFFSET_INLINE( CDOTA_ModifierManager, GetModifierManager, schema::C_DOTA_BaseNPC::m_ModifierManager );
+	OFFSET( int, GetHBOffset, schema::C_DOTA_BaseNPC::m_iHealthBarOffset );
 
 	float GetPhysicalArmor( ) {
 		if ( !util::exists( this ) ) return -1;
@@ -68,18 +29,16 @@ public:
 	EntityIndex_t GetAbility( const int idx )
 	{
 		if ( !util::exists( this ) ) return -1;
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_hAbilities" );
-		const auto& ability = Member<CHandle>( offset + ( 4 * idx ) );
+		const auto& ability = Member<CHandle>( schema::C_DOTA_BaseNPC::m_hAbilities + ( 4 * idx ) );
 		return ability.ToIndex( );
 	}
 
 	EntityIndex_t GetItemSlot( const int idx )
 	{
 		if ( !util::exists( this ) ) return -1;
-		if ( Member<bool>( schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_bHasInventory" ) ) ) {
-			static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC/m_Inventory" );
+		if ( Member<bool>( schema::C_DOTA_BaseNPC::m_bHasInventory ) ) {
 
-			const auto item = Member<CHandle>( offset + ( 4 * idx ) );
+			const auto& item = Member<CHandle>( schema::C_DOTA_BaseNPC::m_Inventory + ( 4 * idx ) );
 			if ( item.is_valid( ) ) return item.ToIndex( );
 		}
 		return -1;
@@ -95,14 +54,9 @@ public:
 
 	bool IsIllusion( ) {
 		if ( !util::exists( this ) ) return false;
-		static const auto offset = schema::dynamic_field_offset( "client.dll/C_DOTA_BaseNPC_Hero/m_hReplicatingOtherHeroModel" );
-		const auto state = Member<uintptr_t>( offset ) != 0xFFFFFFFF;
+		const auto state = Member<std::uintptr_t>( schema::C_DOTA_BaseNPC_Hero::m_hReplicatingOtherHeroModel ) != 0xFFFFFFFF;
 		return state;
 	}
 
-	int32_t GetHeroId( ) {
-		if ( !util::exists( this ) ) return -1;
-
-		return schema_member<int32_t>( "client.dll/C_DOTA_BaseNPC_Hero/m_iHeroID" );
-	}
+	OFFSET( int32_t, GetHeroId, schema::C_DOTA_BaseNPC_Hero::m_iHeroID )
 };

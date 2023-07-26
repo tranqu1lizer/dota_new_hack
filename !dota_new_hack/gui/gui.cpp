@@ -194,12 +194,6 @@ void CGui::Render( ) {
 	if ( !show ) return;
 
 	ImGui::Begin( "dota 2 super mega hacksx", &show, ImGuiWindowFlags_NoCollapse ); {
-		static char schema_buf[256];
-		ImGui::InputText( "##schemab", schema_buf, IM_ARRAYSIZE( schema_buf ) );
-		if ( ImGui::Button( "List class" ) ) {
-			schema::dump_class_offsets( schema_buf );
-		}
-
 		ImGui::SliderFloat4( "mat color", mat_rgba, 0.f, 1.f, "%.3f", ImGuiSliderFlags_Vertical );
 
 		if ( ImGui::CollapsingHeader( "Panorama" ) ) {

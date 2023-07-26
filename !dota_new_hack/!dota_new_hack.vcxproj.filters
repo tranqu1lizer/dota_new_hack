@@ -415,8 +415,6 @@
     <ClInclude Include="core\sdk_game\valve\CUtlTSHash.hpp">
       <Filter>core\sdk_game\valve</Filter>
     </ClInclude>
-    <ClInclude Include="core\util\city.hpp" />
-    <ClInclude Include="core\util\cityhash32.hxx" />
     <ClInclude Include="core\util\undocumented.hpp">
       <Filter>core\util</Filter>
     </ClInclude>
@@ -483,6 +481,8 @@
     <ClInclude Include="core\sdk_game\CEntity2NetworkClasses.h" />
     <ClInclude Include="core\sdk_game\INetworkClientService.h" />
     <ClInclude Include="core\definitions.h" />
+    <ClInclude Include="core\util\fnv1a.h" />
+    <ClInclude Include="core\schema.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -733,7 +733,6 @@
       <Filter>core\lib\protobuf\files</Filter>
     </ClCompile>
     <ClCompile Include="core\sdk_game\panorama\CPanelStyle.hpp" />
-    <ClCompile Include="core\util\city.cpp" />
     <ClCompile Include="core\util\mapbox.hxx" />
     <ClCompile Include="core\sdk_game\panorama\CUIInput.hpp" />
     <ClCompile Include="gui\panorama_gui.cc" />
@@ -748,6 +747,9 @@
     <ClCompile Include="core\features\camera_hack.cc" />
     <ClCompile Include="core\util\request.cc" />
     <ClCompile Include="core\features\overwolf.cc" />
+    <ClCompile Include="core\util\fnv1a.cc">
+      <Filter>core\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="core\sdk_game\CGameEntitySystem.hpp">

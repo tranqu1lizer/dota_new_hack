@@ -4,11 +4,7 @@ class CDOTA_CameraManager;
 
 class CDOTA_Camera {
 public:
-	CDOTA_CameraManager* GetCameraManager( ) {
-		if ( !this ) return nullptr;
-
-		return *reinterpret_cast<CDOTA_CameraManager**>( this + 0x20 );
-	}
+	OFFSET( CDOTA_CameraManager*, GetCameraManager, 0x20 );
 
 	void set_distance( float distance ) noexcept {
 		if ( !this ) return;

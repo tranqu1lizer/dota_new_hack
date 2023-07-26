@@ -30,6 +30,7 @@
 #include <spdlog/stopwatch.h>
 
 #include "core/definitions.h"
+#include "core/schema.h"
 
 #define CURL_STATICLIB
 #pragma comment(lib, "wldap32.lib" )

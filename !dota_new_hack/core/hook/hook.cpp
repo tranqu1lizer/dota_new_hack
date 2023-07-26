@@ -16,7 +16,7 @@ void EntityEventListener::OnEntityCreated( C_BaseEntity* rcx ) {
 	if ( const auto clientclass = rcx->GetClientClass( ); ( clientclass && clientclass->m_pNetworkName ) ) {
 		const auto class_name = std::string_view( clientclass->m_pNetworkName );
 		if ( class_name == "C_DOTAGamerulesProxy" ) { // class id 1438
-			g_pGameRules = rcx->schema_member<C_DOTAGamerules*>( "client.dll/C_DOTAGamerulesProxy/m_pGameRules" );
+			g_pGameRules = rcx->Member<C_DOTAGamerules*>( schema::C_DOTAGamerulesProxy::m_pGameRules );
 		}
 
 		if ( class_name.starts_with( "C_DOTA_Unit_Hero" ) || class_name.starts_with( "CDOTA_Unit_Hero" ) )
@@ -126,8 +126,8 @@ EGCResults hook::functions::SGCRetrieveMessage( ISteamGameCoordinator* thisptr, 
 		if ( body.ParsePartialFromArray( body_data, body_size ) ) {
 			//body.owner_soid( ).
 			if ( panorama_gui.auto_accept && body.objects_modified_size( ) == 5 ) {
-				const auto inversed_lobby_id = ~( CGCClient::get( ).lobby_manager( )->find_dota_lobby( )->lobby_id( ) );
-				const uint32_t account_id = reinterpret_cast<CDOTAPlayerInventory*>( CGCClient::get( ).so_listeners( )[ 1 ] )->m_soid.m_steamid;
+				const auto inversed_lobby_id = ~( CGCClient::get( ).GetLobbyManager( )->find_dota_lobby( )->lobby_id( ) );
+				const uint32_t account_id = reinterpret_cast<CDOTAPlayerInventory*>( CGCClient::get( ).GetListeners( )[ 1 ] )->m_soid.m_steamid;
 
 				CMsgReadyUp msg;
 				msg.set_ready_up_key( inversed_lobby_id ^ ( account_id | ( (uint64_t)account_id << 32 ) ) );
@@ -197,7 +197,7 @@ void* hook::functions::PostReceivedNetMessage( INetChannel* rcx, CNetworkSeriali
 			}
 		}
 
-		if ( g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS || g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_PRE_GAME ) {
+		if ( g_pGameRules->GetGameState( ) == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS || g_pGameRules->GetGameState( ) == DOTA_GAMERULES_STATE_PRE_GAME ) {
 
 			if ( panorama_gui.draw_networthdelta ) {
 				util::set_timer( []( ) {
@@ -251,7 +251,7 @@ long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UI
 	// OLD IMGUI MENU
 	pGui->Render( );
 
-	if ( IEngineClient::get( ).IsInGame( ) && g_pGameRules && ( g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS || g_pGameRules->game_state( ) == DOTA_GAMERULES_STATE_PRE_GAME ) ) {
+	if ( IEngineClient::get( ).IsInGame( ) && g_pGameRules && ( g_pGameRules->GetGameState( ) == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS || g_pGameRules->GetGameState( ) == DOTA_GAMERULES_STATE_PRE_GAME ) ) {
 
 		if ( panorama_gui.draw_health )
 			features::hero_bar.draw_health( panorama_gui.draw_mana_bar );
@@ -272,7 +272,7 @@ long hook::functions::Present( IDXGISwapChain* pSwapchain, UINT SyncInterval, UI
 			if ( CRenderGameSystem::GetInstance( )->GetVectorInScreenSpace( pos, scr ) ) {
 				std::uint16_t cc = 0;
 
-				for ( auto modifier : hero->modifier_manager( )->GetModifiers( ) ) {
+				for ( auto modifier : hero->GetModifierManager( )->GetModifiers( ) ) {
 					cc += 20;
 					ImGui::GetForegroundDrawList( )->AddText( ImVec2{ scr.x - 30, scr.y + cc }, 0xFFFFFFFF, modifier->GetBuffName( ) );
 				}
@@ -331,10 +331,6 @@ LRESULT __stdcall hook::functions::WndProc( const HWND hWnd, const unsigned int 
 			auto Result =
 				ReturnSpoofer::DoSpoofCall<DWORD>( MessageBoxA, &JMP_RBX_TEST,
 					NULL, "", "Spoofed call", NULL );
-
-			auto mod = (C_BaseModelEntity*)context.local_entity;
-
-			mod->SetColor( 0, 0, 0 );
 		}
 		if ( wParam == VK_F2 ) {
 			context.DotaHud->FindChildTraverse( "ErrorMessages" )->panel2d_as< CDOTA_Hud_ErrorMsg>( )->ShowErrorMessage( "toster" );

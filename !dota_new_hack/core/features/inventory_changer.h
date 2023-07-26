@@ -19,7 +19,7 @@ private:
 	bool SOCreatedForObj( CGCClientSharedObject* obj, ESOCacheEvent ev = eSOCacheEvent_Incremental ) {
 		auto& gcc = CGCClient::get( );
 		if ( !( &gcc ) ) return false;
-		const auto dota_inventory = reinterpret_cast<CDOTAPlayerInventory*>( gcc.so_listeners( )[1] );
+		const auto dota_inventory = reinterpret_cast<CDOTAPlayerInventory*>( gcc.GetListeners( )[1] );
 		if ( !( &dota_inventory ) ) return false;
 
 		const auto rs = dota_inventory->SOCreated( dota_inventory->m_soid, obj, ev );
@@ -29,7 +29,7 @@ private:
 	bool SOUpdatedForObj( CGCClientSharedObject* obj, ESOCacheEvent ev = eSOCacheEvent_Incremental ) {
 		auto& gcc = CGCClient::get( );
 		if ( !( &gcc ) ) return false;
-		const auto dota_inventory = reinterpret_cast<CDOTAPlayerInventory*>( gcc.so_listeners( )[1] );
+		const auto dota_inventory = reinterpret_cast<CDOTAPlayerInventory*>( gcc.GetListeners( )[1] );
 		if ( !( &dota_inventory ) ) return false;
 
 		const auto rs = dota_inventory->SOUpdated( dota_inventory->m_soid, obj, ev );

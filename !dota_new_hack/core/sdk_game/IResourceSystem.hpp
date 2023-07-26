@@ -41,8 +41,8 @@ class IResourceSystem : VClass {
 		return *reinterpret_cast<const char**>( *reinterpret_cast<uintptr_t*>( resource + 0x8 ) );
 	}
 
-	uint64 GetResourceType( std::uint64_t resource ) {
-		return CallVFunc<42, uint64>( resource );
+	std::uint64_t GetResourceType( std::uint64_t resource ) {
+		return CallVFunc<42, std::uint64_t>( resource );
 	}
 
 	const uint32_t GetNamedResourceCount( ) {

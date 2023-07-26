@@ -72,13 +72,3 @@ public:
 		return (T)util::vmt( (std::uintptr_t)this, Index );
 	}
 };
-
-class SchemaVClass : public VClass { //
-public:
-	template<class T>
-	auto& schema_member( const std::string& path ) noexcept
-	{
-		const auto offset = schema::dynamic_field_offset( path );
-		return *(T*)( (std::uintptr_t)this + offset );
-	}
-};

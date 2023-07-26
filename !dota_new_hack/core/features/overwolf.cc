@@ -7,8 +7,8 @@ std::size_t write_callback( void* contents, size_t size, size_t nmemb, void* use
 
 void COverWolf::process_lobby_members( ) {
 	auto& gc = CGCClient::get( );
-	if ( &gc && gc.lobby_manager( )->lobby_data ) {
-		auto& dotaLobby = gc.lobby_manager( )->lobby_data->m_dota_lobby->get_dynamic_lobby( )->so_dynamic_lobby;
+	if ( &gc && gc.GetLobbyManager( )->lobby_data ) {
+		auto& dotaLobby = gc.GetLobbyManager( )->lobby_data->m_dota_lobby->get_dynamic_lobby( )->so_dynamic_lobby;
 		CURL* curl = curl_easy_init( ); std::string url = "http://127.0.0.1:5000/?players=", read_buf; uint16_t pl_count = 0;
 		curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, write_callback );
 		curl_easy_setopt( curl, CURLOPT_WRITEDATA, &read_buf );

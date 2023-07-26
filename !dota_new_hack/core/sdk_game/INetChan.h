@@ -113,7 +113,7 @@ class CMsgProtoBufHeader;
 class IProtoBufSendHandler
 {
 public:
-	virtual bool BAsyncSend( int EDOTAGCMsg, const uint8_t* pubMsgBytes, uint32 cubSize ) = 0;
+	virtual bool BAsyncSend( int EDOTAGCMsg, const uint8_t* pubMsgBytes, uint32_t cubSize ) = 0;
 };
 
 class CProtoBufMsgBase : public VClass {

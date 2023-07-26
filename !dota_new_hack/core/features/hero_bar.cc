@@ -53,6 +53,6 @@ void CHeroBar::draw_mana( ) {
 		// Manabar
 		drawing::DrawRectFilled(
 			drawPos - ImVec2( 110, manabarSize.y ) / 2 + ImVec2( 1, 1 ),
-			ImVec2( manabarSize.x * ( hero->mana( ) / hero->max_mana( ) ) - 2, manabarSize.y - 2 ), ImVec4( 0, 0.5, 1, 1 ) );
+			ImVec2( manabarSize.x * ( hero->GetMana( ) / hero->GetMaxMana( ) ) - 2, manabarSize.y - 2 ), ImVec4( 0, 0.5, 1, 1 ) );
 	}
 }
